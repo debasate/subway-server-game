@@ -40,7 +40,7 @@ let coinsThisRun = 0;
 let playerUpgrades = JSON.parse(localStorage.getItem('subwayUpgrades') || '{}');
 const defaultUpgrades = {
     speed: false,
-    shield: false, 
+    shield: false,
     magnet: false,
     skin: false
 };
@@ -68,7 +68,7 @@ function updateShopDisplay() {
     Object.keys(shopItems).forEach(item => {
         const shopItem = document.querySelector(`.shop-item[data-item="${item}"]`);
         const buyBtn = shopItem.querySelector('.buy-btn');
-        
+
         if (playerUpgrades[item]) {
             shopItem.classList.add('owned');
             buyBtn.textContent = 'Eigendom';
@@ -132,12 +132,12 @@ function resetGame(mode = 'infinity') {
     coinsThisRun = 0;
     currentLevel = 1;
     levelProgress = 0;
-    
+
     // Reset shield system
     temporaryShield = false;
     shieldTimeLeft = 0;
     lastShieldScore = 0;
-    
+
     if (gameMode === 'infinity') {
         speed = playerUpgrades.speed ? 4.8 : 4; // Speed boost upgrade
         baseSpeed = speed;
@@ -146,7 +146,7 @@ function resetGame(mode = 'infinity') {
         baseSpeed = speed;
         levelTarget = levels[0].target;
     }
-    
+
     updateGameInfo();
     updateCoinDisplay();
 }
@@ -200,16 +200,16 @@ function drawPlayer() {
     ctx.fillStyle = '#000';
     ctx.fillRect(x + 8, y + 10, 4, 4);
     ctx.fillRect(x + 28, y + 10, 4, 4);
-    
+
     // Shield indicator als speler permanent shield heeft
     if (player.lives > 1) {
         ctx.strokeStyle = '#00BFFF';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(x + w/2, y + h/2, w/2 + 5, 0, Math.PI * 2);
+        ctx.arc(x + w / 2, y + h / 2, w / 2 + 5, 0, Math.PI * 2);
         ctx.stroke();
     }
-    
+
     // Tijdelijk schild indicator (1000 punten schild)
     if (temporaryShield && shieldTimeLeft > 0) {
         // Animatie effect - pulseren
@@ -217,14 +217,14 @@ function drawPlayer() {
         ctx.strokeStyle = `rgba(255, 215, 0, ${pulse})`;
         ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.arc(x + w/2, y + h/2, w/2 + 8, 0, Math.PI * 2);
+        ctx.arc(x + w / 2, y + h / 2, w / 2 + 8, 0, Math.PI * 2);
         ctx.stroke();
-        
+
         // Schild timer tekst
         ctx.fillStyle = '#FFD700';
         ctx.font = 'bold 12px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(`🛡️${Math.ceil(shieldTimeLeft)}s`, x + w/2, y - 10);
+        ctx.fillText(`🛡️${Math.ceil(shieldTimeLeft)}s`, x + w / 2, y - 10);
         ctx.textAlign = 'left';
     }
 }
@@ -321,39 +321,39 @@ function checkCollision() {
 function updateGameLogic() {
     // Langzamere score toename
     score += scoreMultiplier;
-    
+
     // Check voor 1000 punten schild
     const currentThousand = Math.floor(score / 1000);
     const lastThousand = Math.floor(lastShieldScore / 1000);
-    
+
     if (currentThousand > lastThousand) {
         // Nieuwe 1000 punten bereikt - activeer schild!
         temporaryShield = true;
         shieldTimeLeft = 10; // 10 seconden
         lastShieldScore = score;
-        
+
         // Visual feedback
         setTimeout(() => {
             alert(`🛡️ SCHILD GEACTIVEERD! 🛡️\n10 seconden bescherming!`);
         }, 100);
     }
-    
+
     // Update schild timer
     if (temporaryShield && shieldTimeLeft > 0) {
-        shieldTimeLeft -= 1/60; // Verminderen per frame (60fps)
+        shieldTimeLeft -= 1 / 60; // Verminderen per frame (60fps)
         if (shieldTimeLeft <= 0) {
             temporaryShield = false;
             shieldTimeLeft = 0;
         }
     }
-    
+
     // Coins verdienen (1 coin per 100 punten)
     const newCoins = Math.floor(score / 100) - Math.floor((score - scoreMultiplier) / 100);
     if (newCoins > 0) {
         const coinMultiplier = playerUpgrades.magnet ? 2 : 1;
         coinsThisRun += newCoins * coinMultiplier;
     }
-    
+
     if (gameMode === 'infinity') {
         // Infinity mode: gradually increase speed
         speed += 0.001;
@@ -382,17 +382,17 @@ function updateGameLogic() {
             }, 100);
             return;
         }
-        
+
         // Gradually increase speed within level
         const level = levels[currentLevel - 1];
-        const levelProgress = (score - (currentLevel > 1 ? levels[currentLevel - 2].target : 0)) / 
-                            (levelTarget - (currentLevel > 1 ? levels[currentLevel - 2].target : 0));
+        const levelProgress = (score - (currentLevel > 1 ? levels[currentLevel - 2].target : 0)) /
+            (levelTarget - (currentLevel > 1 ? levels[currentLevel - 2].target : 0));
         speed = baseSpeed + (level.maxSpeed - baseSpeed) * levelProgress;
     }
-    
+
     updateGameInfo();
     updateCoinDisplay();
-}function getSpawnRate() {
+} function getSpawnRate() {
     if (gameMode === 'infinity') {
         return 0.03;
     } else {
@@ -477,9 +477,9 @@ function gameLoop() {
             // Remove colliding obstacle
             obstacles = obstacles.filter(obs => {
                 return !(obs.x < player.x + player.w &&
-                        obs.x + obs.w > player.x &&
-                        obs.y < player.y + player.h &&
-                        obs.y + obs.h > player.y);
+                    obs.x + obs.w > player.x &&
+                    obs.y < player.y + player.h &&
+                    obs.y + obs.h > player.y);
             });
         } else if (player.lives > 1) {
             // Permanent shield absorbs hit
@@ -487,9 +487,9 @@ function gameLoop() {
             // Remove colliding obstacle
             obstacles = obstacles.filter(obs => {
                 return !(obs.x < player.x + player.w &&
-                        obs.x + obs.w > player.x &&
-                        obs.y < player.y + player.h &&
-                        obs.y + obs.h > player.y);
+                    obs.x + obs.w > player.x &&
+                    obs.y < player.y + player.h &&
+                    obs.y + obs.h > player.y);
             });
         } else {
             // Game over
