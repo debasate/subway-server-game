@@ -34,16 +34,16 @@ class AuthManager {
         if (elements.demoBtn) elements.demoBtn.addEventListener('click', () => this.handleDemoLogin());
         if (elements.logoutBtn) elements.logoutBtn.addEventListener('click', () => this.handleLogout());
 
-        // Tab switching
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            if (tab) tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
-        });
+        // Form switching
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        if (showRegister) showRegister.addEventListener('click', () => this.showRegisterForm());
+        if (showLogin) showLogin.addEventListener('click', () => this.showLoginForm());
 
         // Real-time validation - only if elements exist
         const regUsername = document.getElementById('register-username');
         const regPassword = document.getElementById('register-password');
-        const regPasswordConfirm = document.getElementById('register-password-confirm');
-        const termsAgree = document.getElementById('terms-agree');
+        const regPasswordConfirm = document.getElementById('register-confirm-password');
         const loginUsername = document.getElementById('login-username');
         const loginPassword = document.getElementById('login-password');
 
@@ -59,6 +59,22 @@ class AuthManager {
         if (loginPassword) loginPassword.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleLogin();
         });
+    }
+
+    showRegisterForm() {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        if (loginForm) loginForm.style.display = 'none';
+        if (registerForm) registerForm.style.display = 'block';
+        this.clearMessages();
+    }
+
+    showLoginForm() {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        if (loginForm) loginForm.style.display = 'block';
+        if (registerForm) registerForm.style.display = 'none';
+        this.clearMessages();
     }
 
     switchTab(tabName) {
@@ -77,37 +93,19 @@ class AuthManager {
     }
 
     validateUsername(username) {
-        const feedback = document.getElementById('username-feedback');
-        if (!feedback) return false; // Safety check
-
         if (username.length < 3) {
-            feedback.textContent = 'Gebruikersnaam moet minimaal 3 tekens lang zijn';
-            feedback.className = 'input-feedback error';
             return false;
         } else if (username.length > 20) {
-            feedback.textContent = 'Gebruikersnaam mag maximaal 20 tekens lang zijn';
-            feedback.className = 'input-feedback error';
             return false;
         } else if (this.users[username.toLowerCase()]) {
-            feedback.textContent = 'Deze gebruikersnaam is al in gebruik';
-            feedback.className = 'input-feedback error';
             return false;
         } else {
-            feedback.textContent = 'Gebruikersnaam beschikbaar';
-            feedback.className = 'input-feedback success';
             return true;
         }
     }
 
     validatePassword(password) {
-        const strengthBar = document.querySelector('.strength-fill');
-        const strengthText = document.querySelector('.strength-text');
-
-        // Safety checks
-        if (!strengthBar || !strengthText) return false;
-
         let strength = 0;
-        let feedback = '';
 
         if (password.length >= 6) strength += 1;
         if (password.match(/[a-z]/)) strength += 1;
@@ -115,58 +113,35 @@ class AuthManager {
         if (password.match(/[0-9]/)) strength += 1;
         if (password.match(/[^a-zA-Z0-9]/)) strength += 1;
 
-        strengthBar.style.width = `${(strength / 5) * 100}%`;
-
-        if (password.length === 0) {
-            feedback = 'Voer een wachtwoord in';
-            strengthBar.className = 'strength-fill';
-        } else if (strength <= 2) {
-            feedback = 'Zwak wachtwoord';
-            strengthBar.className = 'strength-fill weak';
-        } else if (strength <= 3) {
-            feedback = 'Gemiddeld wachtwoord';
-            strengthBar.className = 'strength-fill medium';
-        } else {
-            feedback = 'Sterk wachtwoord';
-            strengthBar.className = 'strength-fill strong';
-        }
-
-        strengthText.textContent = feedback;
         return strength >= 2;
     }
 
     validatePasswordMatch() {
         const password = document.getElementById('register-password').value;
-        const confirmPassword = document.getElementById('register-password-confirm').value;
-        const feedback = document.getElementById('password-feedback');
-
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+        
         if (confirmPassword.length === 0) {
-            feedback.textContent = '';
             return false;
         } else if (password !== confirmPassword) {
-            feedback.textContent = 'Wachtwoorden komen niet overeen';
-            feedback.className = 'input-feedback error';
             return false;
         } else {
-            feedback.textContent = 'Wachtwoorden komen overeen';
-            feedback.className = 'input-feedback success';
             return true;
         }
     }
 
     toggleRegisterButton() {
-        const username = document.getElementById('register-username').value;
-        const password = document.getElementById('register-password').value;
-        const confirmPassword = document.getElementById('register-password-confirm').value;
-        const termsAgreed = document.getElementById('terms-agree').checked;
+        const username = document.getElementById('register-username')?.value || '';
+        const password = document.getElementById('register-password')?.value || '';
+        const confirmPassword = document.getElementById('register-confirm-password')?.value || '';
         const registerBtn = document.getElementById('register-btn');
 
         const isValid = this.validateUsername(username) &&
             this.validatePassword(password) &&
-            this.validatePasswordMatch() &&
-            termsAgreed;
+            this.validatePasswordMatch();
 
-        registerBtn.disabled = !isValid;
+        if (registerBtn) {
+            registerBtn.disabled = !isValid;
+        }
     }
 
     async handleLogin() {
@@ -204,13 +179,26 @@ class AuthManager {
 
     async handleRegister() {
         const username = document.getElementById('register-username').value.trim();
-        const email = document.getElementById('register-email').value.trim();
         const password = document.getElementById('register-password').value;
-        const confirmPassword = document.getElementById('register-password-confirm').value;
-        const termsAgreed = document.getElementById('terms-agree').checked;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
 
-        if (!this.validateUsername(username) || !this.validatePassword(password) || !this.validatePasswordMatch() || !termsAgreed) {
+        if (!username || !password || !confirmPassword) {
+            this.showError('Vul alle velden in');
+            return;
+        }
+
+        if (!this.validateUsername(username) || !this.validatePassword(password)) {
             this.showError('Controleer je invoer en probeer opnieuw');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            this.showError('Wachtwoorden komen niet overeen');
+            return;
+        }
+
+        if (this.users[username.toLowerCase()]) {
+            this.showError('Gebruikersnaam bestaat al');
             return;
         }
 
@@ -221,7 +209,6 @@ class AuthManager {
 
         const newUser = {
             displayName: username,
-            email: email || null,
             password: password,
             createdAt: new Date().toISOString(),
             stats: {
@@ -433,29 +420,44 @@ class AuthManager {
     }
 
     showLoading(show) {
-        document.getElementById('auth-loading').style.display = show ? 'block' : 'none';
-        document.querySelectorAll('.auth-form').forEach(form => {
-            form.style.display = show ? 'none' : (form.classList.contains('active') ? 'block' : 'none');
+        const statusEl = document.getElementById('auth-status');
+        if (statusEl && show) {
+            statusEl.innerHTML = `<div class="auth-message">⏳ Laden...</div>`;
+        } else if (statusEl && !show) {
+            // Only clear if it shows loading message
+            if (statusEl.innerHTML.includes('Laden...')) {
+                statusEl.innerHTML = '';
+            }
+        }
+        
+        // Disable form buttons during loading
+        const buttons = document.querySelectorAll('.auth-btn');
+        buttons.forEach(btn => {
+            if (btn) btn.disabled = show;
         });
     }
 
     showError(message) {
-        const errorEl = document.getElementById('auth-error');
-        errorEl.querySelector('.message-text').textContent = message;
-        errorEl.style.display = 'flex';
-        setTimeout(() => errorEl.style.display = 'none', 5000);
+        const statusEl = document.getElementById('auth-status');
+        if (statusEl) {
+            statusEl.innerHTML = `<div class="auth-message error">${message}</div>`;
+            setTimeout(() => statusEl.innerHTML = '', 5000);
+        }
     }
 
     showSuccess(message) {
-        const successEl = document.getElementById('auth-success');
-        successEl.querySelector('.message-text').textContent = message;
-        successEl.style.display = 'flex';
-        setTimeout(() => successEl.style.display = 'none', 3000);
+        const statusEl = document.getElementById('auth-status');
+        if (statusEl) {
+            statusEl.innerHTML = `<div class="auth-message success">${message}</div>`;
+            setTimeout(() => statusEl.innerHTML = '', 3000);
+        }
     }
 
     clearMessages() {
-        document.getElementById('auth-error').style.display = 'none';
-        document.getElementById('auth-success').style.display = 'none';
+        const statusEl = document.getElementById('auth-status');
+        if (statusEl) {
+            statusEl.innerHTML = '';
+        }
     }
 
     initMobileTouchHandlers() {
