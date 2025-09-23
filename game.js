@@ -1380,7 +1380,7 @@ const AUTO_SAVE_INTERVAL = 5000; // Save every 5 seconds
 function updateCoinDisplay() {
     const coinDisplayElement = document.getElementById('coin-display');
     const coinsCountElement = document.getElementById('coins-count');
-    
+
     if (coinDisplayElement) coinDisplayElement.textContent = coins;
     if (coinsCountElement) coinsCountElement.textContent = coinsThisRun;
 
@@ -2803,10 +2803,23 @@ function hideMobileControls() {
 }
 
 function startGame(mode = 'infinity') {
+    console.log(`🚀 Starting game in ${mode} mode...`);
+    
     resetGame(mode);
-    startScreen.style.display = 'none';
-    canvas.style.display = 'block';
-    gameInfo.style.display = 'block';
+    
+    const startScreen = document.getElementById('start-screen');
+    const canvas = document.getElementById('game-canvas');
+    const gameInfo = document.getElementById('game-info');
+    
+    console.log('🔍 Elements found:', {
+        startScreen: !!startScreen,
+        canvas: !!canvas,
+        gameInfo: !!gameInfo
+    });
+    
+    if (startScreen) startScreen.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
+    if (gameInfo) gameInfo.style.display = 'block';
 
     // Center the game canvas
     document.body.style.display = 'block';
@@ -2859,7 +2872,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize as guest user
     coins = parseInt(localStorage.getItem('subwayCoins') || '0');
     playerUpgrades = JSON.parse(localStorage.getItem('subwayUpgrades') || '{}');
-    
+
     // Show start screen directly
     const startScreen = document.getElementById('start-screen');
     if (startScreen) {
@@ -2871,9 +2884,44 @@ document.addEventListener('DOMContentLoaded', () => {
     const levelBtn = document.getElementById('level-btn');
     const multiplayerBtn = document.getElementById('multiplayer-btn');
     
-    if (infinityBtn) infinityBtn.onclick = () => startGame('infinity');
-    if (levelBtn) levelBtn.onclick = () => startGame('level');
-    if (multiplayerBtn) multiplayerBtn.onclick = () => startGame('multiplayer');    // Set initial canvas background
+    console.log('🔍 Button debug:', {
+        infinityBtn: !!infinityBtn,
+        levelBtn: !!levelBtn,
+        multiplayerBtn: !!multiplayerBtn,
+        startScreen: !!startScreen
+    });
+    
+    if (infinityBtn) {
+        infinityBtn.onclick = () => {
+            console.log('🎮 Infinity button clicked!');
+            startGame('infinity');
+        };
+        console.log('✅ Infinity button listener attached');
+    } else {
+        console.error('❌ Infinity button not found!');
+    }
+    
+    if (levelBtn) {
+        levelBtn.onclick = () => {
+            console.log('🎯 Level button clicked!');
+            startGame('level');
+        };
+        console.log('✅ Level button listener attached');
+    } else {
+        console.error('❌ Level button not found!');
+    }
+    
+    if (multiplayerBtn) {
+        multiplayerBtn.onclick = () => {
+            console.log('🤖 Multiplayer button clicked!');
+            startGame('multiplayer');
+        };
+        console.log('✅ Multiplayer button listener attached');
+    } else {
+        console.error('❌ Multiplayer button not found!');
+    }
+
+    // Set initial canvas background
     if (canvas && ctx) {
         ctx.fillStyle = '#2C3E50';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
