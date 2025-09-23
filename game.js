@@ -1821,23 +1821,9 @@ function adjustCanvasForGameMode() {
     canvas.width = 480;  // Fixed game resolution
     canvas.height = 640;
 
-    // Get viewport dimensions
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    // Set canvas to fill viewport while maintaining aspect ratio
-    const gameAspectRatio = 480 / 640; // Original game ratio
-    const viewportAspectRatio = viewportWidth / viewportHeight;
-
-    if (viewportAspectRatio > gameAspectRatio) {
-        // Viewport is wider - fit to height
-        canvas.style.width = (viewportHeight * gameAspectRatio) + 'px';
-        canvas.style.height = viewportHeight + 'px';
-    } else {
-        // Viewport is taller - fit to width
-        canvas.style.width = viewportWidth + 'px';
-        canvas.style.height = (viewportWidth / gameAspectRatio) + 'px';
-    }
+    // Set fixed display size (no viewport scaling)
+    canvas.style.width = '480px';
+    canvas.style.height = '640px';
 
     // Center the canvas
     canvas.style.position = 'absolute';
@@ -1845,14 +1831,16 @@ function adjustCanvasForGameMode() {
     canvas.style.left = '50%';
     canvas.style.transform = 'translate(-50%, -50%)';
 
-    console.log(`🖥️ Canvas adjusted for game mode: ${canvas.width}x${canvas.height} (internal) | ${canvas.style.width} x ${canvas.style.height} (display)`);
+    console.log(`🖥️ Canvas set to fixed size: ${canvas.width}x${canvas.height} (internal) | ${canvas.style.width} x ${canvas.style.height} (display)`);
 }
 
-// Add window resize handler for canvas adjustment
+// Resize handler disabled - using fixed canvas size
+/*
 window.addEventListener('resize', () => {
     if (document.body.classList.contains('game-mode')) {
         adjustCanvasForGameMode();
     }
 });
+*/
 
 console.log('✅ Improved game engine loaded successfully');
