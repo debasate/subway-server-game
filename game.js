@@ -1,3 +1,22 @@
+// ================================
+// EMERGENCY BUTTON FIX - IMMEDIATE
+// ================================
+
+// IMMEDIATE GLOBAL FUNCTION
+console.log('🚨 LOADING BUTTON FIX...');
+
+function startGame(mode) {
+    alert(`BUTTON WORKS! Starting ${mode}`);
+    console.log(`🎯 EMERGENCY START: ${mode}`);
+    return true;
+}
+
+// FORCE TO WINDOW
+window.startGame = startGame;
+console.log('✅ BUTTON FIX LOADED!', typeof window.startGame);
+
+// ================================
+
 // User Authentication System
 class AuthManager {
     constructor() {
@@ -2843,12 +2862,13 @@ function hideMobileControls() {
 }
 
 // ================================
-// CLEAN BUTTON SYSTEM - WORKING
+// ULTRA SIMPLE BUTTON FIX - DIRECT
 // ================================
 
-// GLOBAL startGame function - CLEAN VERSION
-window.startGame = function (mode = 'infinity') {
-    console.log(`🚀 Starting game in ${mode} mode...`);
+// FORCE GLOBAL FUNCTION IMMEDIATELY
+function startGame(mode = 'infinity') {
+    alert(`Starting ${mode} mode!`);
+    console.log(`🚀 DIRECT: Starting game in ${mode} mode...`);
 
     try {
         // FORCE STOP ANY RUNNING GAME
@@ -2865,7 +2885,10 @@ window.startGame = function (mode = 'infinity') {
         alert(`Game Error: ${error.message}`);
         return false;
     }
-};
+}
+
+// MAKE IT GLOBAL IMMEDIATELY
+window.startGame = startGame;
 
 // INTERNAL GAME STARTER
 function startGameInternal(mode = 'infinity') {

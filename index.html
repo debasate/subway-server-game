@@ -117,7 +117,7 @@
                     <div class="mode-stats">
                         <span>⭐ Best: <span id="infinity-best">0</span></span>
                     </div>
-                    <button id="infinity-btn" class="mode-btn" onclick="window.startGame('infinity')">Spelen</button>
+                    <button id="infinity-btn" class="mode-btn" onclick="startGame('infinity'); window.startGame && window.startGame('infinity')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="level">
@@ -128,7 +128,7 @@
                         <span>📊 Level: <span id="current-level">1</span></span>
                         <span>⭐ Best: <span id="level-best">0</span></span>
                     </div>
-                    <button id="level-btn" class="mode-btn" onclick="window.startGame('level')">Spelen</button>
+                    <button id="level-btn" class="mode-btn" onclick="startGame('level'); window.startGame && window.startGame('level')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="multiplayer">
@@ -139,7 +139,7 @@
                         <span>🏆 Wins: <span id="multiplayer-wins">0</span></span>
                     </div>
                     <button id="multiplayer-btn" class="mode-btn"
-                        onclick="window.startGame('multiplayer')">Spelen</button>
+                        onclick="startGame('multiplayer'); window.startGame && window.startGame('multiplayer')">Spelen</button>
                 </div>
             </div>
         </div>
