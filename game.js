@@ -351,7 +351,7 @@ class Bot {
         ctx.fillRect(this.x + 3, this.y + 3, this.w - 6, this.h - 6);
 
         // Outline
-        ctx.strokeStyle = '#333';
+        ctx.strokeStyle = '#999';
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x + 3, this.y + 3, this.w - 6, this.h - 6);
 
@@ -388,8 +388,8 @@ function initializeBots() {
 // ================================
 
 function drawBackground() {
-    // Clear canvas
-    ctx.fillStyle = '#2C3E50';
+    // Clear canvas - light background
+    ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw lanes
@@ -397,7 +397,7 @@ function drawBackground() {
         const laneCenter = lanes[i] + 20;
 
         // Lane lines
-        ctx.strokeStyle = '#34495E';
+        ctx.strokeStyle = '#bbb';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(laneCenter - 15, 0);
@@ -414,18 +414,13 @@ function drawBackground() {
         }
     }
 
-    // Tunnel walls
-    ctx.fillStyle = '#1A252F';
-    ctx.fillRect(0, 0, 100, canvas.height);
-    ctx.fillRect(380, 0, 100, canvas.height);
+    // Note: Tunnel walls removed for cleaner gameplay
 }
 
 function drawPlayer() {
     const { x, y, w, h } = player;
 
-    // Shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-    ctx.fillRect(x + 3, y + 3, w, h);
+    // Shadow - removed for cleaner display
 
     // Player body with gradient
     const gradient = ctx.createLinearGradient(x, y, x, y + h);
@@ -447,7 +442,7 @@ function drawPlayer() {
     ctx.strokeRect(x, y, w, h);
 
     // Eyes
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = '#fff';
     ctx.fillRect(x + 8, y + 10, 4, 4);
     ctx.fillRect(x + 28, y + 10, 4, 4);
 }
@@ -456,9 +451,7 @@ function drawObstacles() {
     obstacles.forEach(obs => {
         const { x, y, w, h } = obs;
 
-        // Shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-        ctx.fillRect(x + 2, y + 2, w, h);
+        // Shadow - removed for cleaner display
 
         // Obstacle body with gradient
         const gradient = ctx.createLinearGradient(x, y, x, y + h);
@@ -493,24 +486,39 @@ function drawUI() {
     ctx.font = 'bold 20px Arial';
     ctx.fillText(`Score: ${Math.floor(score)}`, 10, 30);
 
-    // Best Score
-    const bestScore = parseInt(localStorage.getItem('bestScore') || '0');
+    // Mode-specific Best Score
+    const modeBest = getModeSpecificBest();
     ctx.font = '16px Arial';
     ctx.fillStyle = '#FFD700';
-    ctx.fillText(`🏆 Best: ${bestScore}`, 10, 55);
 
-    // Coins
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText(`💰 ${coinsThisRun}`, 10, 80);
+    // Display appropriate label and value based on game mode
+    if (gameMode === 'speedrun' || gameMode === 'coinrush') {
+        if (modeBest > 0) {
+            ctx.fillText(`🏆 Best Time: ${modeBest.toFixed(2)}s`, 10, 55);
+        } else {
+            ctx.fillText(`🏆 Best Time: --`, 10, 55);
+        }
+    } else if (gameMode === 'survival') {
+        if (modeBest > 0) {
+            ctx.fillText(`🏆 Best Survival: ${modeBest.toFixed(2)}s`, 10, 55);
+        } else {
+            ctx.fillText(`🏆 Best Survival: --`, 10, 55);
+        }
+    } else {
+        // Score-based modes
+        ctx.fillText(`� BEST SCORE: ${Math.floor(modeBest)}`, 10, 55);
+    }
+
+    // Reset shadow
+    ctx.shadowBlur = 0;
 
     // Mode specific info
     drawModeSpecificUI();
 
-    // Mode info (bottom)
+    // Mode info (bottom) - TEST
     ctx.font = '14px Arial';
-    ctx.fillStyle = '#ccc';
-    ctx.fillText(`Mode: ${gameMode}`, 10, canvas.height - 40);
+    ctx.fillStyle = '#333';
+    ctx.fillText(`Mode: ${gameMode} | Score: ${Math.floor(score)}`, 10, canvas.height - 40);
 
     if (gameMode === 'level') {
         ctx.fillText(`Level: ${currentLevel}`, 10, canvas.height - 20);
@@ -529,34 +537,34 @@ function drawModeSpecificUI() {
     switch (gameMode) {
         case 'chaos':
             if (currentChaosEffect) {
-                ctx.fillText(`🌪️ Effect: ${currentChaosEffect}`, 10, 105);
+                ctx.fillText(`🌪️ Effect: ${currentChaosEffect}`, 10, 85);
             }
             const nextChaos = Math.ceil((300 - chaosTimer) / 60);
-            ctx.fillText(`Next chaos in: ${nextChaos}s`, 10, 125);
+            ctx.fillText(`Next chaos in: ${nextChaos}s`, 10, 105);
             break;
 
         case 'speedrun':
             const speedrunTime = ((Date.now() - speedrunStartTime) / 1000).toFixed(1);
-            ctx.fillText(`⚡ Time: ${speedrunTime}s`, 10, 105);
-            ctx.fillText(`🎯 Target: 1000 points`, 10, 125);
+            ctx.fillText(`⚡ Time: ${speedrunTime}s`, 10, 85);
+            ctx.fillText(`🎯 Target: 1000 points`, 10, 105);
             break;
 
         case 'survival':
             const survivalTime = ((Date.now() - survivalStartTime) / 1000).toFixed(1);
-            ctx.fillText(`🛡️ Survived: ${survivalTime}s`, 10, 105);
-            ctx.fillText(`❤️ Lives: ${player.lives}`, 10, 125);
+            ctx.fillText(`🛡️ Survived: ${survivalTime}s`, 10, 85);
+            ctx.fillText(`❤️ Lives: ${player.lives}`, 10, 105);
             break;
 
         case 'coinrush':
             const coinrushTime = ((Date.now() - coinrushStartTime) / 1000).toFixed(1);
-            ctx.fillText(`💰 Time: ${coinrushTime}s`, 10, 105);
-            ctx.fillText(`🎯 Target: 100 coins (${coinsThisRun}/100)`, 10, 125);
+            ctx.fillText(`💰 Time: ${coinrushTime}s`, 10, 85);
+            ctx.fillText(`🎯 Target: 100 coins (${coinsThisRun}/100)`, 10, 105);
             break;
 
         case 'nightmare':
             ctx.fillStyle = '#FF6B6B';
-            ctx.fillText(`😈 NIGHTMARE MODE`, 10, 105);
-            ctx.fillText(`💀 Lives: ${player.lives}`, 10, 125);
+            ctx.fillText(`😈 NIGHTMARE MODE`, 10, 85);
+            ctx.fillText(`💀 Lives: ${player.lives}`, 10, 105);
             break;
     }
 }
@@ -569,8 +577,8 @@ function drawMultiplayerUI() {
     ];
     playerRanking = allPlayers.sort((a, b) => b.score - a.score);
 
-    // Draw ranking panel
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    // Draw ranking panel - lighter background
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.fillRect(canvas.width - 180, 10, 170, 200);
 
     ctx.fillStyle = '#fff';
@@ -635,29 +643,29 @@ function updateGameLogic() {
     // Update score
     score += scoreMultiplier;
 
-    // Update coins - verbeterde logica
-    const newCoins = Math.floor(score / 100) - Math.floor((score - scoreMultiplier) / 100);
-    if (newCoins > 0) {
-        coinsThisRun += newCoins;
-        coins += newCoins;
+    // Update crystals - space theme
+    const newCrystals = Math.floor(score / 80) - Math.floor((score - scoreMultiplier) / 80);
+    if (newCrystals > 0) {
+        crystalsThisRun += newCrystals;
+        crystals += newCrystals;
 
-        console.log(`💰 Earned ${newCoins} coins! Total: ${coins}`);
+        console.log(`� Earned ${newCrystals} crystals! Total: ${crystals}`);
 
-        // Immediate save voor coins om lag te voorkomen
+        // Immediate save voor crystals
         try {
-            localStorage.setItem('subwayCoins', coins.toString());
+            localStorage.setItem('spaceCrystals', crystals.toString());
             localStorage.setItem('bestScore', Math.max(parseInt(localStorage.getItem('bestScore') || '0'), Math.floor(score)).toString());
-            console.log(`💾 Coins saved: ${coins}`);
+            console.log(`💾 Crystals saved: ${crystals}`);
         } catch (error) {
-            console.error('❌ Failed to save coins:', error);
+            console.error('❌ Failed to save crystals:', error);
         }
 
         // Update display
-        updateCoinDisplay();
+        updateCrystalDisplay();
 
-        // Visual feedback
-        createParticle(player.x + player.w / 2, player.y, 'coin', '#FFD700', 2);
-        playSound('coin');
+        // Visual feedback - neon particle effect
+        createStarParticle(player.x + player.w / 2, player.y, 'crystal', '#ff00ff', 3);
+        playSound('crystal');
     }
 
     // Update speed (progressive difficulty)
@@ -699,18 +707,24 @@ function updateGameLogic() {
 function endGame() {
     gameRunning = false;
 
-    // FORCE SAVE alle progress onmiddellijk
+    // Debug info voor score opslaan
+    console.log(`🎯 Final Score: ${Math.floor(score)}`);
+    console.log(`🏆 Current Best Score: ${localStorage.getItem('bestScore')}`);
     console.log(`💰 Final coins earned this run: ${coinsThisRun}`);
     console.log(`🏦 Total coins before save: ${coins}`);
 
     // EXTRA BACKUP SAVE - Direct localStorage save
     try {
         localStorage.setItem('subwayCoins', coins.toString());
-        localStorage.setItem('bestScore', Math.max(parseInt(localStorage.getItem('bestScore') || '0'), Math.floor(score)).toString());
-        console.log(`🔒 Backup save completed: ${coins} coins`);
+        const newBestScore = Math.max(parseInt(localStorage.getItem('bestScore') || '0'), Math.floor(score));
+        localStorage.setItem('bestScore', newBestScore.toString());
+        console.log(`🔒 Backup save completed: ${coins} coins, best score: ${newBestScore}`);
     } catch (error) {
         console.error('❌ Backup save failed:', error);
     }
+
+    // Save mode-specific best score
+    const modeBest = saveModeSpecificBest();
 
     const saveSuccess = saveGameProgress();
 
@@ -764,7 +778,48 @@ function updateCoinDisplay() {
         });
     }
 
+    // Update mode-specific best scores in menu
+    updateModeSpecificDisplays();
+
     console.log(`💰 UI updated - Current coins: ${coins}`);
+}
+
+/**
+ * Update mode-specific best score displays in the main menu
+ */
+function updateModeSpecificDisplays() {
+    try {
+        // Update each game mode's best score display
+        const modes = ['chaos', 'speedrun', 'survival', 'coinrush', 'nightmare'];
+
+        modes.forEach(mode => {
+            const bestValue = getModeSpecificBest(mode);
+            const element = document.getElementById(`${mode}-best`);
+
+            if (element) {
+                if (mode === 'speedrun' || mode === 'coinrush') {
+                    // Time-based modes
+                    element.textContent = bestValue > 0 ? `${bestValue.toFixed(2)}s` : '∞';
+                } else if (mode === 'survival') {
+                    // Survival time
+                    element.textContent = bestValue > 0 ? `${bestValue.toFixed(2)}s` : '0s';
+                } else {
+                    // Score-based modes
+                    element.textContent = Math.floor(bestValue) || '0';
+                }
+            }
+        });
+
+        // Update general best score
+        const generalBest = parseInt(localStorage.getItem('bestScore') || '0');
+        const generalBestElement = document.getElementById('best-score');
+        if (generalBestElement) {
+            generalBestElement.textContent = generalBest;
+        }
+
+    } catch (error) {
+        console.error('❌ Failed to update mode-specific displays:', error);
+    }
 }
 
 // ================================
@@ -828,14 +883,20 @@ function updateParticles() {
  */
 function saveGameProgress() {
     try {
+        // Debug info
+        console.log(`💾 Saving progress: Score=${Math.floor(score)}, Coins=${coins}, CoinsThisRun=${coinsThisRun}`);
+
         // Save coins
         localStorage.setItem('subwayCoins', coins.toString());
 
         // Save stats
+        const currentBestScore = parseInt(localStorage.getItem('bestScore') || '0');
+        const newBestScore = Math.max(currentBestScore, Math.floor(score));
+
         const stats = {
             totalCoins: coins,
             totalGamesPlayed: (parseInt(localStorage.getItem('totalGamesPlayed') || '0')) + 1,
-            bestScore: Math.max(parseInt(localStorage.getItem('bestScore') || '0'), Math.floor(score)),
+            bestScore: newBestScore,
             lastScore: Math.floor(score),
             lastCoinsEarned: coinsThisRun,
             lastPlayTime: Date.now()
@@ -846,6 +907,7 @@ function saveGameProgress() {
         localStorage.setItem('totalGamesPlayed', stats.totalGamesPlayed.toString());
 
         console.log('💾 Game progress saved:', stats);
+        console.log(`🏆 Best score updated: ${currentBestScore} → ${newBestScore}`);
         return true;
     } catch (error) {
         console.error('❌ Failed to save progress:', error);
@@ -866,6 +928,71 @@ function loadGameProgress() {
         console.error('❌ Failed to load progress:', error);
         coins = 0;
         return false;
+    }
+}
+
+/**
+ * Save best score for specific game mode
+ */
+function saveModeSpecificBest() {
+    try {
+        const modeKey = `best_${gameMode}`;
+        const currentModeBest = parseInt(localStorage.getItem(modeKey) || '0');
+        let newBest = currentModeBest;
+
+        // For time-based modes, save time; for score-based modes, save score
+        if (gameMode === 'speedrun') {
+            const currentTime = (Date.now() - speedrunStartTime) / 1000;
+            if (score >= 1000) { // Only save if target reached
+                if (currentModeBest === 0 || currentTime < currentModeBest) {
+                    newBest = currentTime;
+                    localStorage.setItem(modeKey, newBest.toString());
+                    console.log(`🏆 New ${gameMode} best: ${newBest.toFixed(2)}s`);
+                }
+            }
+        } else if (gameMode === 'coinrush') {
+            const currentTime = (Date.now() - coinrushStartTime) / 1000;
+            if (coinsThisRun >= 100) { // Only save if target reached
+                if (currentModeBest === 0 || currentTime < currentModeBest) {
+                    newBest = currentTime;
+                    localStorage.setItem(modeKey, newBest.toString());
+                    console.log(`🏆 New ${gameMode} best: ${newBest.toFixed(2)}s`);
+                }
+            }
+        } else if (gameMode === 'survival') {
+            const currentTime = (Date.now() - survivalStartTime) / 1000;
+            if (currentTime > currentModeBest) {
+                newBest = currentTime;
+                localStorage.setItem(modeKey, newBest.toString());
+                console.log(`🏆 New ${gameMode} best: ${newBest.toFixed(2)}s`);
+            }
+        } else {
+            // Score-based modes (chaos, nightmare, infinity, level, multiplayer)
+            const currentScore = Math.floor(score);
+            if (currentScore > currentModeBest) {
+                newBest = currentScore;
+                localStorage.setItem(modeKey, newBest.toString());
+                console.log(`🏆 New ${gameMode} best: ${newBest} points`);
+            }
+        }
+
+        return newBest;
+    } catch (error) {
+        console.error('❌ Failed to save mode-specific best:', error);
+        return 0;
+    }
+}
+
+/**
+ * Get best score for specific game mode
+ */
+function getModeSpecificBest(mode = gameMode) {
+    try {
+        const modeKey = `best_${mode}`;
+        return parseFloat(localStorage.getItem(modeKey) || '0');
+    } catch (error) {
+        console.error('❌ Failed to get mode-specific best:', error);
+        return 0;
     }
 }
 
@@ -1044,6 +1171,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load saved progress FIRST
     loadGameProgress();
+
+    // Update all displays with loaded data
+    updateCoinDisplay();
 
     // Initialize mobile controls
     if (isMobile) {
@@ -1687,6 +1817,10 @@ function updateGameModeLogic() {
 function adjustCanvasForGameMode() {
     if (!canvas) return;
 
+    // Set internal canvas resolution first
+    canvas.width = 480;  // Fixed game resolution
+    canvas.height = 640;
+
     // Get viewport dimensions
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -1711,7 +1845,7 @@ function adjustCanvasForGameMode() {
     canvas.style.left = '50%';
     canvas.style.transform = 'translate(-50%, -50%)';
 
-    console.log(`🖥️ Canvas adjusted for game mode: ${canvas.style.width} x ${canvas.style.height}`);
+    console.log(`🖥️ Canvas adjusted for game mode: ${canvas.width}x${canvas.height} (internal) | ${canvas.style.width} x ${canvas.style.height} (display)`);
 }
 
 // Add window resize handler for canvas adjustment

@@ -2148,11 +2148,6 @@ body::before {
     backdrop-filter: blur(10px);
 }
 
-#coins-ingame {
-    font-weight: bold;
-    color: #ffeb3b;
-}
-
 canvas {
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -2192,11 +2187,6 @@ canvas {
     color: white;
     font-weight: bold;
     font-size: 16px;
-}
-
-#coins-ingame {
-    color: #FFD700;
-    font-size: 18px;
 }
 
 /* Mobile Controls */
