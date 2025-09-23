@@ -538,6 +538,41 @@ body {
     transform: translateY(-1px);
 }
 
+.demo-info {
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #4CAF50;
+    backdrop-filter: blur(10px);
+}
+
+.demo-info h4 {
+    margin: 0 0 8px 0;
+    color: #4CAF50;
+    font-size: 14px;
+}
+
+.demo-info p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
+}
+
+.demo-info strong {
+    color: #4CAF50;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    background: rgba(76, 175, 80, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.demo-info small {
+    opacity: 0.7;
+}
+
 .btn-icon {
     font-size: 1.1rem;
 }

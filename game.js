@@ -13,6 +13,7 @@ class AuthManager {
             this.initAuthListeners();
             this.initMobileTouchHandlers();
             this.optimizeForMobile();
+            this.startDemoCodeUpdater();
         }
     }
 
@@ -239,6 +240,15 @@ class AuthManager {
     }
 
     async handleDemoLogin() {
+        // Check demo code first
+        const enteredCode = prompt('🔐 Voer de demo code in (regenereert elke 10 minuten):');
+        const currentValidCode = this.generateDemoCode();
+        
+        if (enteredCode !== currentValidCode) {
+            this.showError(`❌ Onjuiste demo code! Huidige code: ${currentValidCode}`);
+            return;
+        }
+
         console.log('🎮 Demo login started...');
         this.showLoading(true);
         await this.delay(500);
@@ -277,9 +287,53 @@ class AuthManager {
         this.currentUser = { ...demoUser, username: 'demo' };
         this.isLoggedIn = true;
 
-        this.showSuccess('🎮 Demo account geladen! Alle features ontgrendeld!');
+        this.showSuccess(`🎮 Demo account geladen! Code geldig tot: ${this.getNextCodeTime()}`);
         setTimeout(() => this.showMainGame(), 1500);
         this.showLoading(false);
+    }
+
+    generateDemoCode() {
+        // Generate code based on current time (updates every 10 minutes)
+        const now = new Date();
+        const tenMinuteSlot = Math.floor(now.getTime() / (10 * 60 * 1000));
+        
+        // Simple hash function for consistent code generation
+        const codeBase = tenMinuteSlot.toString();
+        let hash = 0;
+        for (let i = 0; i < codeBase.length; i++) {
+            const char = codeBase.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        
+        // Convert to 4-digit code
+        const code = Math.abs(hash % 9000) + 1000;
+        return code.toString();
+    }
+
+    getNextCodeTime() {
+        const now = new Date();
+        const nextSlot = Math.ceil(now.getTime() / (10 * 60 * 1000)) * (10 * 60 * 1000);
+        const nextTime = new Date(nextSlot);
+        return nextTime.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    startDemoCodeUpdater() {
+        // Update demo code display every second
+        this.updateDemoCodeDisplay();
+        setInterval(() => {
+            this.updateDemoCodeDisplay();
+        }, 1000);
+    }
+
+    updateDemoCodeDisplay() {
+        const codeElement = document.getElementById('current-demo-code');
+        const timeElement = document.getElementById('next-code-time');
+        
+        if (codeElement && timeElement) {
+            codeElement.textContent = this.generateDemoCode();
+            timeElement.textContent = this.getNextCodeTime();
+        }
     }
 
     handleGuestPlay() {

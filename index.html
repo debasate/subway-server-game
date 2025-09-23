@@ -49,7 +49,7 @@
                 <div class="form-actions">
                     <button id="login-btn" class="auth-btn primary">🚀 Inloggen</button>
                     <button id="show-register" class="auth-btn secondary">📝 Account Aanmaken</button>
-                    <button id="demo-login-btn" class="auth-btn secondary">🎮 Demo Account</button>
+                    <button id="demo-login-btn" class="auth-btn secondary">🔐 Demo Code</button>
                     <div class="guest-section">
                         <input type="text" id="guest-nickname" placeholder="Nickname (optioneel)" maxlength="15">
                         <button id="guest-play-btn" class="auth-btn guest">👤 Speel als Gast</button>
@@ -84,6 +84,16 @@
 
             <!-- Auth Status Messages -->
             <div id="auth-status" class="auth-status"></div>
+
+            <!-- Demo Code Info -->
+            <div class="demo-info" style="margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px; border-left: 4px solid #4CAF50;">
+                <h4 style="margin: 0 0 8px 0; color: #4CAF50;">🔐 Demo Code Info</h4>
+                <p style="margin: 0; font-size: 14px; color: rgba(255,255,255,0.8);">
+                    Huidige code: <strong id="current-demo-code">----</strong><br>
+                    Volgende code: <span id="next-code-time">--:--</span><br>
+                    <small>💡 Codes regenereren elke 10 minuten</small>
+                </p>
+            </div>
 
             <!-- Debug Section (development only) -->
             <div class="debug-section"
