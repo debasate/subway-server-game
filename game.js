@@ -7,7 +7,7 @@ console.log('🚨 LOADING BUTTON FIX...');
 
 function startGame(mode) {
     console.log(`🎯 STARTING: ${mode}`);
-    
+
     try {
         // FORCE STOP ANY RUNNING GAME
         if (gameRunning) {
@@ -2708,7 +2708,7 @@ document.addEventListener('keydown', e => {
             createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
             console.log('👈 Moved left to lane:', player.lane);
         }
-        
+
         // RIGHT MOVEMENT - Arrow Right OR D key
         if ((e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') && player.lane < 2) {
             player.lane++;
