@@ -26,4 +26,8 @@ Een eenvoudige endless runner game geïnspireerd door Subway Surfers, gemaakt me
 
 ## Live Demo
 
-Speel het spel live op: [GitHub Pages URL komt hier]
+Speel het spel live op: https://debasate.github.io/subway-server-game/
+
+## GitHub Repository
+
+Bekijk de broncode op: https://github.com/debasate/subway-server-game
