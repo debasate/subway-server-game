@@ -245,45 +245,46 @@ class AuthManager {
     }
 
     async handleDemoLogin() {
+        console.log('🎮 Demo login started...');
         this.showLoading(true);
         await this.delay(500);
 
         // Create demo user if not exists
-        if (!this.users['admin']) {
-            this.users['admin'] = {
-                displayName: 'Demo User',
-                email: 'demo@example.com',
-                password: 'admin',
-                createdAt: new Date().toISOString(),
-                stats: {
-                    totalCoins: 999,
-                    highScore: 15000,
-                    gamesPlayed: 50,
-                    totalPlayTime: 7200,
-                    levelsCompleted: 8,
-                    powerUpsUsed: 25
-                },
-                achievements: ['first_game', 'coin_collector', 'speed_demon'],
-                settings: {
-                    soundEnabled: true,
-                    musicVolume: 0.3,
-                    effectsVolume: 0.5
-                },
-                gameData: {
-                    unlockedSkins: ['default', 'goldenSkin', 'speedSkin'],
-                    currentTheme: 'neon',
-                    powerUps: { doubleJump: 5, timeSlower: 3 },
-                    level: 3
-                }
-            };
-            this.saveUsers();
-        }
+        const demoUser = {
+            displayName: 'Demo Speler',
+            email: 'demo@subway.game',
+            password: 'demo123',
+            createdAt: new Date().toISOString(),
+            stats: {
+                totalCoins: 999,
+                highScore: 15000,
+                gamesPlayed: 50,
+                totalPlayTime: 7200,
+                levelsCompleted: 8,
+                powerUpsUsed: 25
+            },
+            achievements: ['first_game', 'coin_collector', 'speed_demon'],
+            settings: {
+                soundEnabled: true,
+                musicVolume: 0.3,
+                effectsVolume: 0.5
+            },
+            gameData: {
+                unlockedSkins: ['default', 'goldenSkin', 'speedSkin'],
+                currentTheme: 'neon',
+                powerUps: { doubleJump: 5, timeSlower: 3 },
+                level: 3
+            }
+        };
 
-        this.currentUser = { ...this.users['admin'], username: 'admin' };
+        this.users['demo'] = demoUser;
+        this.saveUsers();
+
+        this.currentUser = { ...demoUser, username: 'demo' };
         this.isLoggedIn = true;
 
-        this.showSuccess('Demo account ingelogd!');
-        setTimeout(() => this.showMainGame(), 1000);
+        this.showSuccess('🎮 Demo account geladen! Alle features ontgrendeld!');
+        setTimeout(() => this.showMainGame(), 1500);
         this.showLoading(false);
     }
 
@@ -311,7 +312,7 @@ class AuthManager {
         };
         this.isLoggedIn = false;
 
-        this.showSuccess(`Welkom ${nickname}! 🎮 Voortgang wordt alleen lokaal opgeslagen. Maak een account voor cloud save!`);
+        this.showSuccess(`Welkom ${nickname}! 🎮 Je kunt altijd inloggen via de knop rechtsboven!`);
         setTimeout(() => this.showMainGame(), 2000);
     }
 
@@ -348,40 +349,80 @@ class AuthManager {
     }
 
     updateUserProfile() {
+        console.log('🔧 updateUserProfile called', this.currentUser);
         const avatar = document.getElementById('user-avatar');
         const usernameDisplay = document.getElementById('username-display');
         const saveStatus = document.getElementById('save-status');
         const connectionStatus = document.getElementById('connection-status');
         const logoutBtn = document.getElementById('logout-btn');
 
+        // Check if elements exist
+        if (!avatar || !usernameDisplay || !saveStatus || !connectionStatus || !logoutBtn) {
+            console.error('❌ UI elements missing:', {
+                avatar: !!avatar,
+                usernameDisplay: !!usernameDisplay,
+                saveStatus: !!saveStatus,
+                connectionStatus: !!connectionStatus,
+                logoutBtn: !!logoutBtn
+            });
+            return;
+        }
+
+        // Update basic info
         avatar.textContent = this.currentUser.displayName.charAt(0).toUpperCase();
         usernameDisplay.textContent = this.currentUser.displayName;
 
         if (this.currentUser.isGuest) {
-            console.log('Setting up guest mode - should show login button');
-            saveStatus.textContent = 'Opslaan op dit apparaat';
-            connectionStatus.textContent = 'Gast Modus';
-            // Verander logout knop naar login knop voor gast gebruikers
-            logoutBtn.textContent = '🔑 Inloggen';
+            console.log('👤 Setting up GUEST mode UI');
+            saveStatus.textContent = '💾 Lokaal Opgeslagen';
+            connectionStatus.textContent = '🔒 Gast Modus';
+            
+            // FORCE update logout button to login button
+            logoutBtn.innerHTML = '🔑 Inloggen';
             logoutBtn.style.display = 'block';
-            // Verander de onclick functie
-            logoutBtn.onclick = () => this.switchToLogin();
+            logoutBtn.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+            logoutBtn.onclick = () => {
+                console.log('🔑 Login button clicked!');
+                this.switchToLogin();
+            };
+            
+            console.log('✅ Guest UI setup complete');
         } else {
-            saveStatus.textContent = 'Cloud Save';
-            connectionStatus.textContent = 'Connected';
-            logoutBtn.textContent = '🚪 Uitloggen';
+            console.log('👥 Setting up LOGGED IN user UI');
+            saveStatus.textContent = '☁️ Cloud Save';
+            connectionStatus.textContent = '🟢 Verbonden';
+            
+            logoutBtn.innerHTML = '🚪 Uitloggen';
             logoutBtn.style.display = 'block';
-            // Reset onclick functie naar uitloggen
-            logoutBtn.onclick = () => this.handleLogout();
+            logoutBtn.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
+            logoutBtn.onclick = () => {
+                console.log('🚪 Logout button clicked!');
+                this.handleLogout();
+            };
+            
+            console.log('✅ Logged in UI setup complete');
         }
+        
+        // Force refresh display
+        setTimeout(() => {
+            if (this.currentUser.isGuest) {
+                logoutBtn.innerHTML = '🔑 Inloggen';
+            }
+        }, 100);
     }
 
     switchToLogin() {
+        console.log('🔄 Switching to login screen...');
         // Ga terug naar login scherm zodat gebruiker kan inloggen
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
         this.showLoginForm();
         this.clearMessages();
+        
+        // Show helpful message
+        setTimeout(() => {
+            this.showSuccess('💡 Log in om je voortgang op te slaan in de cloud!');
+        }, 500);
     }
 
     loadUserGameData() {
@@ -580,6 +621,18 @@ class AuthManager {
 
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Debug function to clear all data
+    clearAllData() {
+        console.log('🗑️ Clearing all saved data...');
+        localStorage.clear();
+        this.users = {};
+        this.currentUser = null;
+        this.isLoggedIn = false;
+        
+        // Force reload page
+        window.location.reload();
     }
 }
 
