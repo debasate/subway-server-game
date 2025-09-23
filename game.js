@@ -578,12 +578,22 @@ function updateGameLogic() {
     // Update score
     score += scoreMultiplier;
 
-    // Update coins
+    // Update coins - verbeterde logica
     const newCoins = Math.floor(score / 100) - Math.floor((score - scoreMultiplier) / 100);
     if (newCoins > 0) {
         coinsThisRun += newCoins;
         coins += newCoins;
-        localStorage.setItem('subwayCoins', coins.toString());
+
+        // Immediate save voor coins om lag te voorkomen
+        try {
+            localStorage.setItem('subwayCoins', coins.toString());
+        } catch (error) {
+            console.error('Failed to save coins:', error);
+        }
+
+        // Visual feedback
+        createParticle(player.x + player.w / 2, player.y, 'coin', '#FFD700', 2);
+        playSound('coin');
     }
 
     // Update speed (progressive difficulty)
@@ -619,22 +629,49 @@ function updateGameLogic() {
 function endGame() {
     gameRunning = false;
 
-    let message = `Game Over!\nFinal Score: ${Math.floor(score)}`;
+    // FORCE SAVE alle progress onmiddellijk
+    console.log(`💰 Final coins earned this run: ${coinsThisRun}`);
+    console.log(`🏦 Total coins before save: ${coins}`);
+
+    const saveSuccess = saveGameProgress();
+
+    if (saveSuccess) {
+        console.log(`✅ Progress saved successfully! New total: ${coins} coins`);
+    } else {
+        console.error('❌ Failed to save progress!');
+    }
+
+    let message = `Game Over!\nFinal Score: ${Math.floor(score)}\nCoins Earned: +${coinsThisRun}\nTotal Coins: ${coins}`;
 
     if (isMultiplayer) {
         const playerPosition = playerRanking.findIndex(p => p.isPlayer) + 1;
         if (player.lives > 0) {
-            message = `🎉 VICTORY! 🎉\nYou won!\nFinal Score: ${Math.floor(score)}`;
+            message = `🎉 VICTORY! 🎉\nYou won!\nFinal Score: ${Math.floor(score)}\nCoins Earned: +${coinsThisRun}\nTotal Coins: ${coins}`;
         } else {
-            message = `Game Over!\nPosition: ${playerPosition}/${playerRanking.length}\nFinal Score: ${Math.floor(score)}`;
+            message = `Game Over!\nPosition: ${playerPosition}/${playerRanking.length}\nFinal Score: ${Math.floor(score)}\nCoins Earned: +${coinsThisRun}\nTotal Coins: ${coins}`;
         }
     }
 
     console.log(message);
 
+    // Update coin display in UI
+    updateCoinDisplay();
+
     setTimeout(() => {
         backToMenu();
     }, 3000);
+}
+
+/**
+ * Update coin display in UI
+ */
+function updateCoinDisplay() {
+    const coinDisplayElements = document.querySelectorAll('#coin-display, [data-coins]');
+    coinDisplayElements.forEach(element => {
+        if (element) {
+            element.textContent = coins;
+        }
+    });
 }
 
 // ================================
@@ -690,8 +727,54 @@ function updateParticles() {
 }
 
 // ================================
-// AUDIO SYSTEM
+// SAVE SYSTEM - IMPROVED
 // ================================
+
+/**
+ * Save all game progress to localStorage
+ */
+function saveGameProgress() {
+    try {
+        // Save coins
+        localStorage.setItem('subwayCoins', coins.toString());
+
+        // Save stats
+        const stats = {
+            totalCoins: coins,
+            totalGamesPlayed: (parseInt(localStorage.getItem('totalGamesPlayed') || '0')) + 1,
+            bestScore: Math.max(parseInt(localStorage.getItem('bestScore') || '0'), Math.floor(score)),
+            lastScore: Math.floor(score),
+            lastCoinsEarned: coinsThisRun,
+            lastPlayTime: Date.now()
+        };
+
+        localStorage.setItem('gameStats', JSON.stringify(stats));
+        localStorage.setItem('bestScore', stats.bestScore.toString());
+        localStorage.setItem('totalGamesPlayed', stats.totalGamesPlayed.toString());
+
+        console.log('💾 Game progress saved:', stats);
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to save progress:', error);
+        return false;
+    }
+}
+
+/**
+ * Load game progress from localStorage
+ */
+function loadGameProgress() {
+    try {
+        coins = parseInt(localStorage.getItem('subwayCoins') || '0');
+        const stats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+        console.log('📥 Game progress loaded:', { coins, stats });
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to load progress:', error);
+        coins = 0;
+        return false;
+    }
+}
 
 function playSound(soundName, volume = effectsVolume) {
     if (isMuted) return;
@@ -832,7 +915,18 @@ function gameLoop() {
     // Check collisions
     if (checkCollision()) {
         player.lives--;
+
+        // Save coins immediately bij collision
+        try {
+            localStorage.setItem('subwayCoins', coins.toString());
+            console.log(`💥 Collision! Coins saved: ${coins}`);
+        } catch (error) {
+            console.error('Failed to save coins on collision:', error);
+        }
+
         if (player.lives <= 0) {
+            // Final save before game end
+            console.log(`💀 Game over! Final save - Total coins: ${coins}, This run: ${coinsThisRun}`);
             endGame();
             return;
         }
@@ -855,6 +949,9 @@ window.startGame = startGame;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🎮 Game engine initialized');
 
+    // Load saved progress
+    loadGameProgress();
+
     // Initialize mobile controls
     if (isMobile) {
         initMobileControls();
@@ -875,10 +972,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Load saved coins
-    coins = parseInt(localStorage.getItem('subwayCoins') || '0');
+    // Update initial coin display
+    updateCoinDisplay();
 
-    console.log('🚀 Game ready to play!');
+    console.log(`🚀 Game ready to play! Starting coins: ${coins}`);
 });
 
 console.log('✅ Improved game engine loaded successfully');
