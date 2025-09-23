@@ -63,31 +63,31 @@ function updateGameInfo() {
 
 function drawPlayer() {
     const { x, y, w, h } = player;
-    
+
     // Hoofdkleur (geel/goud)
     const gradient = ctx.createLinearGradient(x, y, x, y + h);
     gradient.addColorStop(0, '#FFD700');
     gradient.addColorStop(0.3, '#FFC107');
     gradient.addColorStop(0.7, '#FF9800');
     gradient.addColorStop(1, '#F57C00');
-    
+
     // Schaduw
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     ctx.fillRect(x + 3, y + 3, w, h);
-    
+
     // Hoofdlichaam
     ctx.fillStyle = gradient;
     ctx.fillRect(x, y, w, h);
-    
+
     // 3D effect - highlight
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.fillRect(x + 2, y + 2, w - 4, 8);
-    
+
     // Border
     ctx.strokeStyle = '#E65100';
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, w, h);
-    
+
     // Ogen (simpel karakter effect)
     ctx.fillStyle = '#000';
     ctx.fillRect(x + 8, y + 10, 4, 4);
@@ -97,35 +97,35 @@ function drawPlayer() {
 function drawObstacles() {
     obstacles.forEach(obs => {
         const { x, y, w, h } = obs;
-        
+
         // Rode obstakel met gradient
         const gradient = ctx.createLinearGradient(x, y, x, y + h);
         gradient.addColorStop(0, '#F44336');
         gradient.addColorStop(0.5, '#D32F2F');
         gradient.addColorStop(1, '#B71C1C');
-        
+
         // Schaduw
         ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
         ctx.fillRect(x + 2, y + 2, w, h);
-        
+
         // Hoofdlichaam
         ctx.fillStyle = gradient;
         ctx.fillRect(x, y, w, h);
-        
+
         // 3D effect
         ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.fillRect(x + 2, y + 2, w - 4, 6);
-        
+
         // Donkere rand voor diepte
         ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
         ctx.fillRect(x + w - 3, y + 3, 3, h - 3);
         ctx.fillRect(x + 3, y + h - 3, w - 3, 3);
-        
+
         // Border
         ctx.strokeStyle = '#8E0000';
         ctx.lineWidth = 2;
         ctx.strokeRect(x, y, w, h);
-        
+
         // Waarschuwingspatroon
         ctx.fillStyle = '#FFEB3B';
         for (let i = 0; i < 3; i++) {
@@ -238,14 +238,14 @@ function drawBackground() {
     bgGradient.addColorStop(0, '#2C3E50');
     bgGradient.addColorStop(0.5, '#34495E');
     bgGradient.addColorStop(1, '#2C3E50');
-    
+
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     // Tekenen van de drie railsporen
     for (let i = 0; i < 3; i++) {
         const laneCenter = lanes[i] + 20; // Center van elke lane
-        
+
         // Rail lijnen
         ctx.strokeStyle = '#BDC3C7';
         ctx.lineWidth = 3;
@@ -255,14 +255,14 @@ function drawBackground() {
         ctx.moveTo(laneCenter + 15, 0);
         ctx.lineTo(laneCenter + 15, canvas.height);
         ctx.stroke();
-        
+
         // Dwarsliggers (railroad ties)
         ctx.fillStyle = '#8B4513';
         for (let y = -20; y < canvas.height + 20; y += 40) {
             const offsetY = (y + score * 2) % (canvas.height + 40) - 20;
             ctx.fillRect(laneCenter - 18, offsetY, 36, 6);
         }
-        
+
         // Rail glans effect
         ctx.strokeStyle = 'rgba(236, 240, 241, 0.8)';
         ctx.lineWidth = 1;
@@ -273,12 +273,12 @@ function drawBackground() {
         ctx.lineTo(laneCenter + 14, canvas.height);
         ctx.stroke();
     }
-    
+
     // Tunnel muren
     ctx.fillStyle = '#1A252F';
     ctx.fillRect(0, 0, 100, canvas.height); // Links
     ctx.fillRect(380, 0, 100, canvas.height); // Rechts
-    
+
     // Tunnel verlichting effect
     const lightGradient = ctx.createRadialGradient(240, 100, 0, 240, 100, 200);
     lightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
