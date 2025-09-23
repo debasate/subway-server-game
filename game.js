@@ -2399,9 +2399,18 @@ function drawPowerUpIndicators() {
 function drawBackground() {
     // Get current theme colors
     const theme = themes[currentTheme];
+    
+    // Fix theme color access
+    const themeColors = {
+        background: theme.colors.primary,
+        primary: theme.colors.secondary,
+        secondary: theme.colors.accent,
+        accent: theme.colors.rail,
+        highlight: theme.colors.accent
+    };
 
     // Always ensure canvas has a background - clear first
-    ctx.fillStyle = theme.background;
+    ctx.fillStyle = themeColors.background;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Theme and weather-based background colors
@@ -2411,27 +2420,27 @@ function drawBackground() {
     switch (currentWeather) {
         case 'rain':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, darkenColor(theme.primary, 20));
-            bgGradient.addColorStop(0.5, theme.background);
-            bgGradient.addColorStop(1, darkenColor(theme.background, 30));
+            bgGradient.addColorStop(0, darkenColor(themeColors.primary, 20));
+            bgGradient.addColorStop(0.5, themeColors.background);
+            bgGradient.addColorStop(1, darkenColor(themeColors.background, 30));
             break;
         case 'snow':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, lightenColor(theme.background, 20));
-            bgGradient.addColorStop(0.5, theme.primary);
-            bgGradient.addColorStop(1, theme.background);
+            bgGradient.addColorStop(0, lightenColor(themeColors.background, 20));
+            bgGradient.addColorStop(0.5, themeColors.primary);
+            bgGradient.addColorStop(1, themeColors.background);
             break;
         case 'night':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, darkenColor(theme.background, 40));
-            bgGradient.addColorStop(0.5, darkenColor(theme.primary, 30));
-            bgGradient.addColorStop(1, darkenColor(theme.accent, 20));
+            bgGradient.addColorStop(0, darkenColor(themeColors.background, 40));
+            bgGradient.addColorStop(0.5, darkenColor(themeColors.primary, 30));
+            bgGradient.addColorStop(1, darkenColor(themeColors.accent, 20));
             break;
         case 'storm':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, theme.background);
-            bgGradient.addColorStop(0.5, darkenColor(theme.background, 40));
-            bgGradient.addColorStop(1, darkenColor(theme.background, 50));
+            bgGradient.addColorStop(0, themeColors.background);
+            bgGradient.addColorStop(0.5, darkenColor(themeColors.background, 40));
+            bgGradient.addColorStop(1, darkenColor(themeColors.background, 50));
 
             // Lightning effect
             if (lightningTimer === 0) {
@@ -2441,9 +2450,9 @@ function drawBackground() {
             break;
         default: // normal
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, theme.background);
-            bgGradient.addColorStop(0.5, theme.primary);
-            bgGradient.addColorStop(1, theme.background);
+            bgGradient.addColorStop(0, themeColors.background);
+            bgGradient.addColorStop(0.5, themeColors.primary);
+            bgGradient.addColorStop(1, themeColors.background);
     }
 
     ctx.fillStyle = bgGradient;
@@ -2454,7 +2463,7 @@ function drawBackground() {
         const laneCenter = lanes[i] + 20; // Center van elke lane
 
         // Rail lijnen met thema kleur
-        ctx.strokeStyle = currentWeather === 'night' ? darkenColor(theme.secondary, 20) : theme.secondary;
+        ctx.strokeStyle = currentWeather === 'night' ? darkenColor(themeColors.secondary, 20) : themeColors.secondary;
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(laneCenter - 15, 0);
@@ -2464,7 +2473,7 @@ function drawBackground() {
         ctx.stroke();
 
         // Dwarsliggers (railroad ties) met thema accent
-        ctx.fillStyle = currentWeather === 'snow' ? lightenColor(theme.accent, 10) : theme.accent;
+        ctx.fillStyle = currentWeather === 'snow' ? lightenColor(themeColors.accent, 10) : themeColors.accent;
         for (let y = -20; y < canvas.height + 20; y += 40) {
             const offsetY = (y + score * 2) % (canvas.height + 40) - 20;
             ctx.fillRect(laneCenter - 18, offsetY, 36, 6);
@@ -2472,8 +2481,8 @@ function drawBackground() {
 
         // Rail glans effect met thema highlight
         const railGloss = currentWeather === 'night' ?
-            `rgba(${hexToRgb(theme.secondary).r}, ${hexToRgb(theme.secondary).g}, ${hexToRgb(theme.secondary).b}, 0.6)` :
-            `rgba(${hexToRgb(theme.highlight).r}, ${hexToRgb(theme.highlight).g}, ${hexToRgb(theme.highlight).b}, 0.8)`;
+            `rgba(150, 150, 150, 0.6)` :
+            `rgba(200, 200, 200, 0.8)`;
         ctx.strokeStyle = railGloss;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -2485,16 +2494,15 @@ function drawBackground() {
     }
 
     // Tunnel muren met thema kleuren
-    const wallColor = currentWeather === 'night' ? darkenColor(theme.background, 50) : darkenColor(theme.primary, 30);
+    const wallColor = currentWeather === 'night' ? darkenColor(themeColors.background, 50) : darkenColor(themeColors.primary, 30);
     ctx.fillStyle = wallColor;
     ctx.fillRect(0, 0, 100, canvas.height); // Links
     ctx.fillRect(380, 0, 100, canvas.height); // Rechts
 
-    // Tunnel verlichting effect met thema highlight
+    // Tunnel verlichting effect
     const lightIntensity = currentWeather === 'night' ? 0.05 : 0.1;
-    const themeRgb = hexToRgb(theme.highlight);
     const lightGradient = ctx.createRadialGradient(240, 100, 0, 240, 100, 200);
-    lightGradient.addColorStop(0, `rgba(${themeRgb.r}, ${themeRgb.g}, ${themeRgb.b}, ${lightIntensity})`);
+    lightGradient.addColorStop(0, `rgba(255, 255, 255, ${lightIntensity})`);
     lightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = lightGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -2803,7 +2811,7 @@ function hideMobileControls() {
 }
 
 // SIMPLE TEST FUNCTION - Make sure this works
-window.testButton = function() {
+window.testButton = function () {
     alert('Button test works!');
     console.log('✅ Button test function called successfully!');
 };
@@ -3460,13 +3468,13 @@ function darkenColor(color, percent) {
 
 function hexToRgb(hex) {
     // Handle rgb() format
-    if (hex.startsWith('rgb')) {
+    if (hex && hex.startsWith('rgb')) {
         const matches = hex.match(/\d+/g);
         return matches ? {
             r: parseInt(matches[0]),
             g: parseInt(matches[1]),
             b: parseInt(matches[2])
-        } : null;
+        } : { r: 255, g: 255, b: 255 };
     }
 
     // Handle hex format
@@ -3475,7 +3483,7 @@ function hexToRgb(hex) {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
-    } : null;
+    } : { r: 255, g: 255, b: 255 };
 }
 
 // Load saved theme on game start
