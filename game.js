@@ -12,11 +12,276 @@ const levelDisplay = document.getElementById('level-display');
 const coinDisplay = document.getElementById('coin-display');
 const coinsCount = document.getElementById('coins-count');
 
+// Audio System
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let isMuted = false;
+let musicVolume = 0.3;
+let effectsVolume = 0.5;
+
+// Sound effects storage
+const sounds = {
+    coin: null,
+    jump: null,
+    crash: null,
+    powerup: null,
+    victory: null,
+    shield: null,
+    levelup: null
+};
+
+// Background music
+let backgroundMusic = null;
+let currentMusicTrack = null;
+
+// Particle System
+let particles = [];
+let particleId = 0;
+
+class Particle {
+    constructor(x, y, type = 'default', color = '#FFD700') {
+        this.id = particleId++;
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.color = color;
+        this.life = 1.0;
+        this.maxLife = 1.0;
+        this.size = Math.random() * 4 + 2;
+        this.vx = (Math.random() - 0.5) * 6;
+        this.vy = (Math.random() - 0.5) * 6;
+        this.gravity = 0.1;
+        this.alpha = 1.0;
+        this.decay = 0.02;
+        
+        // Type-specific properties
+        switch(type) {
+            case 'coin':
+                this.color = '#FFD700';
+                this.size = Math.random() * 3 + 1;
+                this.decay = 0.015;
+                break;
+            case 'explosion':
+                this.color = '#FF4444';
+                this.size = Math.random() * 6 + 3;
+                this.decay = 0.03;
+                break;
+            case 'sparkle':
+                this.color = '#FFFFFF';
+                this.size = Math.random() * 2 + 1;
+                this.decay = 0.025;
+                this.twinkle = Math.random() * Math.PI * 2;
+                break;
+            case 'speed':
+                this.color = '#00BFFF';
+                this.size = Math.random() * 4 + 2;
+                this.decay = 0.02;
+                break;
+            case 'victory':
+                this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+                this.size = Math.random() * 8 + 4;
+                this.decay = 0.01;
+                this.vx = (Math.random() - 0.5) * 10;
+                this.vy = -Math.random() * 8 - 5;
+                break;
+        }
+    }
+    
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        this.life -= this.decay;
+        this.alpha = this.life / this.maxLife;
+        
+        if (this.type === 'sparkle') {
+            this.twinkle += 0.2;
+            this.alpha *= Math.abs(Math.sin(this.twinkle));
+        }
+        
+        return this.life > 0;
+    }
+    
+    draw() {
+        if (this.alpha <= 0) return;
+        
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        
+        if (this.type === 'sparkle') {
+            // Draw sparkle as star shape
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.twinkle);
+            ctx.fillRect(-this.size/2, -1, this.size, 2);
+            ctx.fillRect(-1, -this.size/2, 2, this.size);
+        } else {
+            // Draw as circle
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        ctx.restore();
+    }
+}
+
 let gameRunning = false;
 let gameMode = 'infinity'; // 'infinity', 'level', or 'multiplayer'
 let currentLevel = 1;
 let levelProgress = 0;
 let levelTarget = 1000; // Score needed to complete level
+
+// Weather & Environment Effects
+let currentWeather = 'normal'; // 'normal', 'rain', 'snow', 'night', 'storm'
+let weatherParticles = [];
+let lightningTimer = 0;
+
+// Power-ups System
+let activePowerUps = [];
+let powerUpSpawnTimer = 0;
+let collectiblePowerUps = [];
+
+class PowerUp {
+    constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.w = 30;
+        this.h = 30;
+        this.type = type;
+        this.collected = false;
+        this.bobOffset = Math.random() * Math.PI * 2;
+        this.lifetime = 300; // 5 seconds at 60fps
+        
+        // Type-specific properties
+        switch(type) {
+            case 'speedBoost':
+                this.color = '#00BFFF';
+                this.icon = '⚡';
+                this.duration = 300; // 5 seconds
+                break;
+            case 'coinMagnet':
+                this.color = '#FFD700';
+                this.icon = '🧲';
+                this.duration = 480; // 8 seconds
+                break;
+            case 'jumpBoost':
+                this.color = '#32CD32';
+                this.icon = '🦘';
+                this.duration = 1; // One-time use
+                break;
+            case 'freeze':
+                this.color = '#87CEEB';
+                this.icon = '❄️';
+                this.duration = 180; // 3 seconds
+                break;
+            case 'starPower':
+                this.color = '#FF6347';
+                this.icon = '🌟';
+                this.duration = 300; // 5 seconds
+                break;
+        }
+    }
+    
+    update() {
+        this.y += speed;
+        this.lifetime--;
+        this.bobOffset += 0.1;
+        return this.lifetime > 0 && this.y < canvas.height + 50;
+    }
+    
+    draw() {
+        const bobAmount = Math.sin(this.bobOffset) * 3;
+        const drawY = this.y + bobAmount;
+        
+        // Glow effect
+        ctx.save();
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 15;
+        
+        // Background circle
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.arc(this.x + this.w/2, drawY + this.h/2, this.w/2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Icon
+        ctx.globalAlpha = 1;
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#fff';
+        ctx.fillText(this.icon, this.x + this.w/2, drawY + this.h/2 + 7);
+        
+        ctx.restore();
+        ctx.textAlign = 'left';
+    }
+    
+    checkCollision(player) {
+        return this.x < player.x + player.w &&
+               this.x + this.w > player.x &&
+               this.y < player.y + player.h &&
+               this.y + this.h > player.y;
+    }
+}
+
+// Achievements System
+let achievements = JSON.parse(localStorage.getItem('subwayAchievements') || '{}');
+const achievementsList = {
+    speedDemon: { 
+        name: 'Speed Demon', 
+        description: 'Score 5000+ in infinity mode',
+        icon: '🏃',
+        requirement: 5000,
+        unlocked: false
+    },
+    ghostMaster: {
+        name: 'Ghost Master',
+        description: 'Use ghost ability 20 times',
+        icon: '👻',
+        requirement: 20,
+        unlocked: false
+    },
+    coinCollector: {
+        name: 'Coin Collector',
+        description: 'Collect 1000 total coins',
+        icon: '💰',
+        requirement: 1000,
+        unlocked: false
+    },
+    botSlayer: {
+        name: 'Bot Slayer',
+        description: 'Win 10 multiplayer matches',
+        icon: '🤖',
+        requirement: 10,
+        unlocked: false
+    },
+    survivor: {
+        name: 'Survivor',
+        description: 'Survive 120 seconds in infinity mode',
+        icon: '⏰',
+        requirement: 120,
+        unlocked: false
+    },
+    powerUser: {
+        name: 'Power User',
+        description: 'Collect 50 power-ups',
+        icon: '⚡',
+        requirement: 50,
+        unlocked: false
+    }
+};
+
+// Daily Challenges System
+let dailyChallenges = JSON.parse(localStorage.getItem('subwayDailyChallenges') || '{}');
+let currentChallenge = null;
+
+// Stats tracking
+let gameStats = JSON.parse(localStorage.getItem('subwayStats') || '{}');
+if (!gameStats.totalCoinsCollected) gameStats.totalCoinsCollected = 0;
+if (!gameStats.ghostAbilityUses) gameStats.ghostAbilityUses = 0;
+if (!gameStats.powerUpsCollected) gameStats.powerUpsCollected = 0;
+if (!gameStats.totalPlayTime) gameStats.totalPlayTime = 0;
+if (!gameStats.longestSurvival) gameStats.longestSurvival = 0;
 
 // Multiplayer state
 let isMultiplayer = false;
@@ -43,6 +308,157 @@ let difficultyLevel = 1;
 // Notification system
 let notifications = [];
 let notificationId = 0;
+
+// Audio functions
+function playSound(soundName, volume = effectsVolume) {
+    if (isMuted || !sounds[soundName]) return;
+    
+    try {
+        // Create simple oscillator-based sounds since we don't have audio files
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        gainNode.gain.setValueAtTime(volume * 0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+        
+        switch(soundName) {
+            case 'coin':
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                break;
+            case 'jump':
+                oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.2);
+                break;
+            case 'crash':
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.5);
+                break;
+            case 'powerup':
+                oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.1);
+                oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.2);
+                break;
+            case 'victory':
+                oscillator.frequency.setValueAtTime(523, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(784, audioContext.currentTime + 0.2); // G5
+                break;
+        }
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+        
+    } catch (error) {
+        console.log('Audio not available:', error);
+    }
+}
+
+function createParticle(x, y, type = 'default', color = '#FFD700', count = 1) {
+    for (let i = 0; i < count; i++) {
+        particles.push(new Particle(x, y, type, color));
+    }
+}
+
+function updateParticles() {
+    particles = particles.filter(particle => {
+        const alive = particle.update();
+        if (alive) particle.draw();
+        return alive;
+    });
+}
+
+function updateWeatherParticles() {
+    // Add weather-specific particles
+    if (currentWeather === 'rain' && Math.random() < 0.3) {
+        weatherParticles.push({
+            x: Math.random() * canvas.width,
+            y: -5,
+            speed: Math.random() * 3 + 5,
+            length: Math.random() * 15 + 10
+        });
+    } else if (currentWeather === 'snow' && Math.random() < 0.1) {
+        weatherParticles.push({
+            x: Math.random() * canvas.width,
+            y: -5,
+            speed: Math.random() * 1 + 1,
+            size: Math.random() * 3 + 2,
+            drift: Math.random() * 2 - 1
+        });
+    }
+    
+    // Update weather particles
+    weatherParticles = weatherParticles.filter(particle => {
+        if (currentWeather === 'rain') {
+            particle.y += particle.speed;
+            
+            ctx.strokeStyle = 'rgba(173, 216, 230, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particle.x, particle.y);
+            ctx.lineTo(particle.x - 2, particle.y - particle.length);
+            ctx.stroke();
+            
+            return particle.y < canvas.height + 20;
+        } else if (currentWeather === 'snow') {
+            particle.y += particle.speed;
+            particle.x += particle.drift;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            return particle.y < canvas.height + 10;
+        }
+        return false;
+    });
+}
+
+function checkAchievements() {
+    Object.keys(achievementsList).forEach(key => {
+        const achievement = achievementsList[key];
+        if (achievements[key] || achievement.unlocked) return;
+        
+        let unlocked = false;
+        
+        switch(key) {
+            case 'speedDemon':
+                unlocked = score >= 5000 && gameMode === 'infinity';
+                break;
+            case 'ghostMaster':
+                unlocked = gameStats.ghostAbilityUses >= 20;
+                break;
+            case 'coinCollector':
+                unlocked = gameStats.totalCoinsCollected >= 1000;
+                break;
+            case 'botSlayer':
+                unlocked = gameStats.multiplayerWins >= 10;
+                break;
+            case 'survivor':
+                const survivalTime = score / (60 * scoreMultiplier);
+                unlocked = survivalTime >= 120 && gameMode === 'infinity';
+                break;
+            case 'powerUser':
+                unlocked = gameStats.powerUpsCollected >= 50;
+                break;
+        }
+        
+        if (unlocked) {
+            achievements[key] = true;
+            achievement.unlocked = true;
+            localStorage.setItem('subwayAchievements', JSON.stringify(achievements));
+            
+            showNotification(`🏆 ACHIEVEMENT UNLOCKED!\n${achievement.icon} ${achievement.name}\n${achievement.description}`, 'achievement', 5000);
+            playSound('victory');
+            createParticle(canvas.width/2, canvas.height/2, 'victory', '#FFD700', 20);
+        }
+    });
+}
 
 function showNotification(message, type = 'info', duration = 3000) {
     const notification = {
@@ -433,6 +849,18 @@ function resetGame(mode = 'infinity') {
     levelProgress = 0;
     difficultyLevel = 1;
 
+    // Reset power-up systems
+    activePowerUps = [];
+    collectiblePowerUps = [];
+    powerUpSpawnTimer = 0;
+    particles = [];
+    weatherParticles = [];
+
+    // Random weather for variety
+    const weatherTypes = ['normal', 'rain', 'snow', 'night', 'storm'];
+    currentWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+    lightningTimer = 0;
+
     // Multiplayer setup
     isMultiplayer = (mode === 'multiplayer');
     if (isMultiplayer) {
@@ -460,6 +888,27 @@ function resetGame(mode = 'infinity') {
 
     updateGameInfo();
     updateCoinDisplay();
+    
+    // Show weather notification
+    const weatherEmojis = {
+        'normal': '☀️',
+        'rain': '🌧️', 
+        'snow': '❄️',
+        'night': '🌙',
+        'storm': '⛈️'
+    };
+    
+    const weatherNames = {
+        'normal': 'Clear Weather',
+        'rain': 'Rainy Conditions',
+        'snow': 'Snowy Weather', 
+        'night': 'Night Mode',
+        'storm': 'Storm Warning'
+    };
+    
+    setTimeout(() => {
+        showNotification(`${weatherEmojis[currentWeather]} ${weatherNames[currentWeather]}`, 'info', 3000);
+    }, 500);
 }
 function updateGameInfo() {
     if (gameMode === 'infinity') {
@@ -687,8 +1136,11 @@ function getDynamicSpawnRate() {
 }
 
 function updateObstacles() {
-    for (let obs of obstacles) {
-        obs.y += speed;
+    // Don't move obstacles if freeze is active
+    if (!hasPowerUp('freeze')) {
+        for (let obs of obstacles) {
+            obs.y += speed;
+        }
     }
     obstacles = obstacles.filter(obs => obs.y < canvas.height);
 }
@@ -705,6 +1157,9 @@ function handleTankCollision(obstacle) {
 function handleGhostCollision() {
     if ((player.activeSkin === 'ghost' || player.activeSkin === 'rainbow') && player.ghostCharges > 0) {
         player.ghostCharges--;
+        gameStats.ghostAbilityUses++;
+        playSound('jump'); // Ghost phase sound
+        createParticle(player.x + player.w/2, player.y + player.h/2, 'sparkle', '#BA55D3', 8);
         return true; // Phase through obstacle
     }
     return false;
@@ -817,7 +1272,58 @@ function updateGameLogic() {
         if (player.activeSkin === 'golden' || player.activeSkin === 'rainbow') {
             coinMultiplier *= 1.25; // 25% bonus
         }
-        coinsThisRun += newCoins * coinMultiplier;
+        const earnedCoins = newCoins * coinMultiplier;
+        coinsThisRun += earnedCoins;
+        gameStats.totalCoinsCollected += earnedCoins;
+        
+        // Create coin particles
+        createParticle(player.x + player.w/2, player.y, 'coin', '#FFD700', 3);
+        playSound('coin');
+    }
+
+    // Power-up spawning
+    powerUpSpawnTimer++;
+    if (powerUpSpawnTimer > 900 && Math.random() < 0.003) { // Every 15 seconds chance
+        const lane = Math.floor(Math.random() * 3);
+        const powerUpTypes = ['speedBoost', 'coinMagnet', 'jumpBoost', 'freeze', 'starPower'];
+        const randomType = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+        
+        collectiblePowerUps.push(new PowerUp(lanes[lane], -50, randomType));
+        powerUpSpawnTimer = 0;
+    }
+
+    // Update power-ups
+    collectiblePowerUps = collectiblePowerUps.filter(powerUp => {
+        const alive = powerUp.update();
+        if (alive) {
+            powerUp.draw();
+            
+            // Check collision with player
+            if (powerUp.checkCollision(player) && !powerUp.collected) {
+                powerUp.collected = true;
+                activatePowerUp(powerUp.type);
+                gameStats.powerUpsCollected++;
+                playSound('powerup');
+                createParticle(powerUp.x + powerUp.w/2, powerUp.y + powerUp.h/2, 'sparkle', '#FFFFFF', 8);
+                return false;
+            }
+        }
+        return alive;
+    });
+
+    // Update active power-ups
+    activePowerUps = activePowerUps.filter(powerUp => {
+        powerUp.duration--;
+        return powerUp.duration > 0;
+    });
+
+    // Weather effects
+    if (currentWeather === 'storm') {
+        lightningTimer++;
+        if (lightningTimer > 120 && Math.random() < 0.02) { // Random lightning
+            lightningTimer = 0;
+            // Lightning effect will be drawn in drawBackground
+        }
     }
 
     // Progressive difficulty system
@@ -869,6 +1375,12 @@ function updateGameLogic() {
 
     updateGameInfo();
     updateCoinDisplay();
+    checkAchievements();
+    
+    // Save stats periodically
+    if (Math.floor(score) % 100 === 0) {
+        localStorage.setItem('subwayStats', JSON.stringify(gameStats));
+    }
 } function getSpawnRate() {
     if (gameMode === 'infinity') {
         return 0.03;
@@ -877,12 +1389,106 @@ function updateGameLogic() {
     }
 }
 
+function activatePowerUp(type) {
+    switch(type) {
+        case 'speedBoost':
+            activePowerUps.push({ type: 'speedBoost', duration: 300 });
+            showNotification('⚡ SPEED BOOST ACTIVATED!', 'success', 2000);
+            break;
+        case 'coinMagnet':
+            activePowerUps.push({ type: 'coinMagnet', duration: 480 });
+            showNotification('🧲 COIN MAGNET ACTIVATED!', 'success', 2000);
+            break;
+        case 'jumpBoost':
+            // Instantly jump over next obstacle
+            const nextObstacle = obstacles.find(obs => obs.y > player.y - 100 && obs.y < player.y + 50);
+            if (nextObstacle) {
+                obstacles = obstacles.filter(obs => obs !== nextObstacle);
+                createParticle(nextObstacle.x + nextObstacle.w/2, nextObstacle.y + nextObstacle.h/2, 'sparkle', '#32CD32', 10);
+            }
+            showNotification('🦘 JUMPED OVER OBSTACLE!', 'success', 2000);
+            break;
+        case 'freeze':
+            activePowerUps.push({ type: 'freeze', duration: 180 });
+            showNotification('❄️ TIME FREEZE ACTIVATED!', 'success', 2000);
+            break;
+        case 'starPower':
+            activePowerUps.push({ type: 'starPower', duration: 300 });
+            showNotification('🌟 STAR POWER ACTIVATED!', 'success', 2000);
+            break;
+    }
+}
+
+function hasPowerUp(type) {
+    return activePowerUps.some(powerUp => powerUp.type === type);
+}
+
+function drawPowerUpIndicators() {
+    let yOffset = 50;
+    activePowerUps.forEach(powerUp => {
+        const timeLeft = Math.ceil(powerUp.duration / 60);
+        
+        let icon = '';
+        let color = '#fff';
+        switch(powerUp.type) {
+            case 'speedBoost': icon = '⚡'; color = '#00BFFF'; break;
+            case 'coinMagnet': icon = '🧲'; color = '#FFD700'; break;
+            case 'freeze': icon = '❄️'; color = '#87CEEB'; break;
+            case 'starPower': icon = '🌟'; color = '#FF6347'; break;
+        }
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(10, yOffset, 80, 25);
+        
+        ctx.fillStyle = color;
+        ctx.font = '16px Arial';
+        ctx.fillText(`${icon} ${timeLeft}s`, 15, yOffset + 18);
+        
+        yOffset += 30;
+    });
+}
+
 function drawBackground() {
-    // Basis achtergrond gradient
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    bgGradient.addColorStop(0, '#2C3E50');
-    bgGradient.addColorStop(0.5, '#34495E');
-    bgGradient.addColorStop(1, '#2C3E50');
+    // Weather-based background colors
+    let bgGradient;
+    
+    switch(currentWeather) {
+        case 'rain':
+            bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#34495E');
+            bgGradient.addColorStop(0.5, '#2C3E50');
+            bgGradient.addColorStop(1, '#1A252F');
+            break;
+        case 'snow':
+            bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#5D6D7E');
+            bgGradient.addColorStop(0.5, '#34495E');
+            bgGradient.addColorStop(1, '#2C3E50');
+            break;
+        case 'night':
+            bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#1A1A2E');
+            bgGradient.addColorStop(0.5, '#16213E');
+            bgGradient.addColorStop(1, '#0F3460');
+            break;
+        case 'storm':
+            bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#2C3E50');
+            bgGradient.addColorStop(0.5, '#1A252F');
+            bgGradient.addColorStop(1, '#17202A');
+            
+            // Lightning effect
+            if (lightningTimer === 0) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            break;
+        default: // normal
+            bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#2C3E50');
+            bgGradient.addColorStop(0.5, '#34495E');
+            bgGradient.addColorStop(1, '#2C3E50');
+    }
 
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -892,7 +1498,7 @@ function drawBackground() {
         const laneCenter = lanes[i] + 20; // Center van elke lane
 
         // Rail lijnen
-        ctx.strokeStyle = '#BDC3C7';
+        ctx.strokeStyle = currentWeather === 'night' ? '#7F8C8D' : '#BDC3C7';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(laneCenter - 15, 0);
@@ -902,14 +1508,15 @@ function drawBackground() {
         ctx.stroke();
 
         // Dwarsliggers (railroad ties)
-        ctx.fillStyle = '#8B4513';
+        ctx.fillStyle = currentWeather === 'snow' ? '#AEB6BF' : '#8B4513';
         for (let y = -20; y < canvas.height + 20; y += 40) {
             const offsetY = (y + score * 2) % (canvas.height + 40) - 20;
             ctx.fillRect(laneCenter - 18, offsetY, 36, 6);
         }
 
         // Rail glans effect
-        ctx.strokeStyle = 'rgba(236, 240, 241, 0.8)';
+        const railGloss = currentWeather === 'night' ? 'rgba(174, 182, 191, 0.6)' : 'rgba(236, 240, 241, 0.8)';
+        ctx.strokeStyle = railGloss;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(laneCenter - 14, 0);
@@ -920,16 +1527,21 @@ function drawBackground() {
     }
 
     // Tunnel muren
-    ctx.fillStyle = '#1A252F';
+    const wallColor = currentWeather === 'night' ? '#0B1426' : '#1A252F';
+    ctx.fillStyle = wallColor;
     ctx.fillRect(0, 0, 100, canvas.height); // Links
     ctx.fillRect(380, 0, 100, canvas.height); // Rechts
 
     // Tunnel verlichting effect
+    const lightIntensity = currentWeather === 'night' ? 0.05 : 0.1;
     const lightGradient = ctx.createRadialGradient(240, 100, 0, 240, 100, 200);
-    lightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+    lightGradient.addColorStop(0, `rgba(255, 255, 255, ${lightIntensity})`);
     lightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = lightGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw weather particles
+    updateWeatherParticles();
 }
 
 function gameLoop() {
@@ -950,19 +1562,30 @@ function gameLoop() {
         drawMultiplayerUI();
     }
 
+    // Draw power-up indicators
+    drawPowerUpIndicators();
+
     updateObstacles();
 
-    if (Math.random() < getDynamicSpawnRate()) {
+    // Power-ups affect obstacle movement
+    const freezeActive = hasPowerUp('freeze');
+    if (!freezeActive && Math.random() < getDynamicSpawnRate()) {
         spawnObstacle();
     }
 
     updateGameLogic();
 
-    if (checkCollision()) {
+    // Update and draw particles
+    updateParticles();
+
+    // Check collisions with star power protection
+    if (checkCollision() && !hasPowerUp('starPower')) {
         if (temporaryShield && shieldTimeLeft > 0) {
             // Tijdelijk schild absorbeert hit
             temporaryShield = false;
             shieldTimeLeft = 0;
+            playSound('shield');
+            createParticle(player.x + player.w/2, player.y + player.h/2, 'sparkle', '#FFD700', 15);
             // Remove colliding obstacle
             obstacles = obstacles.filter(obs => {
                 return !(obs.x < player.x + player.w &&
@@ -973,6 +1596,8 @@ function gameLoop() {
         } else if (player.lives > 1) {
             // Permanent shield absorbs hit
             player.lives--;
+            playSound('shield');
+            createParticle(player.x + player.w/2, player.y + player.h/2, 'sparkle', '#00BFFF', 12);
             // Remove colliding obstacle
             obstacles = obstacles.filter(obs => {
                 return !(obs.x < player.x + player.w &&
@@ -983,14 +1608,29 @@ function gameLoop() {
         } else {
             // Game over
             gameRunning = false;
+            playSound('crash');
+            createParticle(player.x + player.w/2, player.y + player.h/2, 'explosion', '#FF4444', 25);
+            
             setTimeout(() => {
                 coins += coinsThisRun;
+                gameStats.totalCoinsCollected += coinsThisRun;
+                
+                // Update survival time
+                const survivalTime = score / (60 * scoreMultiplier);
+                if (survivalTime > gameStats.longestSurvival) {
+                    gameStats.longestSurvival = survivalTime;
+                }
+                
                 saveProgress();
+                localStorage.setItem('subwayStats', JSON.stringify(gameStats));
+                
                 let message = `Game Over!\nScore: ${Math.floor(score)}\nCoins Earned: ${coinsThisRun} 🪙`;
                 if (gameMode === 'level') {
                     message += `\nReached Level: ${currentLevel}`;
+                } else if (gameMode === 'infinity') {
+                    message += `\nSurvival Time: ${Math.floor(survivalTime)}s`;
                 }
-                showNotification(message, '#10b981');
+                showNotification(message, 'info');
                 backToMenu();
             }, 100);
             return;
@@ -1069,6 +1709,142 @@ document.addEventListener('DOMContentLoaded', () => {
     closeUpdatesBtn.onclick = () => {
         updateLog.classList.remove('active');
     };
+
+    // Settings functionality
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsScreen = document.getElementById('settings-screen');
+    const settingsCloseBtn = document.getElementById('settings-close-btn');
+
+    settingsBtn.onclick = () => {
+        settingsScreen.style.display = 'block';
+        updateSettingsDisplay();
+        updateStatsDisplay();
+        updateAchievementsDisplay();
+    };
+
+    settingsCloseBtn.onclick = () => {
+        settingsScreen.style.display = 'none';
+    };
+
+    // Audio controls
+    const masterVolumeSlider = document.getElementById('master-volume');
+    const effectsVolumeSlider = document.getElementById('effects-volume');
+    const musicVolumeSlider = document.getElementById('music-volume');
+    const muteToggle = document.getElementById('mute-toggle');
+
+    masterVolumeSlider.oninput = () => {
+        const value = masterVolumeSlider.value;
+        document.getElementById('master-volume-value').textContent = value + '%';
+        effectsVolume = (value / 100) * 0.5;
+        musicVolume = (value / 100) * 0.3;
+        localStorage.setItem('subwayMasterVolume', value);
+    };
+
+    effectsVolumeSlider.oninput = () => {
+        const value = effectsVolumeSlider.value;
+        document.getElementById('effects-volume-value').textContent = value + '%';
+        effectsVolume = value / 100;
+        localStorage.setItem('subwayEffectsVolume', value);
+        playSound('coin'); // Test sound
+    };
+
+    musicVolumeSlider.oninput = () => {
+        const value = musicVolumeSlider.value;
+        document.getElementById('music-volume-value').textContent = value + '%';
+        musicVolume = value / 100;
+        localStorage.setItem('subwayMusicVolume', value);
+    };
+
+    muteToggle.onchange = () => {
+        isMuted = muteToggle.checked;
+        localStorage.setItem('subwayMuted', isMuted);
+    };
+
+    // Gameplay toggles
+    const particlesToggle = document.getElementById('particles-toggle');
+    const weatherToggle = document.getElementById('weather-toggle');
+    const shakeToggle = document.getElementById('shake-toggle');
+
+    particlesToggle.onchange = () => {
+        localStorage.setItem('subwayParticles', particlesToggle.checked);
+    };
+
+    weatherToggle.onchange = () => {
+        localStorage.setItem('subwayWeather', weatherToggle.checked);
+        if (!weatherToggle.checked) {
+            currentWeather = 'normal';
+            weatherParticles = [];
+        }
+    };
+
+    shakeToggle.onchange = () => {
+        localStorage.setItem('subwayScreenShake', shakeToggle.checked);
+    };
+
+    function updateSettingsDisplay() {
+        // Load saved settings
+        masterVolumeSlider.value = localStorage.getItem('subwayMasterVolume') || 50;
+        effectsVolumeSlider.value = localStorage.getItem('subwayEffectsVolume') || 70;
+        musicVolumeSlider.value = localStorage.getItem('subwayMusicVolume') || 30;
+        muteToggle.checked = localStorage.getItem('subwayMuted') === 'true';
+        
+        particlesToggle.checked = localStorage.getItem('subwayParticles') !== 'false';
+        weatherToggle.checked = localStorage.getItem('subwayWeather') !== 'false';
+        shakeToggle.checked = localStorage.getItem('subwayScreenShake') !== 'false';
+
+        // Update display values
+        document.getElementById('master-volume-value').textContent = masterVolumeSlider.value + '%';
+        document.getElementById('effects-volume-value').textContent = effectsVolumeSlider.value + '%';
+        document.getElementById('music-volume-value').textContent = musicVolumeSlider.value + '%';
+
+        // Apply settings
+        effectsVolume = effectsVolumeSlider.value / 100;
+        musicVolume = musicVolumeSlider.value / 100;
+        isMuted = muteToggle.checked;
+    }
+
+    function updateStatsDisplay() {
+        document.getElementById('total-coins-stat').textContent = gameStats.totalCoinsCollected || 0;
+        document.getElementById('ghost-uses-stat').textContent = gameStats.ghostAbilityUses || 0;
+        document.getElementById('powerups-stat').textContent = gameStats.powerUpsCollected || 0;
+        document.getElementById('survival-stat').textContent = Math.floor(gameStats.longestSurvival || 0) + 's';
+    }
+
+    function updateAchievementsDisplay() {
+        const achievementsListElement = document.getElementById('achievements-list');
+        achievementsListElement.innerHTML = '';
+
+        Object.keys(achievementsList).forEach(key => {
+            const achievement = achievementsList[key];
+            const isUnlocked = achievements[key] || false;
+
+            const achievementDiv = document.createElement('div');
+            achievementDiv.className = `achievement-item ${isUnlocked ? 'unlocked' : 'locked'}`;
+
+            let progress = '';
+            if (!isUnlocked) {
+                let current = 0;
+                switch(key) {
+                    case 'speedDemon': current = Math.floor(Math.max(gameStats.infinityBest || 0)); break;
+                    case 'ghostMaster': current = gameStats.ghostAbilityUses || 0; break;
+                    case 'coinCollector': current = gameStats.totalCoinsCollected || 0; break;
+                    case 'botSlayer': current = gameStats.multiplayerWins || 0; break;
+                    case 'survivor': current = Math.floor(gameStats.longestSurvival || 0); break;
+                    case 'powerUser': current = gameStats.powerUpsCollected || 0; break;
+                }
+                progress = `<div class="achievement-progress">${current}/${achievement.requirement}</div>`;
+            }
+
+            achievementDiv.innerHTML = `
+                <div class="achievement-icon">${achievement.icon}</div>
+                <div class="achievement-name">${achievement.name}</div>
+                <div class="achievement-description">${achievement.description}</div>
+                ${progress}
+            `;
+
+            achievementsListElement.appendChild(achievementDiv);
+        });
+    }
 
     // Shop tabs functionality
     const shopTabs = document.querySelectorAll('.shop-tab');
@@ -1196,9 +1972,17 @@ document.addEventListener('DOMContentLoaded', () => {
         updateActiveOutfitDisplay();
     };
 
+    // Initialize settings
+    updateSettingsDisplay();
+
     // Initialize displays
     updateStatsDisplay();
     updateActiveOutfitDisplay();
+    
+    // Load initial settings
+    effectsVolume = (localStorage.getItem('subwayEffectsVolume') || 70) / 100;
+    musicVolume = (localStorage.getItem('subwayMusicVolume') || 30) / 100;
+    isMuted = localStorage.getItem('subwayMuted') === 'true';
 });
 
 // Add new items to shop

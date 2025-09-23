@@ -17,7 +17,20 @@
         </div>
         <div class="panel-content">
             <div class="update-item latest">
-                <div class="update-version">v2.1.0 - NEW!</div>
+                <div class="update-version">v3.0.0 - MEGA UPDATE!</div>
+                <div class="update-date">23 Sep 2025</div>
+                <ul>
+                    <li>🎵 Complete geluidssysteem toegevoegd</li>
+                    <li>✨ Particle effects & visual upgrades</li>
+                    <li>⭐ Power-ups collectible systeem</li>
+                    <li>🏆 Achievements & badges systeem</li>
+                    <li>🌦️ Dynamic weather effects</li>
+                    <li>⚙️ Settings menu met audio controls</li>
+                    <li>📊 Enhanced statistics tracking</li>
+                </ul>
+            </div>
+            <div class="update-item">
+                <div class="update-version">v2.1.0</div>
                 <div class="update-date">23 Sep 2025</div>
                 <ul>
                     <li>🤖 Multiplayer VS Bots mode toegevoegd</li>
@@ -53,8 +66,9 @@
     <div id="start-screen">
         <div class="game-header">
             <h1>🚇 Subway Server Game 🚇</h1>
-            <div class="version-badge">v2.1.0</div>
+            <div class="version-badge">v3.0.0</div>
             <button id="show-updates" class="updates-btn">📋 Updates</button>
+            <button id="settings-btn" class="settings-btn">⚙️ Settings</button>
         </div>
 
         <!-- Player Stats Dashboard -->
@@ -131,9 +145,146 @@
             <p>⌨️ Druk <kbd>Enter</kbd> voor Infinity Mode | <kbd>L</kbd> voor Level Mode | <kbd>M</kbd> voor Multiplayer</p>
         </div>
 
+        <!-- New Features Section -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎵</div>
+                <h4>Audio System</h4>
+                <p>Dynamic sound effects and background music</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⭐</div>
+                <h4>Power-ups</h4>
+                <p>Collect special abilities during gameplay</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <h4>Achievements</h4>
+                <p>Unlock badges and track your progress</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌦️</div>
+                <h4>Weather Effects</h4>
+                <p>Experience different environmental conditions</p>
+            </div>
+        </div>
+
         <div class="game-tips">
             <div class="tip-item">💡 <strong>Tip:</strong> Elke 1000 punten = 10 sec schild!</div>
-            <div class="tip-item">🎯 <strong>Nieuw:</strong> Bekijk ads voor gratis coins!</div>
+            <div class="tip-item">⭐ <strong>Nieuw:</strong> Verzamel power-ups voor speciale abilities!</div>
+            <div class="tip-item">� <strong>Nieuw:</strong> Unlock achievements voor bonussen!</div>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" style="display:none;">
+        <div class="settings-header">
+            <h2>⚙️ Game Settings</h2>
+            <button id="settings-close-btn" class="settings-close">×</button>
+        </div>
+
+        <div class="settings-content">
+            <div class="settings-section">
+                <h3>🎵 Audio Settings</h3>
+                <div class="setting-item">
+                    <label>Master Volume</label>
+                    <input type="range" id="master-volume" min="0" max="100" value="50">
+                    <span id="master-volume-value">50%</span>
+                </div>
+                <div class="setting-item">
+                    <label>Sound Effects</label>
+                    <input type="range" id="effects-volume" min="0" max="100" value="70">
+                    <span id="effects-volume-value">70%</span>
+                </div>
+                <div class="setting-item">
+                    <label>Background Music</label>
+                    <input type="range" id="music-volume" min="0" max="100" value="30">
+                    <span id="music-volume-value">30%</span>
+                </div>
+                <div class="setting-item">
+                    <label>Mute All Sounds</label>
+                    <input type="checkbox" id="mute-toggle">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🎮 Gameplay Settings</h3>
+                <div class="setting-item">
+                    <label>Particle Effects</label>
+                    <input type="checkbox" id="particles-toggle" checked>
+                </div>
+                <div class="setting-item">
+                    <label>Weather Effects</label>
+                    <input type="checkbox" id="weather-toggle" checked>
+                </div>
+                <div class="setting-item">
+                    <label>Screen Shake</label>
+                    <input type="checkbox" id="shake-toggle" checked>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>📊 Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-display">
+                        <span class="stat-icon">🪙</span>
+                        <div class="stat-info">
+                            <span class="stat-label">Total Coins</span>
+                            <span class="stat-value" id="total-coins-stat">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-display">
+                        <span class="stat-icon">👻</span>
+                        <div class="stat-info">
+                            <span class="stat-label">Ghost Uses</span>
+                            <span class="stat-value" id="ghost-uses-stat">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-display">
+                        <span class="stat-icon">⭐</span>
+                        <div class="stat-info">
+                            <span class="stat-label">Power-ups</span>
+                            <span class="stat-value" id="powerups-stat">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-display">
+                        <span class="stat-icon">⏰</span>
+                        <div class="stat-info">
+                            <span class="stat-label">Best Survival</span>
+                            <span class="stat-value" id="survival-stat">0s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🏆 Achievements</h3>
+                <div class="achievements-grid" id="achievements-list">
+                    <!-- Achievements will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Challenge Popup -->
+    <div id="challenge-popup" class="modal" style="display:none;">
+        <div class="modal-content challenge-content">
+            <h3>🎯 Daily Challenge</h3>
+            <div id="challenge-details">
+                <div class="challenge-icon">🏃</div>
+                <h4 id="challenge-title">Loading...</h4>
+                <p id="challenge-description">Loading challenge...</p>
+                <div class="challenge-progress">
+                    <div class="progress-bar">
+                        <div id="challenge-progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="challenge-progress-text">0/100</span>
+                </div>
+                <div class="challenge-reward">
+                    Reward: <span id="challenge-reward">50 Coins</span>
+                </div>
+            </div>
+            <button id="challenge-close-btn" class="challenge-btn">Close</button>
         </div>
     </div>
 

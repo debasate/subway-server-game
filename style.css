@@ -155,6 +155,23 @@ body {
     box-shadow: 0 6px 20px rgba(116, 185, 255, 0.4);
 }
 
+.settings-btn {
+    background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+}
+
+.settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+}
+
 /* Player Dashboard */
 #player-dashboard {
     display: grid;
@@ -731,6 +748,7 @@ body {
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .tip-item {
@@ -739,6 +757,296 @@ body {
     border-radius: 20px;
     font-size: 0.9em;
     border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+/* Features Grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.feature-card h4 {
+    margin: 0 0 8px 0;
+    color: #4ecdc4;
+    font-size: 1.1em;
+}
+
+.feature-card p {
+    margin: 0;
+    font-size: 0.85em;
+    color: #bbb;
+}
+
+/* Settings Screen */
+#settings-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 500;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+.settings-header h2 {
+    margin: 0;
+    font-size: 2em;
+    background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.settings-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.settings-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+}
+
+.settings-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.settings-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.settings-section h3 {
+    margin: 0 0 20px 0;
+    color: #4ecdc4;
+    font-size: 1.3em;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px 0;
+}
+
+.setting-item label {
+    font-weight: bold;
+    color: #fff;
+    flex: 1;
+}
+
+.setting-item input[type="range"] {
+    flex: 2;
+    margin: 0 15px;
+}
+
+.setting-item input[type="checkbox"] {
+    transform: scale(1.5);
+    margin-left: 15px;
+}
+
+.setting-item span {
+    color: #4ecdc4;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: right;
+}
+
+/* Statistics Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.stat-display {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-display .stat-icon {
+    font-size: 1.8em;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+.stat-display .stat-info {
+    text-align: left;
+}
+
+.stat-display .stat-label {
+    display: block;
+    font-size: 0.8em;
+    color: #bbb;
+}
+
+.stat-display .stat-value {
+    display: block;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ffeb3b;
+}
+
+/* Achievements Grid */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.achievement-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.achievement-item.unlocked {
+    border-color: #FFD700;
+    background: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.achievement-item.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+.achievement-icon {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.achievement-name {
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.achievement-description {
+    font-size: 0.8em;
+    color: #bbb;
+    margin-bottom: 10px;
+}
+
+.achievement-progress {
+    font-size: 0.9em;
+    color: #4ecdc4;
+    font-weight: bold;
+}
+
+/* Daily Challenge */
+.challenge-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.challenge-icon {
+    font-size: 4em;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+}
+
+.challenge-progress {
+    margin: 15px 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(45deg, #00b894, #00cec9);
+    border-radius: 6px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.challenge-reward {
+    background: rgba(255, 215, 0, 0.2);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 15px 0;
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.challenge-btn {
+    background: linear-gradient(45deg, #00b894, #00cec9);
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.challenge-btn:hover {
+    background: linear-gradient(45deg, #00a085, #00b7c2);
+    transform: scale(1.05);
 }
 
 /* Game Canvas and Info */
