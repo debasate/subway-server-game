@@ -31,8 +31,73 @@ let obstacles = [];
 let speed = 2; // Start veel langzamer
 let score = 0;
 let baseSpeed = 2;
-let scoreMultiplier = 0.3; // Nog langzamere score toename
+let scoreMultiplier = 0.15; // Veel langzamere score toename
 let difficultyLevel = 1;
+
+// Notification system
+let notifications = [];
+let notificationId = 0;
+
+function showNotification(message, type = 'info', duration = 3000) {
+    const notification = {
+        id: notificationId++,
+        message: message,
+        type: type, // 'info', 'success', 'warning', 'achievement'
+        createdAt: Date.now(),
+        duration: duration
+    };
+    notifications.push(notification);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+        notifications = notifications.filter(n => n.id !== notification.id);
+    }, duration);
+}
+
+function drawNotifications() {
+    const currentTime = Date.now();
+    
+    notifications.forEach((notification, index) => {
+        const age = currentTime - notification.createdAt;
+        const progress = age / notification.duration;
+        const opacity = Math.max(0, 1 - progress);
+        
+        // Position from center
+        const y = canvas.height / 2 - 100 + (index * 60);
+        const x = canvas.width / 2;
+        
+        // Background
+        ctx.fillStyle = `rgba(0, 0, 0, ${0.8 * opacity})`;
+        ctx.fillRect(x - 150, y - 25, 300, 50);
+        
+        // Border based on type
+        let borderColor = '#4CAF50';
+        switch (notification.type) {
+            case 'success': borderColor = '#4CAF50'; break;
+            case 'warning': borderColor = '#FF9800'; break;
+            case 'achievement': borderColor = '#FFD700'; break;
+            case 'info': borderColor = '#2196F3'; break;
+        }
+        
+        ctx.strokeStyle = `rgba(${hexToRgb(borderColor)}, ${opacity})`;
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x - 150, y - 25, 300, 50);
+        
+        // Text
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(notification.message, x, y + 5);
+        ctx.textAlign = 'left';
+    });
+}
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? 
+        `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : 
+        '255, 255, 255';
+}
 
 // Shield system
 let temporaryShield = false;
@@ -102,7 +167,7 @@ function buyItem(itemName) {
         saveProgress();
         updateCoinDisplay();
         updateShopDisplay();
-        alert(`${item.name} gekocht! 🎉`);
+        showNotification(`${item.name} gekocht! 🎉`, '#4ade80');
     }
 }
 
@@ -482,7 +547,7 @@ function updateGameLogic() {
 
         // Visual feedback
         setTimeout(() => {
-            alert(`🛡️ SCHILD GEACTIVEERD! 🛡️\n10 seconden bescherming!`);
+            showNotification(`🛡️ SCHILD GEACTIVEERD! 🛡️\n10 seconden bescherming!`, '#fbbf24');
         }, 100);
     }
 
@@ -511,7 +576,7 @@ function updateGameLogic() {
 
     if (difficultyLevel > oldDifficulty) {
         setTimeout(() => {
-            alert(`🔥 DIFFICULTY LEVEL ${difficultyLevel}! 🔥\nThings are getting harder!`);
+            showNotification(`🔥 DIFFICULTY LEVEL ${difficultyLevel}! 🔥\nThings are getting harder!`, '#f97316');
         }, 100);
     }
 
@@ -531,7 +596,7 @@ function updateGameLogic() {
 
             // Brief pause and notification
             setTimeout(() => {
-                alert(`Level ${currentLevel - 1} Complete!\nEntering: ${newLevel.name}`);
+                showNotification(`Level ${currentLevel - 1} Complete!\nEntering: ${newLevel.name}`, '#8b5cf6');
             }, 100);
         } else if (score >= levelTarget && currentLevel >= levels.length) {
             // Game completed!
@@ -539,7 +604,7 @@ function updateGameLogic() {
             setTimeout(() => {
                 coins += coinsThisRun;
                 saveProgress();
-                alert(`🎉 GAME COMPLETED! 🎉\nYou finished all levels!\nFinal Score: ${Math.floor(score)}\nCoins Earned: ${coinsThisRun} 🪙`);
+                showNotification(`🎉 GAME COMPLETED! 🎉\nYou finished all levels!\nFinal Score: ${Math.floor(score)}\nCoins Earned: ${coinsThisRun} 🪙`, '#f59e0b');
                 backToMenu();
             }, 100);
             return;
@@ -663,7 +728,7 @@ function gameLoop() {
                 if (gameMode === 'level') {
                     message += `\nReached Level: ${currentLevel}`;
                 }
-                alert(message);
+                showNotification(message, '#10b981');
                 backToMenu();
             }, 100);
             return;
@@ -690,45 +755,13 @@ document.addEventListener('keydown', e => {
 
     if (e.key === 'ArrowLeft' && player.lane > 0) {
         player.lane--;
-        // Smooth movement for speed skins
-        if (player.moveSpeed > 1) {
-            // Animate to new position
-            const targetX = lanes[player.lane];
-            const currentX = player.x;
-            const animateMove = () => {
-                const diff = targetX - player.x;
-                player.x += diff * 0.3;
-                if (Math.abs(diff) > 1) {
-                    requestAnimationFrame(animateMove);
-                } else {
-                    player.x = targetX;
-                }
-            };
-            animateMove();
-        } else {
-            player.x = lanes[player.lane];
-        }
+        // Instant snelle movement voor iedereen
+        player.x = lanes[player.lane];
     }
     if (e.key === 'ArrowRight' && player.lane < 2) {
         player.lane++;
-        // Smooth movement for speed skins
-        if (player.moveSpeed > 1) {
-            // Animate to new position
-            const targetX = lanes[player.lane];
-            const currentX = player.x;
-            const animateMove = () => {
-                const diff = targetX - player.x;
-                player.x += diff * 0.3;
-                if (Math.abs(diff) > 1) {
-                    requestAnimationFrame(animateMove);
-                } else {
-                    player.x = targetX;
-                }
-            };
-            animateMove();
-        } else {
-            player.x = lanes[player.lane];
-        }
+        // Instant snelle movement voor iedereen
+        player.x = lanes[player.lane];
     }
 });
 
