@@ -1081,32 +1081,346 @@ canvas {
     position: relative;
 }
 
-/* Responsive Design */
+/* Mobile Controls */
+#mobile-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.mobile-control-panel {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 15px 25px;
+    border-radius: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    pointer-events: auto;
+}
+
+.mobile-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 15px;
+    border-radius: 50%;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 60px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-btn:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0.95);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.mobile-arrow {
+    background: linear-gradient(45deg, #4ecdc4, #44a08d);
+}
+
+.mobile-center {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+}
+
+.mobile-info {
+    pointer-events: auto;
+}
+
+.mobile-hint {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile Responsive Design */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
     .game-header h1 {
-        font-size: 2em;
+        font-size: 1.8em;
+    }
+
+    .game-header {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
     }
 
     .gamemode-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
 
     .shop-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
     }
 
     .game-tips {
         flex-direction: column;
         align-items: center;
+        gap: 10px;
     }
 
     #player-dashboard {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
 
     .side-panel {
         width: 100%;
         right: -100%;
+    }
+
+    /* Canvas adjustments for mobile */
+    #game-canvas {
+        max-width: 90vw;
+        max-height: 60vh;
+        width: auto !important;
+        height: auto !important;
+    }
+
+    /* Settings screen mobile optimization */
+    .settings-content {
+        padding: 0 10px;
+    }
+
+    .settings-section {
+        padding: 20px 15px;
+    }
+
+    .setting-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .setting-item label {
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    .setting-item input[type="range"] {
+        margin: 0;
+        width: 100%;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .achievements-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    /* Shop mobile optimization */
+    .shop-header {
+        padding: 0 10px;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .shop-tabs {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .shop-tab {
+        flex: 1;
+        min-width: 100px;
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    /* Mobile game info positioning */
+    #game-info {
+        position: fixed;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        z-index: 100;
+    }
+
+    #game-stats {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    /* Modal mobile optimization */
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        margin: 10px;
+        padding: 20px;
+    }
+
+    /* Quick controls mobile */
+    .quick-controls {
+        margin-bottom: 15px;
+    }
+
+    .quick-controls p {
+        font-size: 0.8em;
+        line-height: 1.4;
+    }
+
+    /* Power-up indicators mobile positioning */
+    .mobile-powerup-indicators {
+        position: fixed;
+        top: 60px;
+        left: 10px;
+        z-index: 100;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-header h1 {
+        font-size: 1.5em;
+    }
+
+    .version-badge,
+    .updates-btn,
+    .settings-btn {
+        font-size: 0.8em;
+        padding: 8px 12px;
+    }
+
+    .gamemode-card {
+        padding: 20px 15px;
+    }
+
+    .mode-icon {
+        font-size: 2.5em;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-icon {
+        font-size: 2em;
+    }
+
+    .mobile-btn {
+        min-width: 50px;
+        min-height: 50px;
+        font-size: 1.2em;
+        padding: 12px;
+    }
+
+    .mobile-control-panel {
+        padding: 12px 20px;
+        gap: 15px;
+    }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+    #start-screen {
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 10px 0;
+    }
+
+    .game-header {
+        margin-bottom: 15px;
+    }
+
+    .gamemode-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .gamemode-card {
+        padding: 15px 10px;
+    }
+
+    .mode-icon {
+        font-size: 2em;
+        margin-bottom: 8px;
+    }
+
+    #player-dashboard {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .mobile-control-panel {
+        bottom: 10px;
+    }
+}
+
+/* Touch improvements */
+@media (hover: none) and (pointer: coarse) {
+    .gamemode-card:hover,
+    .stat-card:hover,
+    .feature-card:hover {
+        transform: none;
+    }
+
+    .gamemode-card:active,
+    .stat-card:active,
+    .feature-card:active {
+        transform: scale(0.98);
+    }
+
+    button:hover {
+        transform: none;
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    /* Larger touch targets */
+    .mode-btn,
+    .buy-btn,
+    .ad-btn {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+
+    .shop-tab {
+        min-height: 44px;
     }
 }
 

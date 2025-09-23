@@ -18,6 +18,23 @@ let isMuted = false;
 let musicVolume = 0.3;
 let effectsVolume = 0.5;
 
+// Mobile Touch Controls
+let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+let lastTouchTime = 0;
+let touchSensitivity = 50; // minimum distance for swipe detection
+
+// Mobile UI elements
+let mobileControls = {
+    leftBtn: null,
+    rightBtn: null,
+    pauseBtn: null,
+    powerUpBtn: null
+};
+
 // Sound effects storage
 const sounds = {
     coin: null,
@@ -1648,6 +1665,14 @@ function backToMenu() {
     canvas.style.display = 'none';
     gameInfo.style.display = 'none';
 
+    // Hide mobile controls
+    if (isMobile) {
+        hideMobileControls();
+        // Reset canvas size
+        canvas.style.width = '';
+        canvas.style.height = '';
+    }
+
     // Restore body flex layout for menu
     document.body.style.display = 'flex';
     document.body.style.justifyContent = 'center';
@@ -1667,13 +1692,158 @@ document.addEventListener('keydown', e => {
         player.lane--;
         // Instant snelle movement voor iedereen
         player.x = lanes[player.lane];
+        playSound('jump');
+        createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
     }
     if (e.key === 'ArrowRight' && player.lane < 2) {
         player.lane++;
         // Instant snelle movement voor iedereen
         player.x = lanes[player.lane];
+        playSound('jump');
+        createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
     }
 });
+
+// Mobile Touch Controls
+function initTouchControls() {
+    // Touch events for canvas (swipe controls)
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Prevent default touch behaviors
+    canvas.addEventListener('touchstart', e => e.preventDefault());
+    canvas.addEventListener('touchmove', e => e.preventDefault());
+    canvas.addEventListener('touchend', e => e.preventDefault());
+}
+
+function handleTouchStart(e) {
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    lastTouchTime = Date.now();
+}
+
+function handleTouchMove(e) {
+    e.preventDefault(); // Prevent scrolling
+}
+
+function handleTouchEnd(e) {
+    if (!gameRunning) return;
+    
+    const touch = e.changedTouches[0];
+    touchEndX = touch.clientX;
+    touchEndY = touch.clientY;
+    
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    const touchDuration = Date.now() - lastTouchTime;
+    
+    // Detect swipe direction
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > touchSensitivity) {
+        if (deltaX > 0 && player.lane < 2) {
+            // Swipe right
+            player.lane++;
+            player.x = lanes[player.lane];
+            playSound('jump');
+            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+        } else if (deltaX < 0 && player.lane > 0) {
+            // Swipe left
+            player.lane--;
+            player.x = lanes[player.lane];
+            playSound('jump');
+            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+        }
+    }
+    
+    // Tap for power-up activation (if available)
+    if (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30 && touchDuration < 300) {
+        // Quick tap - could be used for power-ups in the future
+        activateNextPowerUp();
+    }
+}
+
+function activateNextPowerUp() {
+    // Find the next available power-up that can be manually activated
+    const manualPowerUps = ['jumpBoost', 'freeze', 'coinRain'];
+    const availablePowerUp = collectiblePowerUps.find(powerUp => 
+        manualPowerUps.includes(powerUp.type) && !powerUp.collected
+    );
+    
+    if (availablePowerUp) {
+        availablePowerUp.collected = true;
+        activatePowerUp(availablePowerUp.type);
+        collectiblePowerUps = collectiblePowerUps.filter(p => p !== availablePowerUp);
+    }
+}
+
+// Mobile UI Controls
+function createMobileControls() {
+    if (!isMobile) return;
+    
+    // Create mobile control overlay
+    const mobileControlsDiv = document.createElement('div');
+    mobileControlsDiv.id = 'mobile-controls';
+    mobileControlsDiv.innerHTML = `
+        <div class="mobile-control-panel">
+            <button id="mobile-left" class="mobile-btn mobile-arrow">←</button>
+            <button id="mobile-pause" class="mobile-btn mobile-center">⏸️</button>
+            <button id="mobile-right" class="mobile-btn mobile-arrow">→</button>
+        </div>
+        <div class="mobile-info">
+            <div class="mobile-hint">👆 Swipe left/right or use buttons</div>
+        </div>
+    `;
+    
+    document.body.appendChild(mobileControlsDiv);
+    
+    // Add event listeners
+    document.getElementById('mobile-left').addEventListener('touchstart', e => {
+        e.preventDefault();
+        if (gameRunning && player.lane > 0) {
+            player.lane--;
+            player.x = lanes[player.lane];
+            playSound('jump');
+            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+        }
+    });
+    
+    document.getElementById('mobile-right').addEventListener('touchstart', e => {
+        e.preventDefault();
+        if (gameRunning && player.lane < 2) {
+            player.lane++;
+            player.x = lanes[player.lane];
+            playSound('jump');
+            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+        }
+    });
+    
+    document.getElementById('mobile-pause').addEventListener('touchstart', e => {
+        e.preventDefault();
+        if (gameRunning) {
+            // Pause functionality
+            gameRunning = false;
+            showNotification('Game Paused\nTap to continue', 'info', 10000);
+        } else if (canvas.style.display !== 'none') {
+            gameRunning = true;
+            requestAnimationFrame(gameLoop);
+        }
+    });
+}
+
+function showMobileControls() {
+    const mobileControls = document.getElementById('mobile-controls');
+    if (mobileControls) {
+        mobileControls.style.display = 'flex';
+    }
+}
+
+function hideMobileControls() {
+    const mobileControls = document.getElementById('mobile-controls');
+    if (mobileControls) {
+        mobileControls.style.display = 'none';
+    }
+}
 
 function startGame(mode = 'infinity') {
     resetGame(mode);
@@ -1686,8 +1856,44 @@ function startGame(mode = 'infinity') {
     document.body.style.justifyContent = 'center';
     document.body.style.alignItems = 'center';
 
+    // Show mobile controls if on mobile device
+    if (isMobile) {
+        showMobileControls();
+        // Make canvas responsive
+        adjustCanvasForMobile();
+    }
+
     gameRunning = true;
     requestAnimationFrame(gameLoop);
+}
+
+function adjustCanvasForMobile() {
+    if (!isMobile) return;
+    
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    
+    // Calculate optimal canvas size for mobile
+    const maxWidth = Math.min(screenWidth * 0.9, 480);
+    const maxHeight = Math.min(screenHeight * 0.7, 640);
+    
+    // Maintain aspect ratio
+    const aspectRatio = 480 / 640;
+    let newWidth, newHeight;
+    
+    if (maxWidth / maxHeight > aspectRatio) {
+        newHeight = maxHeight;
+        newWidth = newHeight * aspectRatio;
+    } else {
+        newWidth = maxWidth;
+        newHeight = newWidth / aspectRatio;
+    }
+    
+    canvas.style.width = newWidth + 'px';
+    canvas.style.height = newHeight + 'px';
+    
+    // Update touch sensitivity based on canvas size
+    touchSensitivity = Math.max(30, newWidth * 0.1);
 }
 
 // Event listeners for gamemode buttons
@@ -1978,14 +2184,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize displays
     updateStatsDisplay();
     updateActiveOutfitDisplay();
-
+    
     // Load initial settings
     effectsVolume = (localStorage.getItem('subwayEffectsVolume') || 70) / 100;
     musicVolume = (localStorage.getItem('subwayMusicVolume') || 30) / 100;
     isMuted = localStorage.getItem('subwayMuted') === 'true';
-});
-
-// Add new items to shop
+    
+    // Initialize mobile controls
+    if (isMobile) {
+        initTouchControls();
+        createMobileControls();
+        
+        // Add mobile-specific instructions
+        document.querySelector('.quick-controls p').innerHTML = 
+            '📱 <strong>Mobile:</strong> Swipe left/right to move | Tap for power-ups<br>' +
+            '⌨️ <strong>Desktop:</strong> Arrow keys or Enter/L/M for game modes';
+    }
+    
+    // Handle orientation changes
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+            if (gameRunning && isMobile) {
+                adjustCanvasForMobile();
+            }
+        }, 500);
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (gameRunning && isMobile) {
+            adjustCanvasForMobile();
+        }
+    });
+});// Add new items to shop
 const newShopItems = {
     ...shopItems,
     neonSkin: { price: 400, name: "Neon Racer" },
