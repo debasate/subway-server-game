@@ -7,6 +7,9 @@ body {
     margin: 0;
     padding: 0;
     background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    background-attachment: fixed;
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
     color: #fff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
@@ -15,6 +18,35 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+}
+
+/* Animated background gradient */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Add subtle pattern overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
 }
 
 /* Update Log Panel */
@@ -1079,6 +1111,13 @@ canvas {
     display: block;
     margin: 0 auto;
     position: relative;
+    background: linear-gradient(135deg, #2C3E50, #34495E, #2C3E50);
+    border: 3px solid rgba(78, 205, 196, 0.3);
+}
+
+/* Ensure canvas always has a background */
+#game-canvas {
+    background: linear-gradient(135deg, #2C3E50, #34495E, #2C3E50) !important;
 }
 
 /* Mobile Controls */
@@ -1391,6 +1430,7 @@ canvas {
 
 /* Touch improvements */
 @media (hover: none) and (pointer: coarse) {
+
     .gamemode-card:hover,
     .stat-card:hover,
     .feature-card:hover {

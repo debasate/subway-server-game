@@ -153,6 +153,123 @@ let currentWeather = 'normal'; // 'normal', 'rain', 'snow', 'night', 'storm'
 let weatherParticles = [];
 let lightningTimer = 0;
 
+// Theme System
+let currentTheme = 'subway'; // 'subway', 'space', 'underwater', 'forest', 'desert', 'neon', 'retro'
+let themeUnlocked = JSON.parse(localStorage.getItem('subwayThemesUnlocked') || '{"subway": true}');
+
+const themes = {
+    subway: {
+        name: 'Classic Subway',
+        description: 'The original underground train experience',
+        icon: '🚇',
+        colors: {
+            primary: '#2C3E50',
+            secondary: '#34495E', 
+            accent: '#4ecdc4',
+            rail: '#BDC3C7',
+            wall: '#1A252F'
+        },
+        unlockRequirement: 0,
+        unlocked: true
+    },
+    space: {
+        name: 'Space Station',
+        description: 'Futuristic space tunnel adventure',
+        icon: '🚀',
+        colors: {
+            primary: '#0F1419',
+            secondary: '#1A1F2E',
+            accent: '#00D9FF',
+            rail: '#4A90E2',
+            wall: '#0A0D12'
+        },
+        unlockRequirement: 2000,
+        unlocked: false
+    },
+    underwater: {
+        name: 'Ocean Depths',
+        description: 'Deep sea underwater tunnel',
+        icon: '🌊',
+        colors: {
+            primary: '#1B4F72',
+            secondary: '#2471A3',
+            accent: '#00FFFF',
+            rail: '#5DADE2',
+            wall: '#154360'
+        },
+        unlockRequirement: 5000,
+        unlocked: false
+    },
+    forest: {
+        name: 'Jungle Path',
+        description: 'Mysterious forest tunnel',
+        icon: '🌲',
+        colors: {
+            primary: '#1B4332',
+            secondary: '#2D5016',
+            accent: '#52B788',
+            rail: '#8FBC8F',
+            wall: '#0D2818'
+        },
+        unlockRequirement: 10000,
+        unlocked: false
+    },
+    desert: {
+        name: 'Sand Dunes',
+        description: 'Ancient desert passage',
+        icon: '🏜️',
+        colors: {
+            primary: '#8B4513',
+            secondary: '#A0522D',
+            accent: '#FFD700',
+            rail: '#DEB887',
+            wall: '#654321'
+        },
+        unlockRequirement: 15000,
+        unlocked: false
+    },
+    neon: {
+        name: 'Neon City',
+        description: 'Cyberpunk neon-lit tunnel',
+        icon: '🌃',
+        colors: {
+            primary: '#FF1493',
+            secondary: '#9932CC',
+            accent: '#00FFFF',
+            rail: '#FF69B4',
+            wall: '#4B0082'
+        },
+        unlockRequirement: 25000,
+        unlocked: false
+    },
+    retro: {
+        name: 'Retro Arcade',
+        description: 'Classic 80s style tunnel',
+        icon: '👾',
+        colors: {
+            primary: '#FF6B35',
+            secondary: '#F7931E',
+            accent: '#FFE135',
+            rail: '#C5D86D',
+            wall: '#7209B7'
+        },
+        unlockRequirement: 50000,
+        unlocked: false
+    }
+};
+
+// Level Progress System
+let levelProgressBar = {
+    visible: false,
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    progress: 0,
+    targetProgress: 0,
+    animationSpeed: 0.02
+};
+
 // Power-ups System
 let activePowerUps = [];
 let powerUpSpawnTimer = 0;
@@ -928,15 +1045,17 @@ function resetGame(mode = 'infinity') {
     }, 500);
 }
 function updateGameInfo() {
+    const currentThemeName = themes[currentTheme].name;
+    
     if (gameMode === 'infinity') {
         modeDisplay.textContent = 'Mode: Infinity';
-        levelDisplay.textContent = `Score: ${Math.floor(score)}`;
+        levelDisplay.textContent = `Score: ${Math.floor(score)} | Theme: ${currentThemeName}`;
     } else if (gameMode === 'multiplayer') {
         modeDisplay.textContent = 'Mode: VS Bots (1v4)';
-        levelDisplay.textContent = `Score: ${Math.floor(score)}`;
+        levelDisplay.textContent = `Score: ${Math.floor(score)} | Theme: ${currentThemeName}`;
     } else {
         modeDisplay.textContent = `Mode: Level ${currentLevel}`;
-        levelDisplay.textContent = `Progress: ${Math.floor(score)}/${levelTarget}`;
+        levelDisplay.textContent = `Progress: ${Math.floor(score)}/${levelTarget} | Theme: ${currentThemeName}`;
     }
 }
 
@@ -1117,24 +1236,126 @@ function drawObstacles() {
 
 function drawLevelInfo() {
     if (gameMode === 'level') {
-        ctx.fillStyle = '#fff';
-        ctx.font = '16px Arial';
+        const theme = themes[currentTheme];
+        
+        // Level name with theme colors
+        ctx.fillStyle = theme.highlight;
+        ctx.font = 'bold 16px Arial';
         const level = levels[currentLevel - 1];
         ctx.fillText(level.name, 10, canvas.height - 20);
 
-        // Progress bar
-        const barWidth = 200;
-        const barHeight = 10;
-        const barX = canvas.width - barWidth - 10;
-        const barY = canvas.height - 25;
-
-        ctx.fillStyle = '#333';
-        ctx.fillRect(barX, barY, barWidth, barHeight);
-
-        const progress = Math.min(score / levelTarget, 1);
-        ctx.fillStyle = '#4caf50';
-        ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+        // Enhanced progress bar with animation
+        drawLevelProgressBar();
     }
+}
+
+function drawLevelProgressBar() {
+    const theme = themes[currentTheme];
+    const barWidth = 250;
+    const barHeight = 12;
+    const barX = canvas.width - barWidth - 10;
+    const barY = canvas.height - 30;
+    
+    // Calculate progress
+    const progress = Math.min(score / levelTarget, 1);
+    const animatedProgress = smoothStep(levelProgressBar.previousProgress, progress, 0.05);
+    levelProgressBar.previousProgress = animatedProgress;
+    
+    // Background with theme colors
+    const borderRadius = 6;
+    ctx.fillStyle = darkenColor(theme.background, 30);
+    roundRect(ctx, barX - 2, barY - 2, barWidth + 4, barHeight + 4, borderRadius);
+    ctx.fill();
+    
+    // Progress bar background
+    ctx.fillStyle = darkenColor(theme.primary, 20);
+    roundRect(ctx, barX, barY, barWidth, barHeight, borderRadius - 1);
+    ctx.fill();
+    
+    // Progress fill with gradient
+    if (animatedProgress > 0) {
+        const progressWidth = barWidth * animatedProgress;
+        const gradient = ctx.createLinearGradient(barX, barY, barX + progressWidth, barY);
+        
+        // Dynamic colors based on progress
+        if (progress >= 1) {
+            // Complete - use highlight color
+            gradient.addColorStop(0, theme.highlight);
+            gradient.addColorStop(1, lightenColor(theme.highlight, 20));
+        } else if (progress >= 0.75) {
+            // Almost complete - green to highlight
+            gradient.addColorStop(0, '#4CAF50');
+            gradient.addColorStop(1, theme.accent);
+        } else if (progress >= 0.5) {
+            // Half way - yellow to accent
+            gradient.addColorStop(0, '#FFC107');
+            gradient.addColorStop(1, theme.accent);
+        } else {
+            // Starting - red to secondary
+            gradient.addColorStop(0, '#F44336');
+            gradient.addColorStop(1, theme.secondary);
+        }
+        
+        ctx.fillStyle = gradient;
+        roundRect(ctx, barX, barY, progressWidth, barHeight, borderRadius - 1);
+        ctx.fill();
+        
+        // Shimmer effect for completed progress
+        if (progress >= 1 && levelProgressBar.shimmerOffset !== null) {
+            const shimmerGradient = ctx.createLinearGradient(
+                barX + levelProgressBar.shimmerOffset - 30, barY,
+                barX + levelProgressBar.shimmerOffset + 30, barY
+            );
+            shimmerGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            shimmerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.6)');
+            shimmerGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = shimmerGradient;
+            roundRect(ctx, barX, barY, progressWidth, barHeight, borderRadius - 1);
+            ctx.fill();
+            
+            // Update shimmer animation
+            levelProgressBar.shimmerOffset += 3;
+            if (levelProgressBar.shimmerOffset > barWidth + 60) {
+                levelProgressBar.shimmerOffset = -60;
+            }
+        }
+    }
+    
+    // Progress text with theme colors
+    ctx.fillStyle = theme.highlight;
+    ctx.font = 'bold 11px Arial';
+    ctx.textAlign = 'center';
+    const progressText = `${Math.floor(score)}/${levelTarget}`;
+    ctx.fillText(progressText, barX + barWidth / 2, barY + barHeight + 15);
+    
+    // Percentage text
+    ctx.font = '10px Arial';
+    ctx.fillStyle = theme.secondary;
+    const percentText = `${Math.floor(progress * 100)}%`;
+    ctx.fillText(percentText, barX + barWidth / 2, barY - 8);
+    
+    ctx.textAlign = 'left'; // Reset alignment
+}
+
+// Helper function for smooth progress animation
+function smoothStep(start, end, factor) {
+    return start + (end - start) * factor;
+}
+
+// Helper function for rounded rectangles
+function roundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
 }
 
 function spawnObstacle() {
@@ -1466,33 +1687,41 @@ function drawPowerUpIndicators() {
 }
 
 function drawBackground() {
-    // Weather-based background colors
+    // Get current theme colors
+    const theme = themes[currentTheme];
+    
+    // Always ensure canvas has a background - clear first
+    ctx.fillStyle = theme.background;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Theme and weather-based background colors
     let bgGradient;
 
+    // Combine theme colors with weather effects
     switch (currentWeather) {
         case 'rain':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, '#34495E');
-            bgGradient.addColorStop(0.5, '#2C3E50');
-            bgGradient.addColorStop(1, '#1A252F');
+            bgGradient.addColorStop(0, darkenColor(theme.primary, 20));
+            bgGradient.addColorStop(0.5, theme.background);
+            bgGradient.addColorStop(1, darkenColor(theme.background, 30));
             break;
         case 'snow':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, '#5D6D7E');
-            bgGradient.addColorStop(0.5, '#34495E');
-            bgGradient.addColorStop(1, '#2C3E50');
+            bgGradient.addColorStop(0, lightenColor(theme.background, 20));
+            bgGradient.addColorStop(0.5, theme.primary);
+            bgGradient.addColorStop(1, theme.background);
             break;
         case 'night':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, '#1A1A2E');
-            bgGradient.addColorStop(0.5, '#16213E');
-            bgGradient.addColorStop(1, '#0F3460');
+            bgGradient.addColorStop(0, darkenColor(theme.background, 40));
+            bgGradient.addColorStop(0.5, darkenColor(theme.primary, 30));
+            bgGradient.addColorStop(1, darkenColor(theme.accent, 20));
             break;
         case 'storm':
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, '#2C3E50');
-            bgGradient.addColorStop(0.5, '#1A252F');
-            bgGradient.addColorStop(1, '#17202A');
+            bgGradient.addColorStop(0, theme.background);
+            bgGradient.addColorStop(0.5, darkenColor(theme.background, 40));
+            bgGradient.addColorStop(1, darkenColor(theme.background, 50));
 
             // Lightning effect
             if (lightningTimer === 0) {
@@ -1502,20 +1731,20 @@ function drawBackground() {
             break;
         default: // normal
             bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            bgGradient.addColorStop(0, '#2C3E50');
-            bgGradient.addColorStop(0.5, '#34495E');
-            bgGradient.addColorStop(1, '#2C3E50');
+            bgGradient.addColorStop(0, theme.background);
+            bgGradient.addColorStop(0.5, theme.primary);
+            bgGradient.addColorStop(1, theme.background);
     }
 
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Tekenen van de drie railsporen
+    // Tekenen van de drie railsporen met thema kleuren
     for (let i = 0; i < 3; i++) {
         const laneCenter = lanes[i] + 20; // Center van elke lane
 
-        // Rail lijnen
-        ctx.strokeStyle = currentWeather === 'night' ? '#7F8C8D' : '#BDC3C7';
+        // Rail lijnen met thema kleur
+        ctx.strokeStyle = currentWeather === 'night' ? darkenColor(theme.secondary, 20) : theme.secondary;
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(laneCenter - 15, 0);
@@ -1524,15 +1753,17 @@ function drawBackground() {
         ctx.lineTo(laneCenter + 15, canvas.height);
         ctx.stroke();
 
-        // Dwarsliggers (railroad ties)
-        ctx.fillStyle = currentWeather === 'snow' ? '#AEB6BF' : '#8B4513';
+        // Dwarsliggers (railroad ties) met thema accent
+        ctx.fillStyle = currentWeather === 'snow' ? lightenColor(theme.accent, 10) : theme.accent;
         for (let y = -20; y < canvas.height + 20; y += 40) {
             const offsetY = (y + score * 2) % (canvas.height + 40) - 20;
             ctx.fillRect(laneCenter - 18, offsetY, 36, 6);
         }
 
-        // Rail glans effect
-        const railGloss = currentWeather === 'night' ? 'rgba(174, 182, 191, 0.6)' : 'rgba(236, 240, 241, 0.8)';
+        // Rail glans effect met thema highlight
+        const railGloss = currentWeather === 'night' ? 
+            `rgba(${hexToRgb(theme.secondary).r}, ${hexToRgb(theme.secondary).g}, ${hexToRgb(theme.secondary).b}, 0.6)` : 
+            `rgba(${hexToRgb(theme.highlight).r}, ${hexToRgb(theme.highlight).g}, ${hexToRgb(theme.highlight).b}, 0.8)`;
         ctx.strokeStyle = railGloss;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -1543,16 +1774,17 @@ function drawBackground() {
         ctx.stroke();
     }
 
-    // Tunnel muren
-    const wallColor = currentWeather === 'night' ? '#0B1426' : '#1A252F';
+    // Tunnel muren met thema kleuren
+    const wallColor = currentWeather === 'night' ? darkenColor(theme.background, 50) : darkenColor(theme.primary, 30);
     ctx.fillStyle = wallColor;
     ctx.fillRect(0, 0, 100, canvas.height); // Links
     ctx.fillRect(380, 0, 100, canvas.height); // Rechts
 
-    // Tunnel verlichting effect
+    // Tunnel verlichting effect met thema highlight
     const lightIntensity = currentWeather === 'night' ? 0.05 : 0.1;
+    const themeRgb = hexToRgb(theme.highlight);
     const lightGradient = ctx.createRadialGradient(240, 100, 0, 240, 100, 200);
-    lightGradient.addColorStop(0, `rgba(255, 255, 255, ${lightIntensity})`);
+    lightGradient.addColorStop(0, `rgba(${themeRgb.r}, ${themeRgb.g}, ${themeRgb.b}, ${lightIntensity})`);
     lightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = lightGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1562,6 +1794,12 @@ function drawBackground() {
 }
 
 function gameLoop() {
+    // Ensure canvas always has background
+    if (!ctx) {
+        console.error('Canvas context not available');
+        return;
+    }
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
 
@@ -1686,6 +1924,12 @@ document.addEventListener('keydown', e => {
         return;
     }
 
+    // Theme switching met T toets (werkt altijd)
+    if (e.key.toLowerCase() === 't') {
+        switchToNextTheme();
+        return;
+    }
+
     if (!gameRunning) return;
 
     if (e.key === 'ArrowLeft' && player.lane > 0) {
@@ -1693,14 +1937,14 @@ document.addEventListener('keydown', e => {
         // Instant snelle movement voor iedereen
         player.x = lanes[player.lane];
         playSound('jump');
-        createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+        createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
     }
     if (e.key === 'ArrowRight' && player.lane < 2) {
         player.lane++;
         // Instant snelle movement voor iedereen
         player.x = lanes[player.lane];
         playSound('jump');
-        createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+        createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
     }
 });
 
@@ -1710,7 +1954,7 @@ function initTouchControls() {
     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-    
+
     // Prevent default touch behaviors
     canvas.addEventListener('touchstart', e => e.preventDefault());
     canvas.addEventListener('touchmove', e => e.preventDefault());
@@ -1730,15 +1974,15 @@ function handleTouchMove(e) {
 
 function handleTouchEnd(e) {
     if (!gameRunning) return;
-    
+
     const touch = e.changedTouches[0];
     touchEndX = touch.clientX;
     touchEndY = touch.clientY;
-    
+
     const deltaX = touchEndX - touchStartX;
     const deltaY = touchEndY - touchStartY;
     const touchDuration = Date.now() - lastTouchTime;
-    
+
     // Detect swipe direction
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > touchSensitivity) {
         if (deltaX > 0 && player.lane < 2) {
@@ -1746,18 +1990,21 @@ function handleTouchEnd(e) {
             player.lane++;
             player.x = lanes[player.lane];
             playSound('jump');
-            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+            createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
         } else if (deltaX < 0 && player.lane > 0) {
             // Swipe left
             player.lane--;
             player.x = lanes[player.lane];
             playSound('jump');
-            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+            createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
         }
     }
-    
+    // Swipe up for theme switching
+    else if (deltaY < -50 && Math.abs(deltaX) < 30) {
+        switchToNextTheme();
+    }
     // Tap for power-up activation (if available)
-    if (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30 && touchDuration < 300) {
+    else if (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30 && touchDuration < 300) {
         // Quick tap - could be used for power-ups in the future
         activateNextPowerUp();
     }
@@ -1766,10 +2013,10 @@ function handleTouchEnd(e) {
 function activateNextPowerUp() {
     // Find the next available power-up that can be manually activated
     const manualPowerUps = ['jumpBoost', 'freeze', 'coinRain'];
-    const availablePowerUp = collectiblePowerUps.find(powerUp => 
+    const availablePowerUp = collectiblePowerUps.find(powerUp =>
         manualPowerUps.includes(powerUp.type) && !powerUp.collected
     );
-    
+
     if (availablePowerUp) {
         availablePowerUp.collected = true;
         activatePowerUp(availablePowerUp.type);
@@ -1780,7 +2027,7 @@ function activateNextPowerUp() {
 // Mobile UI Controls
 function createMobileControls() {
     if (!isMobile) return;
-    
+
     // Create mobile control overlay
     const mobileControlsDiv = document.createElement('div');
     mobileControlsDiv.id = 'mobile-controls';
@@ -1791,12 +2038,12 @@ function createMobileControls() {
             <button id="mobile-right" class="mobile-btn mobile-arrow">→</button>
         </div>
         <div class="mobile-info">
-            <div class="mobile-hint">👆 Swipe left/right or use buttons</div>
+            <div class="mobile-hint">👆 Swipe left/right to move | ⬆️ Swipe up for themes</div>
         </div>
     `;
-    
+
     document.body.appendChild(mobileControlsDiv);
-    
+
     // Add event listeners
     document.getElementById('mobile-left').addEventListener('touchstart', e => {
         e.preventDefault();
@@ -1804,20 +2051,20 @@ function createMobileControls() {
             player.lane--;
             player.x = lanes[player.lane];
             playSound('jump');
-            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+            createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
         }
     });
-    
+
     document.getElementById('mobile-right').addEventListener('touchstart', e => {
         e.preventDefault();
         if (gameRunning && player.lane < 2) {
             player.lane++;
             player.x = lanes[player.lane];
             playSound('jump');
-            createParticle(player.x + player.w/2, player.y + player.h/2, 'speed', '#00BFFF', 3);
+            createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
         }
     });
-    
+
     document.getElementById('mobile-pause').addEventListener('touchstart', e => {
         e.preventDefault();
         if (gameRunning) {
@@ -1869,18 +2116,18 @@ function startGame(mode = 'infinity') {
 
 function adjustCanvasForMobile() {
     if (!isMobile) return;
-    
+
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
-    
+
     // Calculate optimal canvas size for mobile
     const maxWidth = Math.min(screenWidth * 0.9, 480);
     const maxHeight = Math.min(screenHeight * 0.7, 640);
-    
+
     // Maintain aspect ratio
     const aspectRatio = 480 / 640;
     let newWidth, newHeight;
-    
+
     if (maxWidth / maxHeight > aspectRatio) {
         newHeight = maxHeight;
         newWidth = newHeight * aspectRatio;
@@ -1888,10 +2135,10 @@ function adjustCanvasForMobile() {
         newWidth = maxWidth;
         newHeight = newWidth / aspectRatio;
     }
-    
+
     canvas.style.width = newWidth + 'px';
     canvas.style.height = newHeight + 'px';
-    
+
     // Update touch sensitivity based on canvas size
     touchSensitivity = Math.max(30, newWidth * 0.1);
 }
@@ -1901,8 +2148,15 @@ infinityBtn.onclick = () => startGame('infinity');
 levelBtn.onclick = () => startGame('level');
 document.getElementById('multiplayer-btn').onclick = () => startGame('multiplayer');
 
-// Enhanced UI Event Listeners
+// Initialize canvas background on load
 document.addEventListener('DOMContentLoaded', () => {
+    // Set initial canvas background
+    if (canvas && ctx) {
+        ctx.fillStyle = '#2C3E50';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
+    }
+    
     // Update log functionality
     const showUpdatesBtn = document.getElementById('show-updates');
     const updateLog = document.getElementById('update-log');
@@ -2184,23 +2438,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize displays
     updateStatsDisplay();
     updateActiveOutfitDisplay();
-    
+
     // Load initial settings
     effectsVolume = (localStorage.getItem('subwayEffectsVolume') || 70) / 100;
     musicVolume = (localStorage.getItem('subwayMusicVolume') || 30) / 100;
     isMuted = localStorage.getItem('subwayMuted') === 'true';
-    
+
     // Initialize mobile controls
     if (isMobile) {
         initTouchControls();
         createMobileControls();
-        
+
         // Add mobile-specific instructions
-        document.querySelector('.quick-controls p').innerHTML = 
-            '📱 <strong>Mobile:</strong> Swipe left/right to move | Tap for power-ups<br>' +
-            '⌨️ <strong>Desktop:</strong> Arrow keys or Enter/L/M for game modes';
+        document.querySelector('.quick-controls p').innerHTML =
+            '📱 <strong>Mobile:</strong> Swipe left/right to move | Swipe up for themes | Tap for power-ups<br>' +
+            '⌨️ <strong>Desktop:</strong> Arrow keys to move | T for themes | Enter/L/M for game modes';
     }
-    
+
     // Handle orientation changes
     window.addEventListener('orientationchange', () => {
         setTimeout(() => {
@@ -2209,7 +2463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 500);
     });
-    
+
     // Handle window resize
     window.addEventListener('resize', () => {
         if (gameRunning && isMobile) {
@@ -2229,3 +2483,138 @@ const newShopItems = {
 // Initialize coin display and shop
 updateCoinDisplay();
 updateShopDisplay();
+
+// Theme System Functions
+function switchToNextTheme() {
+    const themeNames = Object.keys(themes);
+    const currentIndex = themeNames.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % themeNames.length;
+    const nextTheme = themeNames[nextIndex];
+    
+    // Check if theme is unlocked
+    if (isThemeUnlocked(nextTheme)) {
+        currentTheme = nextTheme;
+        localStorage.setItem('currentTheme', currentTheme);
+        
+        // Show theme change notification
+        showNotification(`Thema gewijzigd naar: ${themes[currentTheme].name}`, themes[currentTheme].primary);
+        playSound('powerup'); // Use existing sound
+    } else {
+        const requirement = themes[nextTheme].unlockRequirement;
+        showNotification(`Thema vergrendeld! Vereist: ${requirement}`, '#FF6B6B');
+    }
+}
+
+function isThemeUnlocked(themeName) {
+    if (themeName === 'subway') return true; // Default theme always unlocked
+    
+    const theme = themes[themeName];
+    const requirement = theme.unlockRequirement;
+    
+    // Check different unlock requirements
+    if (requirement.includes('Score')) {
+        const requiredScore = parseInt(requirement.match(/\d+/)[0]);
+        return highScore >= requiredScore;
+    } else if (requirement.includes('Level')) {
+        const requiredLevel = parseInt(requirement.match(/\d+/)[0]);
+        return maxLevelReached >= requiredLevel;
+    } else if (requirement.includes('coins')) {
+        const requiredCoins = parseInt(requirement.match(/\d+/)[0]);
+        return totalCoins >= requiredCoins;
+    }
+    
+    return false;
+}
+
+function showNotification(message, color = '#4CAF50') {
+    // Create notification element if it doesn't exist
+    let notification = document.getElementById('gameNotification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'gameNotification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border: 2px solid ${color};
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        `;
+        document.body.appendChild(notification);
+    }
+    
+    notification.textContent = message;
+    notification.style.borderColor = color;
+    notification.style.opacity = '1';
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+    }, 3000);
+}
+
+// Color Manipulation Functions
+function lightenColor(color, percent) {
+    const rgb = hexToRgb(color);
+    if (!rgb) return color;
+    
+    const factor = percent / 100;
+    return `rgb(${Math.min(255, Math.floor(rgb.r + (255 - rgb.r) * factor))}, 
+                ${Math.min(255, Math.floor(rgb.g + (255 - rgb.g) * factor))}, 
+                ${Math.min(255, Math.floor(rgb.b + (255 - rgb.b) * factor))})`;
+}
+
+function darkenColor(color, percent) {
+    const rgb = hexToRgb(color);
+    if (!rgb) return color;
+    
+    const factor = percent / 100;
+    return `rgb(${Math.floor(rgb.r * (1 - factor))}, 
+                ${Math.floor(rgb.g * (1 - factor))}, 
+                ${Math.floor(rgb.b * (1 - factor))})`;
+}
+
+function hexToRgb(hex) {
+    // Handle rgb() format
+    if (hex.startsWith('rgb')) {
+        const matches = hex.match(/\d+/g);
+        return matches ? {
+            r: parseInt(matches[0]),
+            g: parseInt(matches[1]),
+            b: parseInt(matches[2])
+        } : null;
+    }
+    
+    // Handle hex format
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+// Load saved theme on game start
+function loadSavedTheme() {
+    const savedTheme = localStorage.getItem('currentTheme');
+    if (savedTheme && themes[savedTheme] && isThemeUnlocked(savedTheme)) {
+        currentTheme = savedTheme;
+    }
+    
+    // Initialize shimmer effect for progress bar
+    if (gameMode === 'level') {
+        levelProgressBar.shimmerOffset = -60;
+    }
+}
+
+// Call on game initialization
+loadSavedTheme();
