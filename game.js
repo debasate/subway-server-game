@@ -137,6 +137,9 @@ function resetGame(mode = 'infinity') {
         playerRanking.length = 0;
     }
 
+    // Setup special game mode configurations
+    setupGameMode(mode);
+
     console.log(`✅ Game reset complete - Player at x:${player.x}, lane:${player.lane}`);
 }
 
@@ -150,6 +153,9 @@ function showGameScreen() {
 
     // Add game-mode class for proper styling
     document.body.classList.add('game-mode');
+
+    // Adjust canvas for fullscreen gaming
+    adjustCanvasForGameMode();
 
     // Show mobile controls if on mobile
     if (isMobile) {
@@ -487,11 +493,23 @@ function drawUI() {
     ctx.font = 'bold 20px Arial';
     ctx.fillText(`Score: ${Math.floor(score)}`, 10, 30);
 
-    // Coins
-    ctx.fillText(`💰 ${coinsThisRun}`, 10, 60);
-
-    // Mode info
+    // Best Score
+    const bestScore = parseInt(localStorage.getItem('bestScore') || '0');
     ctx.font = '16px Arial';
+    ctx.fillStyle = '#FFD700';
+    ctx.fillText(`🏆 Best: ${bestScore}`, 10, 55);
+
+    // Coins
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(`💰 ${coinsThisRun}`, 10, 80);
+
+    // Mode specific info
+    drawModeSpecificUI();
+
+    // Mode info (bottom)
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#ccc';
     ctx.fillText(`Mode: ${gameMode}`, 10, canvas.height - 40);
 
     if (gameMode === 'level') {
@@ -501,6 +519,45 @@ function drawUI() {
     // Multiplayer ranking
     if (isMultiplayer) {
         drawMultiplayerUI();
+    }
+}
+
+function drawModeSpecificUI() {
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#4CAF50';
+
+    switch (gameMode) {
+        case 'chaos':
+            if (currentChaosEffect) {
+                ctx.fillText(`🌪️ Effect: ${currentChaosEffect}`, 10, 105);
+            }
+            const nextChaos = Math.ceil((300 - chaosTimer) / 60);
+            ctx.fillText(`Next chaos in: ${nextChaos}s`, 10, 125);
+            break;
+
+        case 'speedrun':
+            const speedrunTime = ((Date.now() - speedrunStartTime) / 1000).toFixed(1);
+            ctx.fillText(`⚡ Time: ${speedrunTime}s`, 10, 105);
+            ctx.fillText(`🎯 Target: 1000 points`, 10, 125);
+            break;
+
+        case 'survival':
+            const survivalTime = ((Date.now() - survivalStartTime) / 1000).toFixed(1);
+            ctx.fillText(`🛡️ Survived: ${survivalTime}s`, 10, 105);
+            ctx.fillText(`❤️ Lives: ${player.lives}`, 10, 125);
+            break;
+
+        case 'coinrush':
+            const coinrushTime = ((Date.now() - coinrushStartTime) / 1000).toFixed(1);
+            ctx.fillText(`💰 Time: ${coinrushTime}s`, 10, 105);
+            ctx.fillText(`🎯 Target: 100 coins (${coinsThisRun}/100)`, 10, 125);
+            break;
+
+        case 'nightmare':
+            ctx.fillStyle = '#FF6B6B';
+            ctx.fillText(`😈 NIGHTMARE MODE`, 10, 105);
+            ctx.fillText(`💀 Lives: ${player.lives}`, 10, 125);
+            break;
     }
 }
 
@@ -607,6 +664,9 @@ function updateGameLogic() {
     const speedIncrease = Math.min(Math.floor(score / 250) * 0.3, 8);
     speed = baseSpeed + speedIncrease;
 
+    // Special game mode updates
+    updateGameModeLogic();
+
     // Update bots in multiplayer
     if (isMultiplayer) {
         bots.forEach(bot => {
@@ -625,6 +685,9 @@ function updateGameLogic() {
             endGame();
         }
     }
+
+    // Check for game mode specific win conditions
+    checkGameModeWinConditions();
 
     // Spawn obstacles
     const spawnRate = Math.min(0.005 + (score / 10000), 0.04);
@@ -991,7 +1054,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const buttons = {
         'infinity-btn': () => startGame('infinity'),
         'level-btn': () => startGame('level'),
-        'multiplayer-btn': () => startGame('multiplayer')
+        'multiplayer-btn': () => startGame('multiplayer'),
+        'chaos-btn': () => startGame('chaos'),
+        'speedrun-btn': () => startGame('speedrun'),
+        'survival-btn': () => startGame('survival'),
+        'coinrush-btn': () => startGame('coinrush'),
+        'nightmare-btn': () => startGame('nightmare')
     };
 
     Object.entries(buttons).forEach(([id, handler]) => {
@@ -1030,9 +1098,9 @@ function setupUIButtons() {
     console.log('🔧 Setting up UI buttons...');
 
     // Debug: Check which buttons exist in DOM
-    const buttonIds = ['shop-panel', 'close-shop', 'settings-modal', 'settings-btn', 'settings-close', 
-                      'update-log', 'show-updates', 'close-updates', 'gtstijn-btn', 'echobots-btn'];
-    
+    const buttonIds = ['shop-panel', 'close-shop', 'settings-modal', 'settings-btn', 'settings-close',
+        'update-log', 'show-updates', 'close-updates', 'gtstijn-btn', 'echobots-btn'];
+
     buttonIds.forEach(id => {
         const element = document.getElementById(id);
         console.log(`🔍 ${id}: ${element ? '✅ Found' : '❌ Not found'}`);
@@ -1457,5 +1525,200 @@ function saveShopData() {
         console.error('❌ Failed to save shop data:', error);
     }
 }
+
+// ================================
+// SPECIAL GAME MODES
+// ================================
+
+let chaosTimer = 0;
+let speedrunStartTime = 0;
+let survivalStartTime = 0;
+let coinrushStartTime = 0;
+let chaosEffects = ['speed', 'reverse', 'bigPlayer', 'smallPlayer', 'invisible', 'doubleCoins', 'shield'];
+let currentChaosEffect = null;
+
+function setupGameMode(mode) {
+    console.log(`🎯 Setting up ${mode} mode...`);
+
+    switch (mode) {
+        case 'chaos':
+            chaosTimer = 0;
+            currentChaosEffect = null;
+            console.log('🌪️ Chaos mode initialized - Random effects every 5 seconds!');
+            break;
+
+        case 'speedrun':
+            speedrunStartTime = Date.now();
+            speed = baseSpeed * 1.5; // Start faster
+            console.log('⚡ Speedrun mode - Race to 1000 points!');
+            break;
+
+        case 'survival':
+            survivalStartTime = Date.now();
+            player.lives = 1; // Only 1 life
+            speed = baseSpeed * 0.8; // Start slower but ramp up fast
+            console.log('🛡️ Survival mode - One life, survive as long as possible!');
+            break;
+
+        case 'coinrush':
+            coinrushStartTime = Date.now();
+            scoreMultiplier = 2; // Double coins
+            speed = baseSpeed * 1.2;
+            console.log('💰 Coin Rush mode - Collect 100 coins as fast as possible!');
+            break;
+
+        case 'nightmare':
+            speed = baseSpeed * 1.3; // Faster from start
+            player.lives = 1; // One life
+            console.log('😈 Nightmare mode - Extreme difficulty activated!');
+            break;
+
+        default:
+            console.log(`🎮 Standard ${mode} mode setup`);
+    }
+}
+
+function applyChaosEffect() {
+    // Remove previous effect
+    if (currentChaosEffect) {
+        removeChaosEffect(currentChaosEffect);
+    }
+
+    // Apply new random effect
+    currentChaosEffect = chaosEffects[Math.floor(Math.random() * chaosEffects.length)];
+
+    switch (currentChaosEffect) {
+        case 'speed':
+            speed *= 1.5;
+            console.log('🌪️ CHAOS: Super Speed!');
+            break;
+        case 'reverse':
+            // Reverse controls for 5 seconds
+            console.log('🌪️ CHAOS: Reverse Controls!');
+            break;
+        case 'bigPlayer':
+            player.w = 60;
+            player.h = 60;
+            console.log('🌪️ CHAOS: Giant Player!');
+            break;
+        case 'smallPlayer':
+            player.w = 20;
+            player.h = 20;
+            console.log('🌪️ CHAOS: Tiny Player!');
+            break;
+        case 'invisible':
+            console.log('🌪️ CHAOS: Invisible Player!');
+            break;
+        case 'doubleCoins':
+            scoreMultiplier *= 2;
+            console.log('🌪️ CHAOS: Double Coins!');
+            break;
+        case 'shield':
+            player.lives += 1;
+            console.log('🌪️ CHAOS: Temporary Shield!');
+            break;
+    }
+}
+
+function removeChaosEffect(effect) {
+    switch (effect) {
+        case 'speed':
+            speed = baseSpeed + (score / 1000);
+            break;
+        case 'bigPlayer':
+        case 'smallPlayer':
+            player.w = 40;
+            player.h = 40;
+            break;
+        case 'doubleCoins':
+            scoreMultiplier = 0.25;
+            break;
+    }
+}
+
+function checkGameModeWinConditions() {
+    switch (gameMode) {
+        case 'speedrun':
+            if (score >= 1000) {
+                const timeElapsed = Date.now() - speedrunStartTime;
+                console.log(`⚡ Speedrun completed in ${timeElapsed / 1000}s!`);
+                endGame(true, `🎉 SPEEDRUN COMPLETE!\nTime: ${(timeElapsed / 1000).toFixed(2)}s\nScore: ${Math.floor(score)}`);
+                return true;
+            }
+            break;
+
+        case 'coinrush':
+            if (coinsThisRun >= 100) {
+                const timeElapsed = Date.now() - coinrushStartTime;
+                console.log(`💰 Coin Rush completed in ${timeElapsed / 1000}s!`);
+                endGame(true, `🎉 COIN RUSH COMPLETE!\nTime: ${(timeElapsed / 1000).toFixed(2)}s\nCoins: ${coinsThisRun}`);
+                return true;
+            }
+            break;
+    }
+    return false;
+}
+
+function updateGameModeLogic() {
+    switch (gameMode) {
+        case 'chaos':
+            chaosTimer++;
+            if (chaosTimer >= 300) { // 5 seconds at 60fps
+                applyChaosEffect();
+                chaosTimer = 0;
+            }
+            break;
+
+        case 'survival':
+            // Increase difficulty faster in survival mode
+            const survivalTime = (Date.now() - survivalStartTime) / 1000;
+            speed = baseSpeed + (survivalTime * 0.1);
+            break;
+
+        case 'nightmare':
+            // Double obstacle spawn rate
+            if (Math.random() < 0.005) {
+                spawnObstacle();
+            }
+            break;
+    }
+}
+
+function adjustCanvasForGameMode() {
+    if (!canvas) return;
+
+    // Get viewport dimensions
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Set canvas to fill viewport while maintaining aspect ratio
+    const gameAspectRatio = 480 / 640; // Original game ratio
+    const viewportAspectRatio = viewportWidth / viewportHeight;
+
+    if (viewportAspectRatio > gameAspectRatio) {
+        // Viewport is wider - fit to height
+        canvas.style.width = (viewportHeight * gameAspectRatio) + 'px';
+        canvas.style.height = viewportHeight + 'px';
+    } else {
+        // Viewport is taller - fit to width
+        canvas.style.width = viewportWidth + 'px';
+        canvas.style.height = (viewportWidth / gameAspectRatio) + 'px';
+    }
+
+    // Center the canvas
+    canvas.style.position = 'absolute';
+    canvas.style.top = '50%';
+    canvas.style.left = '50%';
+    canvas.style.transform = 'translate(-50%, -50%)';
+
+    console.log(`🖥️ Canvas adjusted for game mode: ${canvas.style.width} x ${canvas.style.height}`);
+}
+
+// Add window resize handler for canvas adjustment
+window.addEventListener('resize', () => {
+    if (document.body.classList.contains('game-mode')) {
+        adjustCanvasForGameMode();
+    }
+});
 
 console.log('✅ Improved game engine loaded successfully');

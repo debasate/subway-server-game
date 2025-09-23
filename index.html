@@ -142,6 +142,56 @@
                     </div>
                     <button id="multiplayer-btn" class="mode-btn" onclick="startGame('multiplayer')">Spelen</button>
                 </div>
+
+                <div class="gamemode-card" data-mode="chaos">
+                    <div class="mode-icon">🌪️</div>
+                    <h4>Chaos Mode</h4>
+                    <p>Random effecten elke 5 seconden!</p>
+                    <div class="mode-stats">
+                        <span>🔥 Best Chaos: <span id="chaos-best">0</span></span>
+                    </div>
+                    <button id="chaos-btn" class="mode-btn" onclick="startGame('chaos')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="speedrun">
+                    <div class="mode-icon">⚡</div>
+                    <h4>Speed Run</h4>
+                    <p>Zo snel mogelijk naar 1000 punten!</p>
+                    <div class="mode-stats">
+                        <span>🏃 Best Time: <span id="speedrun-best">∞</span></span>
+                    </div>
+                    <button id="speedrun-btn" class="mode-btn" onclick="startGame('speedrun')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="survival">
+                    <div class="mode-icon">🛡️</div>
+                    <h4>Survival Mode</h4>
+                    <p>Overleef zo lang mogelijk met 1 leven!</p>
+                    <div class="mode-stats">
+                        <span>⏱️ Best Survival: <span id="survival-best">0s</span></span>
+                    </div>
+                    <button id="survival-btn" class="mode-btn" onclick="startGame('survival')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="coinrush">
+                    <div class="mode-icon">💰</div>
+                    <h4>Coin Rush</h4>
+                    <p>Verzamel 100 coins zo snel mogelijk!</p>
+                    <div class="mode-stats">
+                        <span>🪙 Best Rush: <span id="coinrush-best">∞</span></span>
+                    </div>
+                    <button id="coinrush-btn" class="mode-btn" onclick="startGame('coinrush')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="nightmare">
+                    <div class="mode-icon">😈</div>
+                    <h4>Nightmare Mode</h4>
+                    <p>Extreme difficulty met dubbele obstacles!</p>
+                    <div class="mode-stats">
+                        <span>👹 Best Nightmare: <span id="nightmare-best">0</span></span>
+                    </div>
+                    <button id="nightmare-btn" class="mode-btn" onclick="startGame('nightmare')">Spelen</button>
+                </div>
             </div>
         </div>
 

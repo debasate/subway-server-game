@@ -40,6 +40,18 @@ body.game-mode {
     background: #1a1a2e !important;
 }
 
+/* Remove all borders and shadows in game mode */
+body.game-mode canvas {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    object-fit: cover !important;
+}
+
 /* Login & Authentication Styles */
 #login-screen {
     position: fixed;
