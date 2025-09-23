@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚇 Subway Server Game</title>
     <link rel="stylesheet" href="style.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
 </head>
+
 <body>
     <!-- Mobile Controls -->
     <div id="mobile-controls" class="mobile-controls" style="display: none;">
@@ -36,11 +38,13 @@
                 <h2>🔑 Inloggen</h2>
                 <div class="form-group">
                     <label for="login-username">👤 Gebruikersnaam:</label>
-                    <input type="text" id="login-username" placeholder="Voer je gebruikersnaam in" autocomplete="username">
+                    <input type="text" id="login-username" placeholder="Voer je gebruikersnaam in"
+                        autocomplete="username">
                 </div>
                 <div class="form-group">
                     <label for="login-password">🔒 Wachtwoord:</label>
-                    <input type="password" id="login-password" placeholder="Voer je wachtwoord in" autocomplete="current-password">
+                    <input type="password" id="login-password" placeholder="Voer je wachtwoord in"
+                        autocomplete="current-password">
                 </div>
                 <div class="form-actions">
                     <button id="login-btn" class="auth-btn primary">🚀 Inloggen</button>
@@ -54,15 +58,18 @@
                 <h2>📝 Account Aanmaken</h2>
                 <div class="form-group">
                     <label for="register-username">👤 Gebruikersnaam:</label>
-                    <input type="text" id="register-username" placeholder="Kies een gebruikersnaam" autocomplete="username">
+                    <input type="text" id="register-username" placeholder="Kies een gebruikersnaam"
+                        autocomplete="username">
                 </div>
                 <div class="form-group">
                     <label for="register-password">🔒 Wachtwoord:</label>
-                    <input type="password" id="register-password" placeholder="Kies een wachtwoord" autocomplete="new-password">
+                    <input type="password" id="register-password" placeholder="Kies een wachtwoord"
+                        autocomplete="new-password">
                 </div>
                 <div class="form-group">
                     <label for="register-confirm-password">🔒 Bevestig Wachtwoord:</label>
-                    <input type="password" id="register-confirm-password" placeholder="Bevestig je wachtwoord" autocomplete="new-password">
+                    <input type="password" id="register-confirm-password" placeholder="Bevestig je wachtwoord"
+                        autocomplete="new-password">
                 </div>
                 <div class="form-actions">
                     <button id="register-btn" class="auth-btn primary">✨ Account Aanmaken</button>
@@ -295,7 +302,7 @@
                 <h2>🛒 Shop</h2>
                 <button id="close-shop" class="close-btn">×</button>
             </div>
-            
+
             <div class="shop-tabs">
                 <button class="shop-tab active" data-tab="outfits">👔 Outfits</button>
                 <button class="shop-tab" data-tab="powers">⚡ Powers</button>
@@ -448,7 +455,7 @@
         <div id="settings-modal" class="modal" style="display:none;">
             <div class="modal-content">
                 <h3>⚙️ Game Settings</h3>
-                
+
                 <div class="settings-section">
                     <h4>🔊 Audio</h4>
                     <div class="setting-item">
@@ -524,4 +531,5 @@
     <canvas id="game-canvas" width="480" height="640" style="display:none;"></canvas>
     <script src="game.js"></script>
 </body>
+
 </html>
