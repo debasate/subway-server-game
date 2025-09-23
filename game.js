@@ -19,7 +19,7 @@ let levelProgress = 0;
 let levelTarget = 1000; // Score needed to complete level
 
 // Player and game state
-let player = { 
+let player = {
     x: 220, y: 540, w: 40, h: 40, color: '#ff0', lane: 1, lives: 1,
     moveSpeed: 1, // Voor lane switching snelheid
     activeSkin: 'default',
@@ -47,7 +47,7 @@ let coinsThisRun = 0;
 let playerUpgrades = JSON.parse(localStorage.getItem('subwayUpgrades') || '{}');
 const defaultUpgrades = {
     speed: false,
-    shield: false, 
+    shield: false,
     magnet: false,
     goldenSkin: false,
     speedSkin: false,
@@ -67,7 +67,7 @@ const shopItems = {
     ghostSkin: { price: 200, name: "Ghost Mode" },
     tankSkin: { price: 300, name: "Tank Mode" },
     rainbowSkin: { price: 500, name: "Rainbow Power" }
-};function updateCoinDisplay() {
+}; function updateCoinDisplay() {
     coinDisplay.textContent = coins;
     coinsCount.textContent = coinsThisRun;
 }
@@ -143,7 +143,7 @@ function resetGame(mode = 'infinity') {
     player.moveSpeed = 1;
     player.ghostCharges = 0;
     player.lastGhostScore = 0;
-    
+
     // Bepaal actieve skin
     if (playerUpgrades.rainbowSkin) player.activeSkin = 'rainbow';
     else if (playerUpgrades.tankSkin) player.activeSkin = 'tank';
@@ -151,12 +151,12 @@ function resetGame(mode = 'infinity') {
     else if (playerUpgrades.speedSkin) player.activeSkin = 'speed';
     else if (playerUpgrades.goldenSkin) player.activeSkin = 'golden';
     else player.activeSkin = 'default';
-    
+
     // Skin abilities toepassen
     if (player.activeSkin === 'speed' || player.activeSkin === 'rainbow') {
         player.moveSpeed = 1.5;
     }
-    
+
     obstacles = [];
     score = 0;
     coinsThisRun = 0;
@@ -198,7 +198,7 @@ function drawPlayer() {
 
     // Skin-gebaseerde kleuren en effecten
     const gradient = ctx.createLinearGradient(x, y, x, y + h);
-    
+
     switch (player.activeSkin) {
         case 'golden':
             gradient.addColorStop(0, '#FFE55C');
@@ -267,7 +267,7 @@ function drawPlayer() {
         case 'tank': borderColor = '#006400'; break;
         case 'rainbow': borderColor = `hsl(${(time * 100) % 360}, 100%, 30%)`; break;
     }
-    
+
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, w, h);
@@ -276,7 +276,7 @@ function drawPlayer() {
     ctx.fillStyle = '#000';
     ctx.fillRect(x + 8, y + 10, 4, 4);
     ctx.fillRect(x + 28, y + 10, 4, 4);
-    
+
     // Skin speciale effecten
     if (player.activeSkin === 'speed' || player.activeSkin === 'rainbow') {
         // Speed trails
@@ -284,18 +284,18 @@ function drawPlayer() {
         ctx.fillRect(x - 10, y + 10, 8, 4);
         ctx.fillRect(x - 15, y + 20, 12, 4);
     }
-    
+
     if (player.activeSkin === 'ghost' || player.activeSkin === 'rainbow') {
         // Ghost charges indicator
         ctx.fillStyle = '#BA55D3';
         ctx.font = 'bold 10px Arial';
         ctx.fillText(`👻${player.ghostCharges}`, x - 5, y - 5);
     }
-    
+
     if (player.activeSkin === 'tank' || player.activeSkin === 'rainbow') {
         // Tank cannon
         ctx.fillStyle = borderColor;
-        ctx.fillRect(x + w, y + h/2 - 2, 8, 4);
+        ctx.fillRect(x + w, y + h / 2 - 2, 8, 4);
     }
 
     // Shield indicator als speler permanent shield heeft
@@ -398,7 +398,7 @@ function getDynamicSpawnRate() {
     // Super easy start, wordt geleidelijk moeilijker
     const baseRate = 0.005; // Zeer lage start rate
     const maxRate = 0.05;   // Maximum spawn rate
-    
+
     // Difficulty increases every 500 points
     const difficultyMultiplier = Math.min(score / 500, 10);
     return Math.min(baseRate + (difficultyMultiplier * 0.005), maxRate);
@@ -442,13 +442,13 @@ function checkCollision() {
                 obstacles.splice(i, 1);
                 continue;
             }
-            
+
             // Check ghost ability
             if (handleGhostCollision()) {
                 obstacles.splice(i, 1);
                 continue;
             }
-            
+
             return true; // Normal collision
         }
     }
@@ -458,12 +458,12 @@ function checkCollision() {
 function updateGameLogic() {
     // Langzamere score toename
     score += scoreMultiplier;
-    
+
     // Update ghost charges elke 500 punten
     if ((player.activeSkin === 'ghost' || player.activeSkin === 'rainbow')) {
         const currentFiveHundred = Math.floor(score / 500);
         const lastFiveHundred = Math.floor(player.lastGhostScore / 500);
-        
+
         if (currentFiveHundred > lastFiveHundred) {
             player.ghostCharges++;
             player.lastGhostScore = score;
@@ -504,11 +504,11 @@ function updateGameLogic() {
         }
         coinsThisRun += newCoins * coinMultiplier;
     }
-    
+
     // Progressive difficulty system
     const oldDifficulty = difficultyLevel;
     difficultyLevel = Math.floor(score / 250) + 1; // Difficulty increases every 250 points
-    
+
     if (difficultyLevel > oldDifficulty) {
         setTimeout(() => {
             alert(`🔥 DIFFICULTY LEVEL ${difficultyLevel}! 🔥\nThings are getting harder!`);
