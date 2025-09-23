@@ -11,8 +11,18 @@
 <body>
     <div id="start-screen">
         <h1>Subway Server Game</h1>
-        <button id="start-btn">Start Game</button>
-        <p>Of druk op <strong>Enter</strong> om te starten</p>
+        <div id="gamemode-selection">
+            <h3>Kies een gamemode:</h3>
+            <button id="infinity-btn" class="gamemode-btn">Infinity Mode</button>
+            <button id="level-btn" class="gamemode-btn">Level Mode</button>
+        </div>
+        <p>Of druk op <strong>Enter</strong> voor Infinity Mode</p>
+    </div>
+    <div id="game-info" style="display:none;">
+        <div id="game-stats">
+            <span id="mode-display"></span>
+            <span id="level-display"></span>
+        </div>
     </div>
     <canvas id="game-canvas" width="480" height="640" style="display:none;"></canvas>
     <script src="game.js"></script>
