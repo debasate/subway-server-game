@@ -79,9 +79,12 @@
             <div class="version-badge">v3.3.3</div>
             <button id="show-updates" class="updates-btn">📋 Updates</button>
             <button id="settings-btn" class="settings-btn">⚙️ Settings</button>
-            <!-- TEST BUTTON -->
-            <button onclick="testButton()" style="background: red; color: white; padding: 5px; margin: 5px;">🧪
-                Test</button>
+            <!-- FIXED BUTTONS - Multiple Methods -->
+            <button onclick="testButton()" style="background: red; color: white; padding: 5px; margin: 5px;">🧪 Test</button>
+            <button onclick="window.startGame('infinity')" style="background: blue; color: white; padding: 5px; margin: 5px;">🔵 Direct Infinity</button>
+            <button onclick="window.startGame('level')" style="background: green; color: white; padding: 5px; margin: 5px;">🟢 Direct Level</button>
+            <button onclick="window.startGame('multiplayer')" style="background: purple; color: white; padding: 5px; margin: 5px;">🟣 Direct Multi</button>
+            <button onclick="window.debugStartGame('infinity')" style="background: orange; color: white; padding: 5px; margin: 5px;">🔧 Debug Test</button>
         </div>
 
         <!-- Player Stats Dashboard -->
@@ -120,7 +123,8 @@
                     <div class="mode-stats">
                         <span>⭐ Best: <span id="infinity-best">0</span></span>
                     </div>
-                    <button id="infinity-btn" class="mode-btn" onclick="console.log('Infinity button clicked!'); startGame('infinity')">Spelen</button>
+                    <button id="infinity-btn" class="mode-btn"
+                        onclick="console.log('Infinity button clicked!'); startGame('infinity')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="level">
@@ -131,7 +135,8 @@
                         <span>📊 Level: <span id="current-level">1</span></span>
                         <span>⭐ Best: <span id="level-best">0</span></span>
                     </div>
-                    <button id="level-btn" class="mode-btn" onclick="console.log('Level button clicked!'); startGame('level')">Spelen</button>
+                    <button id="level-btn" class="mode-btn"
+                        onclick="console.log('Level button clicked!'); startGame('level')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="multiplayer">
@@ -141,7 +146,8 @@
                     <div class="mode-stats">
                         <span>🏆 Wins: <span id="multiplayer-wins">0</span></span>
                     </div>
-                    <button id="multiplayer-btn" class="mode-btn" onclick="console.log('Multiplayer button clicked!'); startGame('multiplayer')">Spelen</button>
+                    <button id="multiplayer-btn" class="mode-btn"
+                        onclick="console.log('Multiplayer button clicked!'); startGame('multiplayer')">Spelen</button>
                 </div>
             </div>
         </div>

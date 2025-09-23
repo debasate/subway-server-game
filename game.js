@@ -1665,7 +1665,7 @@ const levels = [
 
 function resetGame(mode = 'infinity') {
     console.log(`🔄 Resetting game for mode: ${mode}`);
-    
+
     gameMode = mode;
     player.lane = 1;
     player.x = lanes[player.lane];
@@ -1674,7 +1674,7 @@ function resetGame(mode = 'infinity') {
     player.moveSpeed = 1;
     player.ghostCharges = 0;
     player.lastGhostScore = 0;
-    
+
     console.log(`👤 Player reset to: x=${player.x}, y=${player.y}, lane=${player.lane}`);
     console.log(`🎮 Lanes available: ${JSON.stringify(lanes)}`);
 
@@ -1766,7 +1766,7 @@ function resetGame(mode = 'infinity') {
     setTimeout(() => {
         showNotification(`${weatherEmojis[currentWeather]} ${weatherNames[currentWeather]}`, 'info', 3000);
     }, 500);
-    
+
     console.log('✅ Game reset complete!');
 }
 function updateGameInfo() {
@@ -2652,7 +2652,7 @@ function backToMenu() {
 
 document.addEventListener('keydown', e => {
     console.log('🔍 Key pressed:', e.key, 'Game running:', gameRunning, 'Game mode:', gameMode);
-    
+
     // Als het spel niet loopt en Enter wordt ingedrukt, start infinity mode
     if (!gameRunning && e.key === 'Enter') {
         startGame('infinity');
@@ -2684,7 +2684,7 @@ document.addEventListener('keydown', e => {
             console.log('👉 Moved right to lane:', player.lane);
         }
     }
-    
+
     // Debug shortcuts (work when not in game)
     if (!gameRunning) {
         if (e.key.toLowerCase() === 'l') {
@@ -2846,13 +2846,63 @@ function hideMobileControls() {
 window.testButton = function () {
     alert('Button test works!');
     console.log('✅ Button test function called successfully!');
+    console.log('🔍 Current game state:', {
+        gameRunning,
+        gameMode,
+        player: { x: player.x, y: player.y, lane: player.lane },
+        lanes,
+        canvas: !!canvas,
+        ctx: !!ctx,
+        startGame: typeof window.startGame
+    });
 };
 
-// GLOBAL startGame function - accessible from HTML onclick
-window.startGame = startGame;
+// DEBUG FUNCTION - Test each game mode
+window.debugStartGame = function(mode) {
+    console.log(`🐛 DEBUG: Attempting to start ${mode} mode`);
+    console.log('🔍 Before start:', { gameRunning, gameMode });
+    
+    try {
+        window.startGame(mode);
+        console.log('✅ startGame completed without error');
+    } catch (error) {
+        console.error('❌ Error starting game:', error);
+    }
+    
+    setTimeout(() => {
+        console.log('🔍 After start (delayed):', { gameRunning, gameMode });
+    }, 1000);
+};
 
-function startGame(mode = 'infinity') {
-    console.log(`🚀 Starting game in ${mode} mode...`);
+// ================================
+// FIXED BUTTON SYSTEM - COMPLETE
+// ================================
+
+// GLOBAL startGame function - BULLETPROOF VERSION
+window.startGame = function(mode = 'infinity') {
+    console.log(`🚀 FIXED: Starting game in ${mode} mode...`);
+    console.log('🔧 Game state before start:', { gameRunning, gameMode, playerLane: player.lane });
+    
+    try {
+        // FORCE STOP ANY RUNNING GAME
+        if (gameRunning) {
+            gameRunning = false;
+            console.log('🛑 Stopped previous game');
+        }
+        
+        // CALL INTERNAL FUNCTION
+        return startGameInternal(mode);
+        
+    } catch (error) {
+        console.error('❌ BUTTON ERROR:', error);
+        alert(`Game Error: ${error.message}`);
+        return false;
+    }
+};
+
+// INTERNAL GAME STARTER
+function startGameInternal(mode = 'infinity') {
+    console.log(`🎯 Internal start: ${mode} mode...`);
     console.log('🔧 Game state before start:', { gameRunning, gameMode, playerLane: player.lane });
 
     resetGame(mode);
@@ -2887,7 +2937,7 @@ function startGame(mode = 'infinity') {
     console.log('✅ Game started successfully:', { gameRunning, gameMode, mode });
     console.log('👤 Player position:', { x: player.x, y: player.y, lane: player.lane });
     console.log('🎮 Lanes:', lanes);
-    
+
     requestAnimationFrame(gameLoop);
 }
 
@@ -2957,29 +3007,29 @@ document.addEventListener('DOMContentLoaded', () => {
             multiplayerBtn2: !!multiplayerBtn2
         });
 
-        // Try with addEventListener instead of onclick
+        // FIXED EVENT LISTENERS FOR BUTTONS
         if (infinityBtn2) {
             infinityBtn2.addEventListener('click', function () {
                 console.log('🎮 Infinity button clicked via addEventListener!');
-                startGame('infinity');
+                window.startGame('infinity');
             });
-            console.log('✅ Infinity button addEventListener attached');
+            console.log('✅ Infinity button listener added');
         }
-
+        
         if (levelBtn2) {
             levelBtn2.addEventListener('click', function () {
-                console.log('🎯 Level button clicked via addEventListener!');
-                startGame('level');
+                console.log('🎮 Level button clicked via addEventListener!');
+                window.startGame('level');
             });
-            console.log('✅ Level button addEventListener attached');
+            console.log('✅ Level button listener added');
         }
-
+        
         if (multiplayerBtn2) {
             multiplayerBtn2.addEventListener('click', function () {
-                console.log('🤖 Multiplayer button clicked via addEventListener!');
-                startGame('multiplayer');
+                console.log('🎮 Multiplayer button clicked via addEventListener!');
+                window.startGame('multiplayer');
             });
-            console.log('✅ Multiplayer button addEventListener attached');
+            console.log('✅ Multiplayer button listener added');
         }
     }, 100);
 
