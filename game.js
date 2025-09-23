@@ -689,14 +689,17 @@ function updateCoinDisplay() {
         }
     });
 
-    // Update shop button states based on current coin amount
-    const buyButtons = document.querySelectorAll('.buy-btn');
-    buyButtons.forEach(button => {
-        const itemId = button.getAttribute('data-item');
-        if (itemId && shopItems[itemId]) {
-            updateButtonState(itemId, button);
-        }
-    });
+    // Update shop button states based on current coin amount (only if shop is open)
+    const shopPanel = document.getElementById('shop-panel');
+    if (shopPanel && shopPanel.style.display === 'block') {
+        const buyButtons = document.querySelectorAll('.buy-btn');
+        buyButtons.forEach(button => {
+            const itemId = button.getAttribute('data-item');
+            if (itemId && shopItems[itemId]) {
+                updateButtonState(itemId, button);
+            }
+        });
+    }
 
     console.log(`💰 UI updated - Current coins: ${coins}`);
 }
@@ -1040,8 +1043,9 @@ function setupUIButtons() {
     const showUpdatesBtn = document.getElementById('show-updates');
     const closeUpdatesBtn = document.getElementById('close-updates');
 
-    // GTStijn.site redirect button
+    // Website redirect buttons
     const gtstijnBtn = document.getElementById('gtstijn-btn');
+    const echobotsBtn = document.getElementById('echobots-btn');
 
     // Add shop button to header if not exists
     const gameHeader = document.querySelector('.game-header');
@@ -1055,6 +1059,8 @@ function setupUIButtons() {
             if (shopPanel) {
                 shopPanel.style.display = 'block';
                 shopPanel.classList.add('show');
+                // Initialize shop buttons when shop opens
+                initializeShopButtons();
             }
         };
         gameHeader.appendChild(shopBtn);
@@ -1112,6 +1118,15 @@ function setupUIButtons() {
             window.open('https://gtstijn.site/', '_blank');
         };
         console.log('✅ GTStijn.site button connected');
+    }
+
+    // EchoBots.gg redirect
+    if (echobotsBtn) {
+        echobotsBtn.onclick = () => {
+            console.log('🤖 Redirecting to EchoBots.gg...');
+            window.open('https://echobots.gg/', '_blank');
+        };
+        console.log('✅ EchoBots.gg button connected');
     }
 
     // Ad Modal functionality
@@ -1198,6 +1213,7 @@ function startAdTimer() {
 // Shop data
 const shopItems = {
     // Outfits
+    defaultSkin: { type: 'outfit', price: 0, owned: true, equipped: true, name: 'Default Runner', effect: 'default' },
     speedSkin: { type: 'outfit', price: 150, owned: false, equipped: false, name: 'Speed Demon', effect: 'speed' },
     ghostSkin: { type: 'outfit', price: 200, owned: false, equipped: false, name: 'Ghost Walker', effect: 'ghost' },
     tankSkin: { type: 'outfit', price: 300, owned: false, equipped: false, name: 'Tank Armor', effect: 'tank' },
@@ -1230,6 +1246,12 @@ function initializeShop() {
         }
     }
 
+    console.log('✅ Shop data loaded');
+}
+
+function initializeShopButtons() {
+    console.log('🔘 Initializing shop buttons...');
+
     // Setup buy buttons
     const buyButtons = document.querySelectorAll('.buy-btn');
     console.log(`🔍 Found ${buyButtons.length} buy buttons`);
@@ -1249,7 +1271,7 @@ function initializeShop() {
         }
     });
 
-    console.log('✅ Shop system initialized');
+    console.log('✅ Shop buttons initialized');
 }
 
 function purchaseItem(itemId) {
