@@ -1029,6 +1029,15 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupUIButtons() {
     console.log('🔧 Setting up UI buttons...');
 
+    // Debug: Check which buttons exist in DOM
+    const buttonIds = ['shop-panel', 'close-shop', 'settings-modal', 'settings-btn', 'settings-close', 
+                      'update-log', 'show-updates', 'close-updates', 'gtstijn-btn', 'echobots-btn'];
+    
+    buttonIds.forEach(id => {
+        const element = document.getElementById(id);
+        console.log(`🔍 ${id}: ${element ? '✅ Found' : '❌ Not found'}`);
+    });
+
     // Shop Panel
     const shopPanel = document.getElementById('shop-panel');
     const closeShopBtn = document.getElementById('close-shop');
@@ -1075,6 +1084,8 @@ function setupUIButtons() {
             shopPanel.classList.remove('show');
         };
         console.log('✅ Shop close button connected');
+    } else {
+        console.warn('❌ Shop close button or panel not found');
     }
 
     // Settings functionality
@@ -1084,6 +1095,8 @@ function setupUIButtons() {
             settingsModal.style.display = 'block';
         };
         console.log('✅ Settings button connected');
+    } else {
+        console.warn('❌ Settings button or modal not found');
     }
 
     if (settingsCloseBtn && settingsModal) {
@@ -1092,6 +1105,8 @@ function setupUIButtons() {
             settingsModal.style.display = 'none';
         };
         console.log('✅ Settings close button connected');
+    } else {
+        console.warn('❌ Settings close button or modal not found');
     }
 
     // Updates functionality
@@ -1118,6 +1133,8 @@ function setupUIButtons() {
             window.open('https://gtstijn.site/', '_blank');
         };
         console.log('✅ GTStijn.site button connected');
+    } else {
+        console.warn('❌ GTStijn.site button not found');
     }
 
     // EchoBots.gg redirect
@@ -1127,6 +1144,8 @@ function setupUIButtons() {
             window.open('https://echobots.gg/', '_blank');
         };
         console.log('✅ EchoBots.gg button connected');
+    } else {
+        console.warn('❌ EchoBots.gg button not found');
     }
 
     // Ad Modal functionality
