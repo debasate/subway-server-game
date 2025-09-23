@@ -688,6 +688,17 @@ function updateCoinDisplay() {
             element.textContent = coins;
         }
     });
+
+    // Update shop button states based on current coin amount
+    const buyButtons = document.querySelectorAll('.buy-btn');
+    buyButtons.forEach(button => {
+        const itemId = button.getAttribute('data-item');
+        if (itemId && shopItems[itemId]) {
+            updateButtonState(itemId, button);
+        }
+    });
+
+    console.log(`💰 UI updated - Current coins: ${coins}`);
 }
 
 // ================================
@@ -985,42 +996,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn) {
             btn.onclick = handler;
             console.log(`✅ Button ${id} connected`);
+        } else {
+            console.warn(`❌ Button ${id} not found`);
         }
     });
 
-    // Setup shop interface
-    const shopPanel = document.getElementById('shop-panel');
-    const closeShopBtn = document.getElementById('close-shop');
-
-    // Add shop button to header if not exists
-    const gameHeader = document.querySelector('.game-header');
-    if (gameHeader && !document.getElementById('shop-btn')) {
-        const shopBtn = document.createElement('button');
-        shopBtn.id = 'shop-btn';
-        shopBtn.className = 'settings-btn';
-        shopBtn.innerHTML = '🛒 Shop';
-        shopBtn.onclick = () => {
-            if (shopPanel) shopPanel.style.display = 'block';
-        };
-        gameHeader.appendChild(shopBtn);
-    }
-
-    // Close shop functionality
-    if (closeShopBtn) {
-        closeShopBtn.onclick = () => {
-            if (shopPanel) shopPanel.style.display = 'none';
-        };
-    }
-
-    // Setup GTStijn.site redirect button
-    const gtstijnBtn = document.getElementById('gtstijn-btn');
-    if (gtstijnBtn) {
-        gtstijnBtn.onclick = () => {
-            console.log('🌐 Redirecting to GTStijn.site...');
-            window.open('https://gtstijn.site/', '_blank');
-        };
-        console.log('✅ GTStijn.site button connected');
-    }
+    // Setup all UI interface buttons
+    setupUIButtons();
 
     // Update coin display immediately
     updateCoinDisplay();
@@ -1036,6 +1018,178 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize shop functionality
     initializeShop();
 });
+
+// ================================
+// UI BUTTON SETUP
+// ================================
+
+function setupUIButtons() {
+    console.log('🔧 Setting up UI buttons...');
+
+    // Shop Panel
+    const shopPanel = document.getElementById('shop-panel');
+    const closeShopBtn = document.getElementById('close-shop');
+
+    // Settings Modal
+    const settingsModal = document.getElementById('settings-modal');
+    const settingsBtn = document.getElementById('settings-btn');
+    const settingsCloseBtn = document.getElementById('settings-close');
+
+    // Updates Panel
+    const updateLog = document.getElementById('update-log');
+    const showUpdatesBtn = document.getElementById('show-updates');
+    const closeUpdatesBtn = document.getElementById('close-updates');
+
+    // GTStijn.site redirect button
+    const gtstijnBtn = document.getElementById('gtstijn-btn');
+
+    // Add shop button to header if not exists
+    const gameHeader = document.querySelector('.game-header');
+    if (gameHeader && !document.getElementById('shop-btn')) {
+        const shopBtn = document.createElement('button');
+        shopBtn.id = 'shop-btn';
+        shopBtn.className = 'settings-btn';
+        shopBtn.innerHTML = '🛒 Shop';
+        shopBtn.onclick = () => {
+            console.log('🛒 Opening shop...');
+            if (shopPanel) {
+                shopPanel.style.display = 'block';
+                shopPanel.classList.add('show');
+            }
+        };
+        gameHeader.appendChild(shopBtn);
+        console.log('✅ Shop button created and added');
+    }
+
+    // Shop functionality
+    if (closeShopBtn && shopPanel) {
+        closeShopBtn.onclick = () => {
+            console.log('❌ Closing shop...');
+            shopPanel.style.display = 'none';
+            shopPanel.classList.remove('show');
+        };
+        console.log('✅ Shop close button connected');
+    }
+
+    // Settings functionality
+    if (settingsBtn && settingsModal) {
+        settingsBtn.onclick = () => {
+            console.log('⚙️ Opening settings...');
+            settingsModal.style.display = 'block';
+        };
+        console.log('✅ Settings button connected');
+    }
+
+    if (settingsCloseBtn && settingsModal) {
+        settingsCloseBtn.onclick = () => {
+            console.log('❌ Closing settings...');
+            settingsModal.style.display = 'none';
+        };
+        console.log('✅ Settings close button connected');
+    }
+
+    // Updates functionality
+    if (showUpdatesBtn && updateLog) {
+        showUpdatesBtn.onclick = () => {
+            console.log('📋 Opening updates...');
+            updateLog.style.display = 'block';
+        };
+        console.log('✅ Updates button connected');
+    }
+
+    if (closeUpdatesBtn && updateLog) {
+        closeUpdatesBtn.onclick = () => {
+            console.log('❌ Closing updates...');
+            updateLog.style.display = 'none';
+        };
+        console.log('✅ Updates close button connected');
+    }
+
+    // GTStijn.site redirect
+    if (gtstijnBtn) {
+        gtstijnBtn.onclick = () => {
+            console.log('🌐 Redirecting to GTStijn.site...');
+            window.open('https://gtstijn.site/', '_blank');
+        };
+        console.log('✅ GTStijn.site button connected');
+    }
+
+    // Ad Modal functionality
+    const adModal = document.getElementById('ad-modal');
+    const watchAdBtn = document.getElementById('watch-ad-btn');
+    const adCloseBtn = document.getElementById('ad-close-btn');
+    const adClaimBtn = document.getElementById('ad-claim-btn');
+
+    if (watchAdBtn && adModal) {
+        watchAdBtn.onclick = () => {
+            console.log('📺 Starting ad...');
+            adModal.style.display = 'block';
+            startAdTimer();
+        };
+        console.log('✅ Watch ad button connected');
+    }
+
+    if (adCloseBtn && adModal) {
+        adCloseBtn.onclick = () => {
+            console.log('❌ Closing ad...');
+            adModal.style.display = 'none';
+        };
+        console.log('✅ Ad close button connected');
+    }
+
+    if (adClaimBtn) {
+        adClaimBtn.onclick = () => {
+            console.log('💰 Claiming ad reward...');
+            coins += 10;
+            saveGameProgress();
+            updateCoinDisplay();
+            alert('🎉 Je hebt 10 coins gekregen!');
+            if (adModal) adModal.style.display = 'none';
+        };
+        console.log('✅ Ad claim button connected');
+    }
+
+    // Add click handlers for modal backgrounds (close on background click)
+    [shopPanel, settingsModal, updateLog, adModal].forEach(modal => {
+        if (modal) {
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    if (modal.classList.contains('show')) {
+                        modal.classList.remove('show');
+                    }
+                }
+            };
+        }
+    });
+
+    console.log('✅ All UI buttons initialized');
+}
+
+function startAdTimer() {
+    const countdown = document.getElementById('ad-countdown');
+    const claimBtn = document.getElementById('ad-claim-btn');
+    const progress = document.getElementById('ad-progress');
+
+    let timeLeft = 5;
+
+    if (claimBtn) claimBtn.disabled = true;
+
+    const timer = setInterval(() => {
+        timeLeft--;
+        if (countdown) countdown.textContent = timeLeft;
+        if (progress) progress.style.width = `${((5 - timeLeft) / 5) * 100}%`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            if (claimBtn) {
+                claimBtn.disabled = false;
+                claimBtn.textContent = '🎉 Claim 10 Coins';
+            }
+            console.log('📺 Ad finished, coins can be claimed');
+        }
+    }, 1000);
+}
 
 // ================================
 // SHOP SYSTEM
@@ -1078,11 +1232,20 @@ function initializeShop() {
 
     // Setup buy buttons
     const buyButtons = document.querySelectorAll('.buy-btn');
-    buyButtons.forEach(button => {
+    console.log(`🔍 Found ${buyButtons.length} buy buttons`);
+
+    buyButtons.forEach((button, index) => {
         const itemId = button.getAttribute('data-item');
+        console.log(`Button ${index + 1}: ${itemId}`);
+
         if (itemId) {
-            button.onclick = () => purchaseItem(itemId);
+            button.onclick = () => {
+                console.log(`🖱️ Button clicked: ${itemId}`);
+                purchaseItem(itemId);
+            };
             updateButtonState(itemId, button);
+        } else {
+            console.warn(`❌ Button ${index + 1} has no data-item attribute`);
         }
     });
 
@@ -1090,17 +1253,31 @@ function initializeShop() {
 }
 
 function purchaseItem(itemId) {
+    console.log(`🛒 Attempting to purchase: ${itemId}`);
     const item = shopItems[itemId];
 
     if (!item) {
         console.error(`❌ Item ${itemId} not found`);
+        alert(`Fout: Item ${itemId} niet gevonden!`);
         return;
     }
+
+    console.log(`💰 Current coins: ${coins}, Item price: ${item.price}`);
 
     // Check if already owned (for outfits/powers)
     if (item.owned && item.type !== 'boost') {
         if (item.type === 'outfit') {
             equipOutfit(itemId);
+        } else if (item.type === 'power') {
+            // Use power if owned
+            if (item.uses > 0) {
+                item.uses--;
+                console.log(`⚡ Used ${item.name}, remaining uses: ${item.uses}`);
+                alert(`⚡ ${item.name} gebruikt! Nog ${item.uses} keer beschikbaar.`);
+                saveShopData();
+                updateCoinDisplay();
+                return;
+            }
         }
         console.log(`✅ ${item.name} activated/equipped`);
         return;
@@ -1109,25 +1286,29 @@ function purchaseItem(itemId) {
     // Check if player has enough coins
     if (coins < item.price) {
         console.log(`❌ Not enough coins! Need ${item.price}, have ${coins}`);
-        alert(`Je hebt niet genoeg coins!\nNodig: ${item.price} 🪙\nHebt: ${coins} 🪙`);
+        alert(`Je hebt niet genoeg coins!\n\nNodig: ${item.price} 🪙\nHebt: ${coins} 🪙\n\nSpeel meer games om coins te verdienen!`);
         return;
     }
 
     // Purchase item
     coins -= item.price;
+    console.log(`💸 Spent ${item.price} coins, remaining: ${coins}`);
 
     // Handle different item types
     if (item.type === 'outfit') {
         item.owned = true;
         equipOutfit(itemId);
+        alert(`🎽 ${item.name} gekocht en uitgerust!\n\nJe nieuwe outfit is nu actief.`);
         console.log(`🎽 Purchased and equipped ${item.name}`);
     } else if (item.type === 'power') {
         item.owned = true;
         item.uses += 3; // Give 3 uses
+        alert(`⚡ ${item.name} gekocht!\n\n+3 uses toegevoegd.\nTotaal: ${item.uses} uses beschikbaar.`);
         console.log(`⚡ Purchased ${item.name} - 3 uses added`);
     } else if (item.type === 'boost') {
         // Boosts are consumable, apply immediately to next game
         applyBoost(itemId);
+        alert(`🚀 ${item.name} gekocht!\n\nBoost wordt toegepast in je volgende game.`);
         console.log(`🚀 Purchased ${item.name} boost`);
     }
 
@@ -1136,11 +1317,14 @@ function purchaseItem(itemId) {
     saveGameProgress();
     updateCoinDisplay();
 
-    // Update button state
-    const button = document.querySelector(`[data-item="${itemId}"]`);
-    if (button) {
-        updateButtonState(itemId, button);
-    }
+    // Update ALL button states
+    const allBuyButtons = document.querySelectorAll('.buy-btn');
+    allBuyButtons.forEach(button => {
+        const id = button.getAttribute('data-item');
+        if (id && shopItems[id]) {
+            updateButtonState(id, button);
+        }
+    });
 
     console.log(`💰 Purchase complete! Remaining coins: ${coins}`);
 }
