@@ -85,7 +85,14 @@ function gameLoop() {
 }
 
 document.addEventListener('keydown', e => {
+    // Als het spel niet loopt en Enter wordt ingedrukt, start het spel
+    if (!gameRunning && e.key === 'Enter') {
+        startGame();
+        return;
+    }
+
     if (!gameRunning) return;
+
     if (e.key === 'ArrowLeft' && player.lane > 0) {
         player.lane--;
         player.x = lanes[player.lane];
@@ -96,10 +103,12 @@ document.addEventListener('keydown', e => {
     }
 });
 
-startBtn.onclick = () => {
+function startGame() {
     resetGame();
     startScreen.style.display = 'none';
     canvas.style.display = 'block';
     gameRunning = true;
     requestAnimationFrame(gameLoop);
-};
+}
+
+startBtn.onclick = startGame;
