@@ -27,6 +27,19 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Game mode specific styling */
+body.game-mode {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    height: 100vh !important;
+    background: #1a1a2e !important;
+}
+
 /* Login & Authentication Styles */
 #login-screen {
     position: fixed;
@@ -2091,6 +2104,37 @@ canvas {
 /* Ensure canvas always has a background */
 #game-canvas {
     background: linear-gradient(135deg, #2C3E50, #34495E, #2C3E50) !important;
+    max-width: 100vw;
+    max-height: 100vh;
+    object-fit: contain;
+}
+
+/* Game info styling */
+#game-info {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+#game-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 10px 15px;
+    border-radius: 15px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#coins-ingame {
+    color: #FFD700;
+    font-size: 18px;
 }
 
 /* Mobile Controls */

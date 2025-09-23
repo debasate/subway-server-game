@@ -148,10 +148,8 @@ function showGameScreen() {
     if (canvas) canvas.style.display = 'block';
     if (gameInfo) gameInfo.style.display = 'block';
 
-    // Center layout
-    document.body.style.display = 'block';
-    document.body.style.justifyContent = 'center';
-    document.body.style.alignItems = 'center';
+    // Add game-mode class for proper styling
+    document.body.classList.add('game-mode');
 
     // Show mobile controls if on mobile
     if (isMobile) {
@@ -170,15 +168,13 @@ function backToMenu() {
     if (canvas) canvas.style.display = 'none';
     if (gameInfo) gameInfo.style.display = 'none';
 
+    // Remove game-mode class to restore normal styling
+    document.body.classList.remove('game-mode');
+
     // Hide mobile controls
     if (isMobile) {
         hideMobileControls();
     }
-
-    // Restore menu layout
-    document.body.style.display = 'flex';
-    document.body.style.justifyContent = 'center';
-    document.body.style.alignItems = 'center';
 }
 
 // ================================
