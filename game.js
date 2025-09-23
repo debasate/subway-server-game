@@ -2802,6 +2802,15 @@ function hideMobileControls() {
     }
 }
 
+// SIMPLE TEST FUNCTION - Make sure this works
+window.testButton = function() {
+    alert('Button test works!');
+    console.log('✅ Button test function called successfully!');
+};
+
+// GLOBAL startGame function - accessible from HTML onclick
+window.startGame = startGame;
+
 function startGame(mode = 'infinity') {
     console.log(`🚀 Starting game in ${mode} mode...`);
 
