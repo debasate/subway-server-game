@@ -1664,6 +1664,8 @@ const levels = [
 ];
 
 function resetGame(mode = 'infinity') {
+    console.log(`🔄 Resetting game for mode: ${mode}`);
+    
     gameMode = mode;
     player.lane = 1;
     player.x = lanes[player.lane];
@@ -1672,6 +1674,9 @@ function resetGame(mode = 'infinity') {
     player.moveSpeed = 1;
     player.ghostCharges = 0;
     player.lastGhostScore = 0;
+    
+    console.log(`👤 Player reset to: x=${player.x}, y=${player.y}, lane=${player.lane}`);
+    console.log(`🎮 Lanes available: ${JSON.stringify(lanes)}`);
 
     // Bepaal actieve skin
     if (playerUpgrades.rainbowSkin) player.activeSkin = 'rainbow';
@@ -1710,9 +1715,11 @@ function resetGame(mode = 'infinity') {
     if (isMultiplayer) {
         initializeBots();
         multiplayerResults = null;
+        console.log('🤖 Multiplayer mode: bots initialized');
     } else {
         bots = [];
         playerRanking = [];
+        console.log(`🎯 Single player mode: ${mode}`);
     }
 
     // Reset shield system
@@ -1724,10 +1731,16 @@ function resetGame(mode = 'infinity') {
     if (gameMode === 'infinity') {
         speed = playerUpgrades.speed ? 8.5 : 7;
         baseSpeed = speed;
-    } else {
+        console.log(`♾️ Infinity mode: speed set to ${speed}`);
+    } else if (gameMode === 'level') {
         speed = levels[0].maxSpeed * (playerUpgrades.speed ? 0.8 : 0.7);
         baseSpeed = speed;
         levelTarget = levels[0].target;
+        console.log(`🎯 Level mode: speed=${speed}, target=${levelTarget}`);
+    } else {
+        speed = playerUpgrades.speed ? 8.5 : 7;
+        baseSpeed = speed;
+        console.log(`🤖 Multiplayer mode: speed set to ${speed}`);
     }
 
     updateGameInfo();
@@ -1753,6 +1766,8 @@ function resetGame(mode = 'infinity') {
     setTimeout(() => {
         showNotification(`${weatherEmojis[currentWeather]} ${weatherNames[currentWeather]}`, 'info', 3000);
     }, 500);
+    
+    console.log('✅ Game reset complete!');
 }
 function updateGameInfo() {
     const currentThemeName = themes[currentTheme].name;
@@ -2399,7 +2414,7 @@ function drawPowerUpIndicators() {
 function drawBackground() {
     // Get current theme colors
     const theme = themes[currentTheme];
-    
+
     // Fix theme color access
     const themeColors = {
         background: theme.colors.primary,
@@ -2636,6 +2651,8 @@ function backToMenu() {
 }
 
 document.addEventListener('keydown', e => {
+    console.log('🔍 Key pressed:', e.key, 'Game running:', gameRunning, 'Game mode:', gameMode);
+    
     // Als het spel niet loopt en Enter wordt ingedrukt, start infinity mode
     if (!gameRunning && e.key === 'Enter') {
         startGame('infinity');
@@ -2648,21 +2665,36 @@ document.addEventListener('keydown', e => {
         return;
     }
 
-    if (!gameRunning) return;
-
-    if (e.key === 'ArrowLeft' && player.lane > 0) {
-        player.lane--;
-        // Instant snelle movement voor iedereen
-        player.x = lanes[player.lane];
-        playSound('jump');
-        createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
+    // Movement works in all modes when game is running
+    if (gameRunning) {
+        if (e.key === 'ArrowLeft' && player.lane > 0) {
+            player.lane--;
+            // Instant snelle movement voor iedereen
+            player.x = lanes[player.lane];
+            playSound('jump');
+            createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
+            console.log('👈 Moved left to lane:', player.lane);
+        }
+        if (e.key === 'ArrowRight' && player.lane < 2) {
+            player.lane++;
+            // Instant snelle movement voor iedereen
+            player.x = lanes[player.lane];
+            playSound('jump');
+            createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
+            console.log('👉 Moved right to lane:', player.lane);
+        }
     }
-    if (e.key === 'ArrowRight' && player.lane < 2) {
-        player.lane++;
-        // Instant snelle movement voor iedereen
-        player.x = lanes[player.lane];
-        playSound('jump');
-        createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
+    
+    // Debug shortcuts (work when not in game)
+    if (!gameRunning) {
+        if (e.key.toLowerCase() === 'l') {
+            console.log('🎯 Starting Level mode via L key');
+            startGame('level');
+        }
+        if (e.key.toLowerCase() === 'm') {
+            console.log('🤖 Starting Multiplayer mode via M key');
+            startGame('multiplayer');
+        }
     }
 });
 
@@ -2821,6 +2853,7 @@ window.startGame = startGame;
 
 function startGame(mode = 'infinity') {
     console.log(`🚀 Starting game in ${mode} mode...`);
+    console.log('🔧 Game state before start:', { gameRunning, gameMode, playerLane: player.lane });
 
     resetGame(mode);
 
@@ -2851,6 +2884,10 @@ function startGame(mode = 'infinity') {
     }
 
     gameRunning = true;
+    console.log('✅ Game started successfully:', { gameRunning, gameMode, mode });
+    console.log('👤 Player position:', { x: player.x, y: player.y, lane: player.lane });
+    console.log('🎮 Lanes:', lanes);
+    
     requestAnimationFrame(gameLoop);
 }
 
