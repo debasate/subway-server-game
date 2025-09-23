@@ -32,6 +32,8 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .auth-container {
@@ -45,25 +47,42 @@ body {
     position: relative;
     animation: slideInUp 0.6s ease-out;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    margin: 20px auto;
+    min-height: fit-content;
 }
 
 /* Mobile-first responsive design for auth container */
 @media (max-width: 768px) {
+    #login-screen {
+        align-items: flex-start;
+        padding: 20px 0;
+    }
+    
     .auth-container {
         padding: 25px 20px;
         width: 95%;
         max-width: none;
-        margin: 10px;
+        margin: 20px auto;
         border-radius: 15px;
+        position: relative;
+        min-height: auto;
     }
 }
 
 @media (max-width: 480px) {
+    #login-screen {
+        align-items: flex-start;
+        padding: 10px 0;
+    }
+    
     .auth-container {
         padding: 20px 15px;
         width: 98%;
-        margin: 5px;
+        margin: 10px auto;
         border-radius: 10px;
+        min-height: auto;
+        max-height: calc(100vh - 20px);
+        overflow-y: auto;
     }
 
     .game-logo h1 {

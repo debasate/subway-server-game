@@ -1,169 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🚇 Subway Server Game</title>
+    <link rel="stylesheet" href="style.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Subway Server Game</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
+    <meta name="format-detection" content="telephone=no">
 </head>
-
 <body>
-    <!-- Login Screen -->
+    <!-- Mobile Controls -->
+    <div id="mobile-controls" class="mobile-controls" style="display: none;">
+        <div class="control-section left">
+            <button id="mobile-left" class="control-btn">◀</button>
+        </div>
+        <div class="control-section right">
+            <button id="mobile-right" class="control-btn">▶</button>
+        </div>
+        <div class="control-section center">
+            <button id="mobile-jump" class="control-btn jump-btn">⬆</button>
+        </div>
+    </div>
+
+    <!-- Authentication Screen -->
     <div id="login-screen">
         <div class="auth-container">
-            <div class="game-logo">
+            <div class="auth-header">
                 <h1>🚇 Subway Server Game 🚇</h1>
-                <div class="version-badge">v3.2.0</div>
-            </div>
-
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">🔑 Inloggen</button>
-                <button class="auth-tab" data-tab="register">📝 Registreren</button>
-                <button class="auth-tab" data-tab="guest">👤 Gast Spelen</button>
+                <p>Login om je voortgang op te slaan!</p>
             </div>
 
             <!-- Login Form -->
-            <div id="login-form" class="auth-form active">
-                <h2>Welkom Terug!</h2>
-                <p class="auth-subtitle">Log in om je voortgang te bewaren</p>
-
-                <div class="input-group">
-                    <label for="login-username">Gebruikersnaam</label>
-                    <input type="text" id="login-username" placeholder="Voer je gebruikersnaam in"
-                        autocomplete="username">
+            <div id="login-form" class="auth-form">
+                <h2>🔑 Inloggen</h2>
+                <div class="form-group">
+                    <label for="login-username">👤 Gebruikersnaam:</label>
+                    <input type="text" id="login-username" placeholder="Voer je gebruikersnaam in" autocomplete="username">
                 </div>
-
-                <div class="input-group">
-                    <label for="login-password">Wachtwoord</label>
-                    <input type="password" id="login-password" placeholder="Voer je wachtwoord in"
-                        autocomplete="current-password">
+                <div class="form-group">
+                    <label for="login-password">🔒 Wachtwoord:</label>
+                    <input type="password" id="login-password" placeholder="Voer je wachtwoord in" autocomplete="current-password">
                 </div>
-
-                <div class="auth-options">
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" id="remember-me">
-                        <span class="checkmark"></span>
-                        Onthoud mij
-                    </label>
+                <div class="form-actions">
+                    <button id="login-btn" class="auth-btn primary">🚀 Inloggen</button>
+                    <button id="show-register" class="auth-btn secondary">📝 Account Aanmaken</button>
+                    <button id="guest-play-btn" class="auth-btn guest">👤 Speel als Gast</button>
                 </div>
-
-                <button id="login-btn" class="auth-btn primary">
-                    <span class="btn-icon">🔑</span>
-                    Inloggen
-                </button>
-
-                <div class="auth-divider">
-                    <span>of</span>
-                </div>
-
-                <button id="demo-login-btn" class="auth-btn secondary">
-                    <span class="btn-icon">⚡</span>
-                    Demo Account (admin/admin)
-                </button>
             </div>
 
             <!-- Register Form -->
-            <div id="register-form" class="auth-form">
-                <h2>Account Aanmaken</h2>
-                <p class="auth-subtitle">Maak een account om je scores te bewaren</p>
-
-                <div class="input-group">
-                    <label for="register-username">Gebruikersnaam</label>
-                    <input type="text" id="register-username" placeholder="Kies een gebruikersnaam (3-20 tekens)"
-                        autocomplete="username">
-                    <div class="input-feedback" id="username-feedback"></div>
+            <div id="register-form" class="auth-form" style="display: none;">
+                <h2>📝 Account Aanmaken</h2>
+                <div class="form-group">
+                    <label for="register-username">👤 Gebruikersnaam:</label>
+                    <input type="text" id="register-username" placeholder="Kies een gebruikersnaam" autocomplete="username">
                 </div>
-
-                <div class="input-group">
-                    <label for="register-email">Email (optioneel)</label>
-                    <input type="email" id="register-email" placeholder="je.email@voorbeeld.com" autocomplete="email">
+                <div class="form-group">
+                    <label for="register-password">🔒 Wachtwoord:</label>
+                    <input type="password" id="register-password" placeholder="Kies een wachtwoord" autocomplete="new-password">
                 </div>
-
-                <div class="input-group">
-                    <label for="register-password">Wachtwoord</label>
-                    <input type="password" id="register-password" placeholder="Minimaal 6 tekens"
-                        autocomplete="new-password">
-                    <div class="password-strength" id="password-strength">
-                        <div class="strength-bar">
-                            <div class="strength-fill"></div>
-                        </div>
-                        <span class="strength-text">Voer een wachtwoord in</span>
-                    </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">🔒 Bevestig Wachtwoord:</label>
+                    <input type="password" id="register-confirm-password" placeholder="Bevestig je wachtwoord" autocomplete="new-password">
                 </div>
-
-                <div class="input-group">
-                    <label for="register-password-confirm">Bevestig Wachtwoord</label>
-                    <input type="password" id="register-password-confirm" placeholder="Herhaal je wachtwoord"
-                        autocomplete="new-password">
-                    <div class="input-feedback" id="password-feedback"></div>
+                <div class="form-actions">
+                    <button id="register-btn" class="auth-btn primary">✨ Account Aanmaken</button>
+                    <button id="show-login" class="auth-btn secondary">🔙 Terug naar Login</button>
                 </div>
-
-                <div class="auth-options">
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" id="terms-agree" required>
-                        <span class="checkmark"></span>
-                        Ik ga akkoord met de voorwaarden
-                    </label>
-                </div>
-
-                <button id="register-btn" class="auth-btn primary" disabled>
-                    <span class="btn-icon">📝</span>
-                    Account Aanmaken
-                </button>
             </div>
 
-            <!-- Guest Form -->
-            <div id="guest-form" class="auth-form">
-                <h2>Spelen als Gast</h2>
-                <p class="auth-subtitle">Speel zonder account (voortgang wordt niet bewaard)</p>
-
-                <div class="guest-features">
-                    <div class="feature-list">
-                        <div class="feature-item">✅ Alle game modes beschikbaar</div>
-                        <div class="feature-item">✅ Lokale high scores</div>
-                        <div class="feature-item">❌ Geen cloud save</div>
-                        <div class="feature-item">❌ Geen global leaderboards</div>
-                        <div class="feature-item">❌ Geen cross-device sync</div>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="guest-nickname">Nickname (optioneel)</label>
-                    <input type="text" id="guest-nickname" placeholder="Voer een nickname in" maxlength="15">
-                </div>
-
-                <button id="guest-play-btn" class="auth-btn primary">
-                    <span class="btn-icon">🎮</span>
-                    Spelen als Gast
-                </button>
-
-                <p class="guest-disclaimer">
-                    💡 <strong>Tip:</strong> Maak een account om je voortgang te bewaren!
-                </p>
+            <!-- Remember Me Option -->
+            <div class="remember-section">
+                <label class="remember-checkbox">
+                    <input type="checkbox" id="remember-me">
+                    <span class="checkmark"></span>
+                    Onthoud mij op dit apparaat
+                </label>
             </div>
 
-            <!-- Loading State -->
-            <div id="auth-loading" class="auth-loading" style="display: none;">
-                <div class="loading-spinner"></div>
-                <p>Verbinden...</p>
-            </div>
-
-            <!-- Error Messages -->
-            <div id="auth-error" class="auth-message error" style="display: none;">
-                <span class="message-icon">❌</span>
-                <span class="message-text"></span>
-            </div>
-
-            <!-- Success Messages -->
-            <div id="auth-success" class="auth-message success" style="display: none;">
-                <span class="message-icon">✅</span>
-                <span class="message-text"></span>
-            </div>
+            <!-- Auth Status Messages -->
+            <div id="auth-status" class="auth-status"></div>
         </div>
 
         <!-- Background Animation -->
@@ -203,6 +120,17 @@
             </div>
             <div class="panel-content">
                 <div class="update-item latest">
+                    <div class="update-version">v3.3.3 - FIXES & MOBILE!</div>
+                    <div class="update-date">24 Sep 2025</div>
+                    <ul>
+                        <li>🐛 Play button bug gefixt</li>
+                        <li>📱 Volledig mobile geoptimaliseerd</li>
+                        <li>📜 Scrollable login interface</li>
+                        <li>🎯 Touch controls verbeterd</li>
+                        <li>⚡ Performance optimalisaties</li>
+                    </ul>
+                </div>
+                <div class="update-item">
                     <div class="update-version">v3.0.0 - MEGA UPDATE!</div>
                     <div class="update-date">23 Sep 2025</div>
                     <ul>
@@ -210,278 +138,164 @@
                         <li>✨ Particle effects & visual upgrades</li>
                         <li>⭐ Power-ups collectible systeem</li>
                         <li>🏆 Achievements & badges systeem</li>
-                        <li>🌦️ Dynamic weather effects</li>
-                        <li>⚙️ Settings menu met audio controls</li>
-                        <li>📊 Enhanced statistics tracking</li>
-                    </ul>
-                </div>
-                <div class="update-item">
-                    <div class="update-version">v2.1.0</div>
-                    <div class="update-date">23 Sep 2025</div>
-                    <ul>
-                        <li>🤖 Multiplayer VS Bots mode toegevoegd</li>
-                        <li>👔 Outfit systeem met unieke powers</li>
-                        <li>📺 Advertentie systeem voor gratis coins</li>
-                        <li>🎨 Complete UI herontwerp</li>
-                        <li>📊 Live ranking systeem</li>
-                    </ul>
-                </div>
-                <div class="update-item">
-                    <div class="update-version">v2.0.5</div>
-                    <div class="update-date">22 Sep 2025</div>
-                    <ul>
-                        <li>⚡ Snellere character movement</li>
-                        <li>🔔 In-game notification systeem</li>
-                        <li>🎯 Verbeterde difficulty balancing</li>
-                    </ul>
-                </div>
-                <div class="update-item">
-                    <div class="update-version">v2.0.0</div>
-                    <div class="update-date">21 Sep 2025</div>
-                    <ul>
-                        <li>🛒 Shop systeem met skins</li>
-                        <li>🪙 Coin economy toegevoegd</li>
-                        <li>🛡️ Automatisch schild systeem</li>
-                        <li>🌈 5 unieke skins met abilities</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- Main Game Interface -->
-        <div id="start-screen">
-            <div class="game-header">
-                <h1>🚇 Subway Server Game 🚇</h1>
-                <div class="version-badge">v3.0.0</div>
-                <button id="show-updates" class="updates-btn">📋 Updates</button>
-                <button id="settings-btn" class="settings-btn">⚙️ Settings</button>
-            </div>
-
-            <!-- Player Stats Dashboard -->
-            <div id="player-dashboard">
-                <div class="stat-card">
-                    <div class="stat-icon">🪙</div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="coin-display">0</span>
-                        <span class="stat-label">Coins</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">👔</div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="active-outfit">Default</span>
-                        <span class="stat-label">Outfit</span>
-                    </div>
-                </div>
-                <div class="stat-card ad-card" id="ad-section">
-                    <div class="stat-icon">📺</div>
-                    <div class="stat-info">
-                        <button id="watch-ad-btn" class="ad-btn">Bekijk Ad</button>
-                        <span class="stat-label">+10 Coins</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Enhanced Game Mode Selection -->
-            <div id="gamemode-selection">
-                <h3>🎮 Selecteer Game Mode</h3>
-                <div class="gamemode-grid">
-                    <div class="gamemode-card" data-mode="infinity">
-                        <div class="mode-icon">♾️</div>
-                        <h4>Infinity Mode</h4>
-                        <p>Endless runner met progressieve difficulty</p>
-                        <div class="mode-stats">
-                            <span>⭐ Best: <span id="infinity-best">0</span></span>
-                        </div>
-                        <button id="infinity-btn" class="mode-btn">Spelen</button>
-                    </div>
-
-                    <div class="gamemode-card" data-mode="level">
-                        <div class="mode-icon">🎯</div>
-                        <h4>Level Mode</h4>
-                        <p>Gestructureerde levels met doelen</p>
-                        <div class="mode-stats">
-                            <span>🏆 Level: <span id="level-progress">1</span></span>
-                        </div>
-                        <button id="level-btn" class="mode-btn">Spelen</button>
-                    </div>
-
-                    <div class="gamemode-card" data-mode="multiplayer">
-                        <div class="mode-icon">🤖</div>
-                        <h4>VS Bots</h4>
-                        <p>Compete tegen 4 AI tegenstanders</p>
-                        <div class="mode-stats">
-                            <span>🥇 Wins: <span id="multiplayer-wins">0</span></span>
-                        </div>
-                        <button id="multiplayer-btn" class="mode-btn multiplayer">Spelen</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Shop Access -->
-            <div id="shop-access">
-                <button id="shop-btn" class="main-shop-btn">
-                    <span class="shop-icon">🛒</span>
-                    <span>Outfits & Powers</span>
-                    <span class="shop-badge">NEW</span>
-                </button>
-            </div>
-
-            <div class="quick-controls">
-                <p>⌨️ Druk <kbd>Enter</kbd> voor Infinity Mode | <kbd>L</kbd> voor Level Mode | <kbd>M</kbd> voor
-                    Multiplayer</p>
-            </div>
-
-            <!-- New Features Section -->
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎵</div>
-                    <h4>Audio System</h4>
-                    <p>Dynamic sound effects and background music</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⭐</div>
-                    <h4>Power-ups</h4>
-                    <p>Collect special abilities during gameplay</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
-                    <h4>Achievements</h4>
-                    <p>Unlock badges and track your progress</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌦️</div>
-                    <h4>Weather Effects</h4>
-                    <p>Experience different environmental conditions</p>
-                </div>
-            </div>
-
-            <div class="game-tips">
-                <div class="tip-item">💡 <strong>Tip:</strong> Elke 1000 punten = 10 sec schild!</div>
-                <div class="tip-item">⭐ <strong>Nieuw:</strong> Verzamel power-ups voor speciale abilities!</div>
-                <div class="tip-item">� <strong>Nieuw:</strong> Unlock achievements voor bonussen!</div>
-            </div>
+        <!-- Game Header -->
+        <div class="game-header">
+            <h1>🚇 Subway Server Game 🚇</h1>
+            <div class="version-badge">v3.3.3</div>
+            <button id="show-updates" class="updates-btn">📋 Updates</button>
+            <button id="settings-btn" class="settings-btn">⚙️ Settings</button>
         </div>
 
-        <!-- Settings Screen -->
-        <div id="settings-screen" style="display:none;">
-            <div class="settings-header">
-                <h2>⚙️ Game Settings</h2>
-                <button id="settings-close-btn" class="settings-close">×</button>
+        <!-- Player Stats Dashboard -->
+        <div id="player-dashboard">
+            <div class="stat-card">
+                <div class="stat-icon">🪙</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="coin-display">0</span>
+                    <span class="stat-label">Coins</span>
+                </div>
             </div>
-
-            <div class="settings-content">
-                <div class="settings-section">
-                    <h3>🎵 Audio Settings</h3>
-                    <div class="setting-item">
-                        <label>Master Volume</label>
-                        <input type="range" id="master-volume" min="0" max="100" value="50">
-                        <span id="master-volume-value">50%</span>
-                    </div>
-                    <div class="setting-item">
-                        <label>Sound Effects</label>
-                        <input type="range" id="effects-volume" min="0" max="100" value="70">
-                        <span id="effects-volume-value">70%</span>
-                    </div>
-                    <div class="setting-item">
-                        <label>Background Music</label>
-                        <input type="range" id="music-volume" min="0" max="100" value="30">
-                        <span id="music-volume-value">30%</span>
-                    </div>
-                    <div class="setting-item">
-                        <label>Mute All Sounds</label>
-                        <input type="checkbox" id="mute-toggle">
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon">👔</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="active-outfit">Default</span>
+                    <span class="stat-label">Outfit</span>
                 </div>
-
-                <div class="settings-section">
-                    <h3>🎮 Gameplay Settings</h3>
-                    <div class="setting-item">
-                        <label>Particle Effects</label>
-                        <input type="checkbox" id="particles-toggle" checked>
-                    </div>
-                    <div class="setting-item">
-                        <label>Weather Effects</label>
-                        <input type="checkbox" id="weather-toggle" checked>
-                    </div>
-                    <div class="setting-item">
-                        <label>Screen Shake</label>
-                        <input type="checkbox" id="shake-toggle" checked>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h3>📊 Statistics</h3>
-                    <div class="stats-grid">
-                        <div class="stat-display">
-                            <span class="stat-icon">🪙</span>
-                            <div class="stat-info">
-                                <span class="stat-label">Total Coins</span>
-                                <span class="stat-value" id="total-coins-stat">0</span>
-                            </div>
-                        </div>
-                        <div class="stat-display">
-                            <span class="stat-icon">👻</span>
-                            <div class="stat-info">
-                                <span class="stat-label">Ghost Uses</span>
-                                <span class="stat-value" id="ghost-uses-stat">0</span>
-                            </div>
-                        </div>
-                        <div class="stat-display">
-                            <span class="stat-icon">⭐</span>
-                            <div class="stat-info">
-                                <span class="stat-label">Power-ups</span>
-                                <span class="stat-value" id="powerups-stat">0</span>
-                            </div>
-                        </div>
-                        <div class="stat-display">
-                            <span class="stat-icon">⏰</span>
-                            <div class="stat-info">
-                                <span class="stat-label">Best Survival</span>
-                                <span class="stat-value" id="survival-stat">0s</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h3>🏆 Achievements</h3>
-                    <div class="achievements-grid" id="achievements-list">
-                        <!-- Achievements will be populated by JavaScript -->
-                    </div>
+            </div>
+            <div class="stat-card ad-card" id="ad-section">
+                <div class="stat-icon">📺</div>
+                <div class="stat-info">
+                    <button id="watch-ad-btn" class="ad-btn">Bekijk Ad</button>
+                    <span class="stat-label">+10 Coins</span>
                 </div>
             </div>
         </div>
 
-        <!-- Daily Challenge Popup -->
-        <div id="challenge-popup" class="modal" style="display:none;">
-            <div class="modal-content challenge-content">
-                <h3>🎯 Daily Challenge</h3>
-                <div id="challenge-details">
-                    <div class="challenge-icon">🏃</div>
-                    <h4 id="challenge-title">Loading...</h4>
-                    <p id="challenge-description">Loading challenge...</p>
-                    <div class="challenge-progress">
-                        <div class="progress-bar">
-                            <div id="challenge-progress-fill" class="progress-fill"></div>
-                        </div>
-                        <span id="challenge-progress-text">0/100</span>
+        <!-- Enhanced Game Mode Selection -->
+        <div id="gamemode-selection">
+            <h3>🎮 Selecteer Game Mode</h3>
+            <div class="gamemode-grid">
+                <div class="gamemode-card" data-mode="infinity">
+                    <div class="mode-icon">♾️</div>
+                    <h4>Infinity Mode</h4>
+                    <p>Endless runner met progressieve difficulty</p>
+                    <div class="mode-stats">
+                        <span>⭐ Best: <span id="infinity-best">0</span></span>
                     </div>
-                    <div class="challenge-reward">
-                        Reward: <span id="challenge-reward">50 Coins</span>
-                    </div>
+                    <button id="infinity-btn" class="mode-btn">Spelen</button>
                 </div>
-                <button id="challenge-close-btn" class="challenge-btn">Close</button>
+
+                <div class="gamemode-card" data-mode="level">
+                    <div class="mode-icon">🎯</div>
+                    <h4>Level Mode</h4>
+                    <p>Gestructureerde levels met doelen</p>
+                    <div class="mode-stats">
+                        <span>📊 Level: <span id="current-level">1</span></span>
+                        <span>⭐ Best: <span id="level-best">0</span></span>
+                    </div>
+                    <button id="level-btn" class="mode-btn">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="multiplayer">
+                    <div class="mode-icon">🤖</div>
+                    <h4>VS Bots</h4>
+                    <p>Competitieve multiplayer tegen AI</p>
+                    <div class="mode-stats">
+                        <span>🏆 Wins: <span id="multiplayer-wins">0</span></span>
+                    </div>
+                    <button id="multiplayer-btn" class="mode-btn">Spelen</button>
+                </div>
             </div>
         </div>
 
-        <!-- Enhanced Shop Screen -->
-        <div id="shop-screen" style="display:none;">
+        <!-- Theme Selector -->
+        <div id="theme-panel" class="theme-panel">
+            <h3>🎨 Selecteer Thema</h3>
+            <div class="theme-grid">
+                <div class="theme-card" data-theme="default">
+                    <div class="theme-preview default-theme"></div>
+                    <h4>🌊 Ocean</h4>
+                    <p>Het klassieke thema</p>
+                    <div class="theme-unlock">✅ Ontgrendeld</div>
+                    <button class="theme-btn selected" data-theme="default">Actief</button>
+                </div>
+
+                <div class="theme-card" data-theme="sunset">
+                    <div class="theme-preview sunset-theme"></div>
+                    <h4>🌅 Sunset</h4>
+                    <p>Warme zonsondergang kleuren</p>
+                    <div class="theme-unlock">🔓 Score 100</div>
+                    <button class="theme-btn" data-theme="sunset">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="night">
+                    <div class="theme-preview night-theme"></div>
+                    <h4>🌙 Night</h4>
+                    <p>Donkere nacht modus</p>
+                    <div class="theme-unlock">🔓 Score 500</div>
+                    <button class="theme-btn" data-theme="night">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="forest">
+                    <div class="theme-preview forest-theme"></div>
+                    <h4>🌲 Forest</h4>
+                    <p>Groene natuur kleuren</p>
+                    <div class="theme-unlock">🔓 Score 1000</div>
+                    <button class="theme-btn" data-theme="forest">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="volcano">
+                    <div class="theme-preview volcano-theme"></div>
+                    <h4>🌋 Volcano</h4>
+                    <p>Hete lava kleuren</p>
+                    <div class="theme-unlock">🔓 Score 2000</div>
+                    <button class="theme-btn" data-theme="volcano">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="ice">
+                    <div class="theme-preview ice-theme"></div>
+                    <h4>❄️ Ice</h4>
+                    <p>Koude winter kleuren</p>
+                    <div class="theme-unlock">🔓 Score 3000</div>
+                    <button class="theme-btn" data-theme="ice">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="rainbow">
+                    <div class="theme-preview rainbow-theme"></div>
+                    <h4>🌈 Rainbow</h4>
+                    <p>Alle kleuren van de regenboog</p>
+                    <div class="theme-unlock">🔓 Score 5000</div>
+                    <button class="theme-btn" data-theme="rainbow">Selecteer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Progress Bar -->
+        <div id="level-progress" class="level-progress">
+            <div class="progress-header">
+                <span>⭐ Level <span id="player-level">1</span></span>
+                <span><span id="current-xp">0</span> / <span id="required-xp">100</span> XP</span>
+            </div>
+            <div class="progress-bar">
+                <div id="xp-fill" class="progress-fill"></div>
+            </div>
+            <div class="progress-rewards">
+                <span>🎁 Next: <span id="next-reward">50 Coins</span></span>
+            </div>
+        </div>
+
+        <!-- Shop Interface -->
+        <div id="shop-panel" class="shop-panel">
             <div class="shop-header">
-                <h2>🛒 Outfits & Powers Store</h2>
-                <button id="shop-close-btn" class="shop-close">×</button>
+                <h2>🛒 Shop</h2>
+                <button id="close-shop" class="close-btn">×</button>
             </div>
-
+            
             <div class="shop-tabs">
                 <button class="shop-tab active" data-tab="outfits">👔 Outfits</button>
                 <button class="shop-tab" data-tab="powers">⚡ Powers</button>
@@ -491,13 +305,13 @@
             <!-- Outfits Tab -->
             <div id="outfits-tab" class="shop-tab-content active">
                 <div class="shop-grid">
-                    <div class="outfit-item" data-item="goldenSkin">
-                        <div class="outfit-preview golden-preview"></div>
-                        <h3>✨ Golden Suit</h3>
-                        <p>+25% coin bonus</p>
-                        <div class="rarity legendary">Legendary</div>
-                        <div class="price">🪙 100</div>
-                        <button class="buy-btn" data-item="goldenSkin">Koop</button>
+                    <div class="outfit-item" data-item="defaultSkin">
+                        <div class="outfit-preview default-preview"></div>
+                        <h3>🏃 Default Runner</h3>
+                        <p>De klassieke subway runner</p>
+                        <div class="rarity common">Common</div>
+                        <div class="price owned">✅ Eigendom</div>
+                        <button class="buy-btn equipped" data-item="defaultSkin">Uitgerust</button>
                     </div>
 
                     <div class="outfit-item" data-item="speedSkin">
@@ -630,15 +444,84 @@
             </div>
         </div>
 
-        <div id="game-info" style="display:none;">
-            <div id="game-stats">
-                <span id="mode-display"></span>
-                <span id="level-display"></span>
-                <div id="coins-ingame">🪙 <span id="coins-count">0</span></div>
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3>⚙️ Game Settings</h3>
+                
+                <div class="settings-section">
+                    <h4>🔊 Audio</h4>
+                    <div class="setting-item">
+                        <label>Master Volume:</label>
+                        <input type="range" id="master-volume" min="0" max="100" value="70">
+                        <span id="master-volume-value">70%</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Sound Effects:</label>
+                        <input type="range" id="sfx-volume" min="0" max="100" value="80">
+                        <span id="sfx-volume-value">80%</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Background Music:</label>
+                        <input type="range" id="music-volume" min="0" max="100" value="50">
+                        <span id="music-volume-value">50%</span>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h4>🎮 Gameplay</h4>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="show-fps"> Show FPS Counter
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="particle-effects" checked> Particle Effects
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="screen-shake" checked> Screen Shake
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h4>📊 Statistics</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Games:</span>
+                            <span class="stat-value" id="total-games">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Best Score:</span>
+                            <span class="stat-value" id="best-score">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Coins:</span>
+                            <span class="stat-value" id="total-coins-earned">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Play Time:</span>
+                            <span class="stat-value" id="total-playtime">0m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="settings-close" class="modal-close">×</button>
             </div>
         </div>
-        <canvas id="game-canvas" width="480" height="640" style="display:none;"></canvas>
-        <script src="game.js"></script>
-</body>
+    </div>
 
+    <div id="game-info" style="display:none;">
+        <div id="game-stats">
+            <span id="mode-display"></span>
+            <span id="level-display"></span>
+            <div id="coins-ingame">🪙 <span id="coins-count">0</span></div>
+        </div>
+    </div>
+    <canvas id="game-canvas" width="480" height="640" style="display:none;"></canvas>
+    <script src="game.js"></script>
+</body>
 </html>
