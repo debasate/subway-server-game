@@ -34,10 +34,10 @@ let player = {
 };
 let lanes = [120, 220, 320];
 let obstacles = [];
-let speed = 2; // Start veel langzamer
+let speed = 7; // Veel snellere start snelheid
 let score = 0;
-let baseSpeed = 2;
-let scoreMultiplier = 0.15; // Veel langzamere score toename
+let baseSpeed = 7;
+let scoreMultiplier = 0.25; // Iets snellere score toename
 let difficultyLevel = 1;
 
 // Notification system
@@ -396,11 +396,11 @@ document.querySelectorAll('.buy-btn').forEach(btn => {
 
 // Level definitions
 const levels = [
-    { id: 1, name: "Beginner Station", target: 1000, maxSpeed: 6, spawnRate: 0.02 },
-    { id: 2, name: "City Junction", target: 2000, maxSpeed: 8, spawnRate: 0.025 },
-    { id: 3, name: "Rush Hour", target: 3000, maxSpeed: 10, spawnRate: 0.03 },
-    { id: 4, name: "Express Line", target: 4000, maxSpeed: 12, spawnRate: 0.035 },
-    { id: 5, name: "Final Terminal", target: 5000, maxSpeed: 15, spawnRate: 0.04 }
+    { id: 1, name: "Beginner Station", target: 1000, maxSpeed: 9, spawnRate: 0.02 },
+    { id: 2, name: "City Junction", target: 2000, maxSpeed: 12, spawnRate: 0.025 },
+    { id: 3, name: "Rush Hour", target: 3000, maxSpeed: 15, spawnRate: 0.03 },
+    { id: 4, name: "Express Line", target: 4000, maxSpeed: 18, spawnRate: 0.035 },
+    { id: 5, name: "Final Terminal", target: 5000, maxSpeed: 22, spawnRate: 0.04 }
 ];
 
 function resetGame(mode = 'infinity') {
@@ -448,12 +448,12 @@ function resetGame(mode = 'infinity') {
     shieldTimeLeft = 0;
     lastShieldScore = 0;
 
-    // Zeer easy start
+    // Snellere start
     if (gameMode === 'infinity') {
-        speed = playerUpgrades.speed ? 2.4 : 2;
+        speed = playerUpgrades.speed ? 8.5 : 7;
         baseSpeed = speed;
     } else {
-        speed = levels[0].maxSpeed * (playerUpgrades.speed ? 0.4 : 0.3);
+        speed = levels[0].maxSpeed * (playerUpgrades.speed ? 0.8 : 0.7);
         baseSpeed = speed;
         levelTarget = levels[0].target;
     }
@@ -1007,6 +1007,11 @@ function backToMenu() {
     startScreen.style.display = 'block';
     canvas.style.display = 'none';
     gameInfo.style.display = 'none';
+
+    // Restore body flex layout for menu
+    document.body.style.display = 'flex';
+    document.body.style.justifyContent = 'center';
+    document.body.style.alignItems = 'center';
 }
 
 document.addEventListener('keydown', e => {
@@ -1035,6 +1040,12 @@ function startGame(mode = 'infinity') {
     startScreen.style.display = 'none';
     canvas.style.display = 'block';
     gameInfo.style.display = 'block';
+
+    // Center the game canvas
+    document.body.style.display = 'block';
+    document.body.style.justifyContent = 'center';
+    document.body.style.alignItems = 'center';
+
     gameRunning = true;
     requestAnimationFrame(gameLoop);
 }

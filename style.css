@@ -11,6 +11,10 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
     overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 /* Update Log Panel */
@@ -101,12 +105,9 @@ body {
 
 /* Main Game Interface */
 #start-screen {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     width: 90%;
     max-width: 900px;
+    margin: auto;
 }
 
 .game-header {
@@ -125,7 +126,7 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .version-badge {
@@ -496,13 +497,23 @@ body {
 }
 
 @keyframes rainbow {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
+    0% {
+        filter: hue-rotate(0deg);
+    }
+
+    100% {
+        filter: hue-rotate(360deg);
+    }
 }
 
 @keyframes neon-glow {
-    0% { box-shadow: 0 0 20px rgba(0, 245, 255, 0.5); }
-    100% { box-shadow: 0 0 30px rgba(0, 245, 255, 0.8); }
+    0% {
+        box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 30px rgba(0, 245, 255, 0.8);
+    }
 }
 
 /* Rarity Labels */
@@ -529,12 +540,20 @@ body {
 }
 
 @keyframes mythic-glow {
-    0%, 100% { box-shadow: 0 0 10px rgba(253, 203, 110, 0.5); }
-    50% { box-shadow: 0 0 20px rgba(253, 203, 110, 0.8); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px rgba(253, 203, 110, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(253, 203, 110, 0.8);
+    }
 }
 
 /* Power Items */
-.power-item, .boost-item {
+.power-item,
+.boost-item {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border-radius: 15px;
@@ -544,13 +563,15 @@ body {
     border: 2px solid transparent;
 }
 
-.power-item:hover, .boost-item:hover {
+.power-item:hover,
+.boost-item:hover {
     transform: translateY(-5px);
     border-color: #74b9ff;
     box-shadow: 0 10px 30px rgba(116, 185, 255, 0.3);
 }
 
-.power-icon, .boost-icon {
+.power-icon,
+.boost-icon {
     font-size: 3em;
     margin-bottom: 15px;
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
@@ -646,7 +667,9 @@ body {
 }
 
 @keyframes progress {
-    to { width: 100%; }
+    to {
+        width: 100%;
+    }
 }
 
 .ad-claim {
@@ -745,6 +768,9 @@ body {
 canvas {
     border-radius: 10px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: block;
+    margin: 0 auto;
+    position: relative;
 }
 
 /* Responsive Design */
@@ -752,24 +778,24 @@ canvas {
     .game-header h1 {
         font-size: 2em;
     }
-    
+
     .gamemode-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .shop-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .game-tips {
         flex-direction: column;
         align-items: center;
     }
-    
+
     #player-dashboard {
         grid-template-columns: 1fr;
     }
-    
+
     .side-panel {
         width: 100%;
         right: -100%;
@@ -778,11 +804,20 @@ canvas {
 
 /* Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.outfit-item, .power-item, .boost-item {
+.outfit-item,
+.power-item,
+.boost-item {
     animation: fadeIn 0.5s ease-out;
 }
 
