@@ -1,3 +1,442 @@
+// User Authentication System
+class AuthManager {
+    constructor() {
+        this.currentUser = null;
+        this.isLoggedIn = false;
+        this.users = JSON.parse(localStorage.getItem('gameUsers')) || {};
+        this.initAuthListeners();
+        this.checkAutoLogin();
+    }
+
+    initAuthListeners() {
+        // Tab switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+        });
+
+        // Form submissions
+        document.getElementById('login-btn').addEventListener('click', () => this.handleLogin());
+        document.getElementById('register-btn').addEventListener('click', () => this.handleRegister());
+        document.getElementById('guest-play-btn').addEventListener('click', () => this.handleGuestPlay());
+        document.getElementById('demo-login-btn').addEventListener('click', () => this.handleDemoLogin());
+        document.getElementById('logout-btn').addEventListener('click', () => this.handleLogout());
+
+        // Real-time validation
+        document.getElementById('register-username').addEventListener('input', (e) => this.validateUsername(e.target.value));
+        document.getElementById('register-password').addEventListener('input', (e) => this.validatePassword(e.target.value));
+        document.getElementById('register-password-confirm').addEventListener('input', (e) => this.validatePasswordMatch());
+        document.getElementById('terms-agree').addEventListener('change', (e) => this.toggleRegisterButton());
+
+        // Enter key handling
+        document.getElementById('login-username').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleLogin();
+        });
+        document.getElementById('login-password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleLogin();
+        });
+    }
+
+    switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.tab === tabName);
+        });
+
+        // Update form visibility
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.classList.toggle('active', form.id === `${tabName}-form`);
+        });
+
+        // Clear messages
+        this.clearMessages();
+    }
+
+    validateUsername(username) {
+        const feedback = document.getElementById('username-feedback');
+        
+        if (username.length < 3) {
+            feedback.textContent = 'Gebruikersnaam moet minimaal 3 tekens lang zijn';
+            feedback.className = 'input-feedback error';
+            return false;
+        } else if (username.length > 20) {
+            feedback.textContent = 'Gebruikersnaam mag maximaal 20 tekens lang zijn';
+            feedback.className = 'input-feedback error';
+            return false;
+        } else if (this.users[username.toLowerCase()]) {
+            feedback.textContent = 'Deze gebruikersnaam is al in gebruik';
+            feedback.className = 'input-feedback error';
+            return false;
+        } else {
+            feedback.textContent = 'Gebruikersnaam beschikbaar';
+            feedback.className = 'input-feedback success';
+            return true;
+        }
+    }
+
+    validatePassword(password) {
+        const strengthBar = document.querySelector('.strength-fill');
+        const strengthText = document.querySelector('.strength-text');
+        
+        let strength = 0;
+        let feedback = '';
+
+        if (password.length >= 6) strength += 1;
+        if (password.match(/[a-z]/)) strength += 1;
+        if (password.match(/[A-Z]/)) strength += 1;
+        if (password.match(/[0-9]/)) strength += 1;
+        if (password.match(/[^a-zA-Z0-9]/)) strength += 1;
+
+        strengthBar.style.width = `${(strength / 5) * 100}%`;
+
+        if (password.length === 0) {
+            feedback = 'Voer een wachtwoord in';
+            strengthBar.className = 'strength-fill';
+        } else if (strength <= 2) {
+            feedback = 'Zwak wachtwoord';
+            strengthBar.className = 'strength-fill weak';
+        } else if (strength <= 3) {
+            feedback = 'Gemiddeld wachtwoord';
+            strengthBar.className = 'strength-fill medium';
+        } else {
+            feedback = 'Sterk wachtwoord';
+            strengthBar.className = 'strength-fill strong';
+        }
+
+        strengthText.textContent = feedback;
+        return strength >= 2;
+    }
+
+    validatePasswordMatch() {
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-password-confirm').value;
+        const feedback = document.getElementById('password-feedback');
+
+        if (confirmPassword.length === 0) {
+            feedback.textContent = '';
+            return false;
+        } else if (password !== confirmPassword) {
+            feedback.textContent = 'Wachtwoorden komen niet overeen';
+            feedback.className = 'input-feedback error';
+            return false;
+        } else {
+            feedback.textContent = 'Wachtwoorden komen overeen';
+            feedback.className = 'input-feedback success';
+            return true;
+        }
+    }
+
+    toggleRegisterButton() {
+        const username = document.getElementById('register-username').value;
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-password-confirm').value;
+        const termsAgreed = document.getElementById('terms-agree').checked;
+        const registerBtn = document.getElementById('register-btn');
+
+        const isValid = this.validateUsername(username) && 
+                       this.validatePassword(password) && 
+                       this.validatePasswordMatch() && 
+                       termsAgreed;
+
+        registerBtn.disabled = !isValid;
+    }
+
+    async handleLogin() {
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value;
+        const rememberMe = document.getElementById('remember-me').checked;
+
+        if (!username || !password) {
+            this.showError('Vul alle velden in');
+            return;
+        }
+
+        this.showLoading(true);
+
+        // Simulate API call delay
+        await this.delay(800);
+
+        const user = this.users[username.toLowerCase()];
+        if (user && user.password === password) {
+            this.currentUser = { ...user, username: username.toLowerCase() };
+            this.isLoggedIn = true;
+
+            if (rememberMe) {
+                localStorage.setItem('rememberedUser', username.toLowerCase());
+            }
+
+            this.showSuccess(`Welkom terug, ${user.displayName}!`);
+            setTimeout(() => this.showMainGame(), 1500);
+        } else {
+            this.showError('Onjuiste gebruikersnaam of wachtwoord');
+        }
+
+        this.showLoading(false);
+    }
+
+    async handleRegister() {
+        const username = document.getElementById('register-username').value.trim();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-password-confirm').value;
+        const termsAgreed = document.getElementById('terms-agree').checked;
+
+        if (!this.validateUsername(username) || !this.validatePassword(password) || !this.validatePasswordMatch() || !termsAgreed) {
+            this.showError('Controleer je invoer en probeer opnieuw');
+            return;
+        }
+
+        this.showLoading(true);
+
+        // Simulate API call delay
+        await this.delay(1200);
+
+        const newUser = {
+            displayName: username,
+            email: email || null,
+            password: password,
+            createdAt: new Date().toISOString(),
+            stats: {
+                totalCoins: 0,
+                highScore: 0,
+                gamesPlayed: 0,
+                totalPlayTime: 0,
+                levelsCompleted: 0,
+                powerUpsUsed: 0
+            },
+            achievements: [],
+            settings: {
+                soundEnabled: true,
+                musicVolume: 0.3,
+                effectsVolume: 0.5
+            },
+            gameData: {
+                unlockedSkins: ['default'],
+                currentTheme: 'subway',
+                powerUps: {},
+                level: 1
+            }
+        };
+
+        this.users[username.toLowerCase()] = newUser;
+        this.saveUsers();
+
+        this.currentUser = { ...newUser, username: username.toLowerCase() };
+        this.isLoggedIn = true;
+
+        this.showSuccess(`Account aangemaakt! Welkom ${username}!`);
+        setTimeout(() => this.showMainGame(), 1500);
+        this.showLoading(false);
+    }
+
+    async handleDemoLogin() {
+        this.showLoading(true);
+        await this.delay(500);
+
+        // Create demo user if not exists
+        if (!this.users['admin']) {
+            this.users['admin'] = {
+                displayName: 'Demo User',
+                email: 'demo@example.com',
+                password: 'admin',
+                createdAt: new Date().toISOString(),
+                stats: {
+                    totalCoins: 999,
+                    highScore: 15000,
+                    gamesPlayed: 50,
+                    totalPlayTime: 7200,
+                    levelsCompleted: 8,
+                    powerUpsUsed: 25
+                },
+                achievements: ['first_game', 'coin_collector', 'speed_demon'],
+                settings: {
+                    soundEnabled: true,
+                    musicVolume: 0.3,
+                    effectsVolume: 0.5
+                },
+                gameData: {
+                    unlockedSkins: ['default', 'goldenSkin', 'speedSkin'],
+                    currentTheme: 'neon',
+                    powerUps: { doubleJump: 5, timeSlower: 3 },
+                    level: 3
+                }
+            };
+            this.saveUsers();
+        }
+
+        this.currentUser = { ...this.users['admin'], username: 'admin' };
+        this.isLoggedIn = true;
+
+        this.showSuccess('Demo account ingelogd!');
+        setTimeout(() => this.showMainGame(), 1000);
+        this.showLoading(false);
+    }
+
+    handleGuestPlay() {
+        const nickname = document.getElementById('guest-nickname').value.trim() || 'Guest';
+        
+        this.currentUser = {
+            displayName: nickname,
+            username: null,
+            isGuest: true,
+            stats: {
+                totalCoins: 0,
+                highScore: 0,
+                gamesPlayed: 0,
+                totalPlayTime: 0,
+                levelsCompleted: 0,
+                powerUpsUsed: 0
+            },
+            gameData: {
+                unlockedSkins: ['default'],
+                currentTheme: 'subway',
+                powerUps: {},
+                level: 1
+            }
+        };
+        this.isLoggedIn = false;
+
+        this.showSuccess(`Welkom ${nickname}! Veel speelplezier!`);
+        setTimeout(() => this.showMainGame(), 1000);
+    }
+
+    handleLogout() {
+        this.currentUser = null;
+        this.isLoggedIn = false;
+        localStorage.removeItem('rememberedUser');
+        
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+        
+        // Reset forms
+        document.querySelectorAll('input').forEach(input => {
+            if (input.type !== 'checkbox') input.value = '';
+            else input.checked = false;
+        });
+        
+        this.switchTab('login');
+    }
+
+    checkAutoLogin() {
+        const rememberedUser = localStorage.getItem('rememberedUser');
+        if (rememberedUser && this.users[rememberedUser]) {
+            document.getElementById('login-username').value = this.users[rememberedUser].displayName;
+        }
+    }
+
+    showMainGame() {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'block';
+        
+        this.updateUserProfile();
+        this.loadUserGameData();
+    }
+
+    updateUserProfile() {
+        const avatar = document.getElementById('user-avatar');
+        const usernameDisplay = document.getElementById('username-display');
+        const saveStatus = document.getElementById('save-status');
+        const connectionStatus = document.getElementById('connection-status');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        avatar.textContent = this.currentUser.displayName.charAt(0).toUpperCase();
+        usernameDisplay.textContent = this.currentUser.displayName;
+        
+        if (this.currentUser.isGuest) {
+            saveStatus.textContent = 'Local Only';
+            connectionStatus.textContent = 'Guest Mode';
+            logoutBtn.style.display = 'none';
+        } else {
+            saveStatus.textContent = 'Cloud Save';
+            connectionStatus.textContent = 'Connected';
+            logoutBtn.style.display = 'block';
+        }
+    }
+
+    loadUserGameData() {
+        if (!this.currentUser) return;
+
+        // Load user's game data
+        const gameData = this.currentUser.gameData;
+        const stats = this.currentUser.stats;
+
+        // Set coins
+        coins = stats.totalCoins || 0;
+        updateCoinDisplay();
+
+        // Set high score
+        highScore = stats.highScore || 0;
+
+        // Set current theme
+        currentTheme = gameData.currentTheme || 'subway';
+
+        // Load unlocked skins
+        if (gameData.unlockedSkins) {
+            gameData.unlockedSkins.forEach(skin => {
+                if (shopItems[skin]) {
+                    shopItems[skin].owned = true;
+                }
+            });
+        }
+
+        // Update UI elements
+        document.getElementById('infinity-best').textContent = highScore;
+        document.getElementById('level-progress').textContent = gameData.level || 1;
+        
+        // Update shop display
+        updateShopDisplay();
+    }
+
+    saveUserProgress() {
+        if (!this.currentUser || this.currentUser.isGuest) return;
+
+        // Update user stats
+        this.currentUser.stats.totalCoins = coins;
+        this.currentUser.stats.highScore = Math.max(this.currentUser.stats.highScore, highScore);
+        this.currentUser.gameData.currentTheme = currentTheme;
+
+        // Save to localStorage
+        this.users[this.currentUser.username] = this.currentUser;
+        this.saveUsers();
+    }
+
+    saveUsers() {
+        localStorage.setItem('gameUsers', JSON.stringify(this.users));
+    }
+
+    showLoading(show) {
+        document.getElementById('auth-loading').style.display = show ? 'block' : 'none';
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.style.display = show ? 'none' : (form.classList.contains('active') ? 'block' : 'none');
+        });
+    }
+
+    showError(message) {
+        const errorEl = document.getElementById('auth-error');
+        errorEl.querySelector('.message-text').textContent = message;
+        errorEl.style.display = 'flex';
+        setTimeout(() => errorEl.style.display = 'none', 5000);
+    }
+
+    showSuccess(message) {
+        const successEl = document.getElementById('auth-success');
+        successEl.querySelector('.message-text').textContent = message;
+        successEl.style.display = 'flex';
+        setTimeout(() => successEl.style.display = 'none', 3000);
+    }
+
+    clearMessages() {
+        document.getElementById('auth-error').style.display = 'none';
+        document.getElementById('auth-success').style.display = 'none';
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+// Initialize authentication system
+let authManager;
+
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 const startScreen = document.getElementById('start-screen');
@@ -164,7 +603,7 @@ const themes = {
         icon: '🚇',
         colors: {
             primary: '#2C3E50',
-            secondary: '#34495E', 
+            secondary: '#34495E',
             accent: '#4ecdc4',
             rail: '#BDC3C7',
             wall: '#1A252F'
@@ -688,9 +1127,30 @@ const shopItems = {
     ghostSkin: { price: 200, name: "Ghost Mode" },
     tankSkin: { price: 300, name: "Tank Mode" },
     rainbowSkin: { price: 500, name: "Rainbow Power" }
-}; function updateCoinDisplay() {
+}; 
+
+// Auto-save throttling
+let lastAutoSave = 0;
+const AUTO_SAVE_INTERVAL = 5000; // Save every 5 seconds
+
+function updateCoinDisplay() {
     coinDisplay.textContent = coins;
     coinsCount.textContent = coinsThisRun;
+    
+    // Auto-save with throttling
+    const now = Date.now();
+    if (now - lastAutoSave > AUTO_SAVE_INTERVAL) {
+        lastAutoSave = now;
+        saveProgress();
+        
+        // Show save indicator
+        if (authManager && authManager.currentUser && !authManager.currentUser.isGuest) {
+            document.getElementById('save-status').textContent = 'Saving...';
+            setTimeout(() => {
+                document.getElementById('save-status').textContent = 'Cloud Save';
+            }, 500);
+        }
+    }
 }
 
 // Bot system for multiplayer
@@ -892,8 +1352,14 @@ function drawMultiplayerUI() {
 }
 
 function saveProgress() {
+    // Save to localStorage for backwards compatibility
     localStorage.setItem('subwayCoins', coins.toString());
     localStorage.setItem('subwayUpgrades', JSON.stringify(playerUpgrades));
+    
+    // Save to user account if logged in
+    if (authManager && authManager.currentUser && !authManager.currentUser.isGuest) {
+        authManager.saveUserProgress();
+    }
 }
 
 function updateShopDisplay() {
@@ -1046,7 +1512,7 @@ function resetGame(mode = 'infinity') {
 }
 function updateGameInfo() {
     const currentThemeName = themes[currentTheme].name;
-    
+
     if (gameMode === 'infinity') {
         modeDisplay.textContent = 'Mode: Infinity';
         levelDisplay.textContent = `Score: ${Math.floor(score)} | Theme: ${currentThemeName}`;
@@ -1237,7 +1703,7 @@ function drawObstacles() {
 function drawLevelInfo() {
     if (gameMode === 'level') {
         const theme = themes[currentTheme];
-        
+
         // Level name with theme colors
         ctx.fillStyle = theme.highlight;
         ctx.font = 'bold 16px Arial';
@@ -1255,28 +1721,28 @@ function drawLevelProgressBar() {
     const barHeight = 12;
     const barX = canvas.width - barWidth - 10;
     const barY = canvas.height - 30;
-    
+
     // Calculate progress
     const progress = Math.min(score / levelTarget, 1);
     const animatedProgress = smoothStep(levelProgressBar.previousProgress, progress, 0.05);
     levelProgressBar.previousProgress = animatedProgress;
-    
+
     // Background with theme colors
     const borderRadius = 6;
     ctx.fillStyle = darkenColor(theme.background, 30);
     roundRect(ctx, barX - 2, barY - 2, barWidth + 4, barHeight + 4, borderRadius);
     ctx.fill();
-    
+
     // Progress bar background
     ctx.fillStyle = darkenColor(theme.primary, 20);
     roundRect(ctx, barX, barY, barWidth, barHeight, borderRadius - 1);
     ctx.fill();
-    
+
     // Progress fill with gradient
     if (animatedProgress > 0) {
         const progressWidth = barWidth * animatedProgress;
         const gradient = ctx.createLinearGradient(barX, barY, barX + progressWidth, barY);
-        
+
         // Dynamic colors based on progress
         if (progress >= 1) {
             // Complete - use highlight color
@@ -1295,11 +1761,11 @@ function drawLevelProgressBar() {
             gradient.addColorStop(0, '#F44336');
             gradient.addColorStop(1, theme.secondary);
         }
-        
+
         ctx.fillStyle = gradient;
         roundRect(ctx, barX, barY, progressWidth, barHeight, borderRadius - 1);
         ctx.fill();
-        
+
         // Shimmer effect for completed progress
         if (progress >= 1 && levelProgressBar.shimmerOffset !== null) {
             const shimmerGradient = ctx.createLinearGradient(
@@ -1309,11 +1775,11 @@ function drawLevelProgressBar() {
             shimmerGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
             shimmerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.6)');
             shimmerGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-            
+
             ctx.fillStyle = shimmerGradient;
             roundRect(ctx, barX, barY, progressWidth, barHeight, borderRadius - 1);
             ctx.fill();
-            
+
             // Update shimmer animation
             levelProgressBar.shimmerOffset += 3;
             if (levelProgressBar.shimmerOffset > barWidth + 60) {
@@ -1321,20 +1787,20 @@ function drawLevelProgressBar() {
             }
         }
     }
-    
+
     // Progress text with theme colors
     ctx.fillStyle = theme.highlight;
     ctx.font = 'bold 11px Arial';
     ctx.textAlign = 'center';
     const progressText = `${Math.floor(score)}/${levelTarget}`;
     ctx.fillText(progressText, barX + barWidth / 2, barY + barHeight + 15);
-    
+
     // Percentage text
     ctx.font = '10px Arial';
     ctx.fillStyle = theme.secondary;
     const percentText = `${Math.floor(progress * 100)}%`;
     ctx.fillText(percentText, barX + barWidth / 2, barY - 8);
-    
+
     ctx.textAlign = 'left'; // Reset alignment
 }
 
@@ -1689,11 +2155,11 @@ function drawPowerUpIndicators() {
 function drawBackground() {
     // Get current theme colors
     const theme = themes[currentTheme];
-    
+
     // Always ensure canvas has a background - clear first
     ctx.fillStyle = theme.background;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     // Theme and weather-based background colors
     let bgGradient;
 
@@ -1761,8 +2227,8 @@ function drawBackground() {
         }
 
         // Rail glans effect met thema highlight
-        const railGloss = currentWeather === 'night' ? 
-            `rgba(${hexToRgb(theme.secondary).r}, ${hexToRgb(theme.secondary).g}, ${hexToRgb(theme.secondary).b}, 0.6)` : 
+        const railGloss = currentWeather === 'night' ?
+            `rgba(${hexToRgb(theme.secondary).r}, ${hexToRgb(theme.secondary).g}, ${hexToRgb(theme.secondary).b}, 0.6)` :
             `rgba(${hexToRgb(theme.highlight).r}, ${hexToRgb(theme.highlight).g}, ${hexToRgb(theme.highlight).b}, 0.8)`;
         ctx.strokeStyle = railGloss;
         ctx.lineWidth = 1;
@@ -1799,7 +2265,7 @@ function gameLoop() {
         console.error('Canvas context not available');
         return;
     }
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
 
@@ -2150,13 +2616,16 @@ document.getElementById('multiplayer-btn').onclick = () => startGame('multiplaye
 
 // Initialize canvas background on load
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize authentication system
+    authManager = new AuthManager();
+    
     // Set initial canvas background
     if (canvas && ctx) {
         ctx.fillStyle = '#2C3E50';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         drawBackground();
     }
-    
+
     // Update log functionality
     const showUpdatesBtn = document.getElementById('show-updates');
     const updateLog = document.getElementById('update-log');
@@ -2490,12 +2959,12 @@ function switchToNextTheme() {
     const currentIndex = themeNames.indexOf(currentTheme);
     const nextIndex = (currentIndex + 1) % themeNames.length;
     const nextTheme = themeNames[nextIndex];
-    
+
     // Check if theme is unlocked
     if (isThemeUnlocked(nextTheme)) {
         currentTheme = nextTheme;
         localStorage.setItem('currentTheme', currentTheme);
-        
+
         // Show theme change notification
         showNotification(`Thema gewijzigd naar: ${themes[currentTheme].name}`, themes[currentTheme].primary);
         playSound('powerup'); // Use existing sound
@@ -2507,10 +2976,10 @@ function switchToNextTheme() {
 
 function isThemeUnlocked(themeName) {
     if (themeName === 'subway') return true; // Default theme always unlocked
-    
+
     const theme = themes[themeName];
     const requirement = theme.unlockRequirement;
-    
+
     // Check different unlock requirements
     if (requirement.includes('Score')) {
         const requiredScore = parseInt(requirement.match(/\d+/)[0]);
@@ -2522,7 +2991,7 @@ function isThemeUnlocked(themeName) {
         const requiredCoins = parseInt(requirement.match(/\d+/)[0]);
         return totalCoins >= requiredCoins;
     }
-    
+
     return false;
 }
 
@@ -2551,11 +3020,11 @@ function showNotification(message, color = '#4CAF50') {
         `;
         document.body.appendChild(notification);
     }
-    
+
     notification.textContent = message;
     notification.style.borderColor = color;
     notification.style.opacity = '1';
-    
+
     // Auto hide after 3 seconds
     setTimeout(() => {
         notification.style.opacity = '0';
@@ -2566,7 +3035,7 @@ function showNotification(message, color = '#4CAF50') {
 function lightenColor(color, percent) {
     const rgb = hexToRgb(color);
     if (!rgb) return color;
-    
+
     const factor = percent / 100;
     return `rgb(${Math.min(255, Math.floor(rgb.r + (255 - rgb.r) * factor))}, 
                 ${Math.min(255, Math.floor(rgb.g + (255 - rgb.g) * factor))}, 
@@ -2576,7 +3045,7 @@ function lightenColor(color, percent) {
 function darkenColor(color, percent) {
     const rgb = hexToRgb(color);
     if (!rgb) return color;
-    
+
     const factor = percent / 100;
     return `rgb(${Math.floor(rgb.r * (1 - factor))}, 
                 ${Math.floor(rgb.g * (1 - factor))}, 
@@ -2593,7 +3062,7 @@ function hexToRgb(hex) {
             b: parseInt(matches[2])
         } : null;
     }
-    
+
     // Handle hex format
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -2609,7 +3078,7 @@ function loadSavedTheme() {
     if (savedTheme && themes[savedTheme] && isThemeUnlocked(savedTheme)) {
         currentTheme = savedTheme;
     }
-    
+
     // Initialize shimmer effect for progress bar
     if (gameMode === 'level') {
         levelProgressBar.shimmerOffset = -60;

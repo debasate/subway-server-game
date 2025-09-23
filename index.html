@@ -13,6 +13,183 @@
 </head>
 
 <body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="auth-container">
+            <div class="game-logo">
+                <h1>🚇 Subway Server Game 🚇</h1>
+                <div class="version-badge">v3.2.0</div>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">🔑 Inloggen</button>
+                <button class="auth-tab" data-tab="register">📝 Registreren</button>
+                <button class="auth-tab" data-tab="guest">👤 Gast Spelen</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <h2>Welkom Terug!</h2>
+                <p class="auth-subtitle">Log in om je voortgang te bewaren</p>
+                
+                <div class="input-group">
+                    <label for="login-username">Gebruikersnaam</label>
+                    <input type="text" id="login-username" placeholder="Voer je gebruikersnaam in" autocomplete="username">
+                </div>
+                
+                <div class="input-group">
+                    <label for="login-password">Wachtwoord</label>
+                    <input type="password" id="login-password" placeholder="Voer je wachtwoord in" autocomplete="current-password">
+                </div>
+                
+                <div class="auth-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        Onthoud mij
+                    </label>
+                </div>
+                
+                <button id="login-btn" class="auth-btn primary">
+                    <span class="btn-icon">🔑</span>
+                    Inloggen
+                </button>
+                
+                <div class="auth-divider">
+                    <span>of</span>
+                </div>
+                
+                <button id="demo-login-btn" class="auth-btn secondary">
+                    <span class="btn-icon">⚡</span>
+                    Demo Account (admin/admin)
+                </button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="auth-form">
+                <h2>Account Aanmaken</h2>
+                <p class="auth-subtitle">Maak een account om je scores te bewaren</p>
+                
+                <div class="input-group">
+                    <label for="register-username">Gebruikersnaam</label>
+                    <input type="text" id="register-username" placeholder="Kies een gebruikersnaam (3-20 tekens)" autocomplete="username">
+                    <div class="input-feedback" id="username-feedback"></div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="register-email">Email (optioneel)</label>
+                    <input type="email" id="register-email" placeholder="je.email@voorbeeld.com" autocomplete="email">
+                </div>
+                
+                <div class="input-group">
+                    <label for="register-password">Wachtwoord</label>
+                    <input type="password" id="register-password" placeholder="Minimaal 6 tekens" autocomplete="new-password">
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill"></div>
+                        </div>
+                        <span class="strength-text">Voer een wachtwoord in</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="register-password-confirm">Bevestig Wachtwoord</label>
+                    <input type="password" id="register-password-confirm" placeholder="Herhaal je wachtwoord" autocomplete="new-password">
+                    <div class="input-feedback" id="password-feedback"></div>
+                </div>
+                
+                <div class="auth-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="terms-agree" required>
+                        <span class="checkmark"></span>
+                        Ik ga akkoord met de voorwaarden
+                    </label>
+                </div>
+                
+                <button id="register-btn" class="auth-btn primary" disabled>
+                    <span class="btn-icon">📝</span>
+                    Account Aanmaken
+                </button>
+            </div>
+
+            <!-- Guest Form -->
+            <div id="guest-form" class="auth-form">
+                <h2>Spelen als Gast</h2>
+                <p class="auth-subtitle">Speel zonder account (voortgang wordt niet bewaard)</p>
+                
+                <div class="guest-features">
+                    <div class="feature-list">
+                        <div class="feature-item">✅ Alle game modes beschikbaar</div>
+                        <div class="feature-item">✅ Lokale high scores</div>
+                        <div class="feature-item">❌ Geen cloud save</div>
+                        <div class="feature-item">❌ Geen global leaderboards</div>
+                        <div class="feature-item">❌ Geen cross-device sync</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="guest-nickname">Nickname (optioneel)</label>
+                    <input type="text" id="guest-nickname" placeholder="Voer een nickname in" maxlength="15">
+                </div>
+                
+                <button id="guest-play-btn" class="auth-btn primary">
+                    <span class="btn-icon">🎮</span>
+                    Spelen als Gast
+                </button>
+                
+                <p class="guest-disclaimer">
+                    💡 <strong>Tip:</strong> Maak een account om je voortgang te bewaren!
+                </p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="auth-loading" class="auth-loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p>Verbinden...</p>
+            </div>
+
+            <!-- Error Messages -->
+            <div id="auth-error" class="auth-message error" style="display: none;">
+                <span class="message-icon">❌</span>
+                <span class="message-text"></span>
+            </div>
+
+            <!-- Success Messages -->
+            <div id="auth-success" class="auth-message success" style="display: none;">
+                <span class="message-icon">✅</span>
+                <span class="message-text"></span>
+            </div>
+        </div>
+
+        <!-- Background Animation -->
+        <div class="auth-background">
+            <div class="floating-elements">
+                <div class="floating-coin">🪙</div>
+                <div class="floating-coin">🚇</div>
+                <div class="floating-coin">⭐</div>
+                <div class="floating-coin">🎮</div>
+                <div class="floating-coin">🏆</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Game Interface -->
+    <div id="start-screen" style="display: none;">
+        <!-- User Profile Header -->
+        <div id="user-profile" class="user-profile">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <div class="user-info">
+                <h3 id="username-display">Guest Player</h3>
+                <div class="user-stats">
+                    <span>💾 <span id="save-status">Local Save</span></span>
+                    <span>⚡ Online: <span id="connection-status">Offline</span></span>
+                </div>
+            </div>
+            <button id="logout-btn" class="logout-btn" style="display: none;">
+                <span>🚪</span> Uitloggen
+            </button>
+        </div>
+
     <!-- Update Log Panel -->
     <div id="update-log" class="side-panel">
         <div class="panel-header">
