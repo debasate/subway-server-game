@@ -13,10 +13,16 @@ const coinDisplay = document.getElementById('coin-display');
 const coinsCount = document.getElementById('coins-count');
 
 let gameRunning = false;
-let gameMode = 'infinity'; // 'infinity' or 'level'
+let gameMode = 'infinity'; // 'infinity', 'level', or 'multiplayer'
 let currentLevel = 1;
 let levelProgress = 0;
 let levelTarget = 1000; // Score needed to complete level
+
+// Multiplayer state
+let isMultiplayer = false;
+let bots = [];
+let playerRanking = [];
+let multiplayerResults = null;
 
 // Player and game state
 let player = {
@@ -47,7 +53,7 @@ function showNotification(message, type = 'info', duration = 3000) {
         duration: duration
     };
     notifications.push(notification);
-    
+
     // Auto remove after duration
     setTimeout(() => {
         notifications = notifications.filter(n => n.id !== notification.id);
@@ -56,20 +62,20 @@ function showNotification(message, type = 'info', duration = 3000) {
 
 function drawNotifications() {
     const currentTime = Date.now();
-    
+
     notifications.forEach((notification, index) => {
         const age = currentTime - notification.createdAt;
         const progress = age / notification.duration;
         const opacity = Math.max(0, 1 - progress);
-        
+
         // Position from center
         const y = canvas.height / 2 - 100 + (index * 60);
         const x = canvas.width / 2;
-        
+
         // Background
         ctx.fillStyle = `rgba(0, 0, 0, ${0.8 * opacity})`;
         ctx.fillRect(x - 150, y - 25, 300, 50);
-        
+
         // Border based on type
         let borderColor = '#4CAF50';
         switch (notification.type) {
@@ -78,11 +84,11 @@ function drawNotifications() {
             case 'achievement': borderColor = '#FFD700'; break;
             case 'info': borderColor = '#2196F3'; break;
         }
-        
+
         ctx.strokeStyle = `rgba(${hexToRgb(borderColor)}, ${opacity})`;
         ctx.lineWidth = 3;
         ctx.strokeRect(x - 150, y - 25, 300, 50);
-        
+
         // Text
         ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
         ctx.font = 'bold 16px Arial';
@@ -94,8 +100,8 @@ function drawNotifications() {
 
 function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? 
-        `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : 
+    return result ?
+        `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` :
         '255, 255, 255';
 }
 
@@ -135,6 +141,204 @@ const shopItems = {
 }; function updateCoinDisplay() {
     coinDisplay.textContent = coins;
     coinsCount.textContent = coinsThisRun;
+}
+
+// Bot system for multiplayer
+class Bot {
+    constructor(name, color, difficulty = 'medium') {
+        this.name = name;
+        this.x = 220;
+        this.y = 540 + Math.random() * 100; // Slight y offset for visibility
+        this.w = 35;
+        this.h = 35;
+        this.color = color;
+        this.lane = 1;
+        this.score = 0;
+        this.alive = true;
+        this.difficulty = difficulty; // 'easy', 'medium', 'hard'
+        this.reactionTime = this.getDifficultyReactionTime();
+        this.lastDecision = 0;
+        this.targetLane = 1;
+        this.isMoving = false;
+    }
+
+    getDifficultyReactionTime() {
+        switch (this.difficulty) {
+            case 'easy': return 800 + Math.random() * 400; // 800-1200ms
+            case 'medium': return 400 + Math.random() * 300; // 400-700ms 
+            case 'hard': return 150 + Math.random() * 200; // 150-350ms
+            default: return 500;
+        }
+    }
+
+    update() {
+        if (!this.alive) return;
+
+        // Update position if moving between lanes
+        if (this.isMoving) {
+            const targetX = lanes[this.targetLane];
+            const diff = targetX - this.x;
+            this.x += diff * 0.2;
+            if (Math.abs(diff) < 2) {
+                this.x = targetX;
+                this.lane = this.targetLane;
+                this.isMoving = false;
+            }
+        }
+
+        // AI decision making
+        const now = Date.now();
+        if (now - this.lastDecision > this.reactionTime) {
+            this.makeDecision();
+            this.lastDecision = now;
+            this.reactionTime = this.getDifficultyReactionTime(); // Vary reaction time
+        }
+
+        // Update score (slightly different rate per bot)
+        this.score += scoreMultiplier * (0.9 + Math.random() * 0.2);
+    }
+
+    makeDecision() {
+        if (this.isMoving) return;
+
+        // Look ahead for obstacles
+        const dangerAhead = this.checkDangerInLane(this.lane);
+        const leftSafe = this.lane > 0 ? this.checkDangerInLane(this.lane - 1) : false;
+        const rightSafe = this.lane < 2 ? this.checkDangerInLane(this.lane + 1) : false;
+
+        if (dangerAhead) {
+            // Try to move to safer lane
+            if (leftSafe && !rightSafe) {
+                this.moveTo(this.lane - 1);
+            } else if (rightSafe && !leftSafe) {
+                this.moveTo(this.lane + 1);
+            } else if (leftSafe && rightSafe) {
+                // Both safe, choose randomly
+                const direction = Math.random() < 0.5 ? -1 : 1;
+                this.moveTo(this.lane + direction);
+            }
+            // If no safe lane, stay put and hope for the best
+        } else {
+            // Randomly move sometimes to make bots more dynamic
+            if (Math.random() < 0.1) { // 10% chance to move randomly
+                const possibleMoves = [];
+                if (this.lane > 0) possibleMoves.push(this.lane - 1);
+                if (this.lane < 2) possibleMoves.push(this.lane + 1);
+                if (possibleMoves.length > 0) {
+                    const randomLane = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                    this.moveTo(randomLane);
+                }
+            }
+        }
+    }
+
+    checkDangerInLane(lane) {
+        const laneX = lanes[lane];
+        return obstacles.some(obstacle => {
+            const obstacleBottom = obstacle.y + obstacle.h;
+            const obstacleTop = obstacle.y;
+            const dangerZone = this.y - 150; // Look ahead distance
+
+            return Math.abs(obstacle.x - laneX) < 30 &&
+                obstacleBottom > dangerZone &&
+                obstacleTop < this.y + this.h + 50;
+        });
+    }
+
+    moveTo(newLane) {
+        if (newLane >= 0 && newLane <= 2 && newLane !== this.lane) {
+            this.targetLane = newLane;
+            this.isMoving = true;
+        }
+    }
+
+    checkCollision() {
+        if (!this.alive) return false;
+
+        return obstacles.some(obstacle => {
+            return this.x < obstacle.x + obstacle.w &&
+                this.x + this.w > obstacle.x &&
+                this.y < obstacle.y + obstacle.h &&
+                this.y + this.h > obstacle.y;
+        });
+    }
+
+    draw() {
+        if (!this.alive) return;
+
+        // Bot body (slightly smaller than player)
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x + 3, this.y + 3, this.w - 6, this.h - 6);
+
+        // Bot outline
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(this.x + 3, this.y + 3, this.w - 6, this.h - 6);
+
+        // Bot "face" (simple eyes)
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(this.x + 8, this.y + 8, 4, 4);
+        ctx.fillRect(this.x + 18, this.y + 8, 4, 4);
+    }
+}
+
+function initializeBots() {
+    bots = [];
+    const botConfigs = [
+        { name: 'Bot Alpha', color: '#ff4444', difficulty: 'hard' },
+        { name: 'Bot Beta', color: '#44ff44', difficulty: 'medium' },
+        { name: 'Bot Gamma', color: '#4444ff', difficulty: 'medium' },
+        { name: 'Bot Delta', color: '#ff44ff', difficulty: 'easy' }
+    ];
+
+    botConfigs.forEach((config, index) => {
+        const bot = new Bot(config.name, config.color, config.difficulty);
+        bot.y += (index - 1.5) * 15; // Spread bots vertically
+        bots.push(bot);
+    });
+}
+
+function updateMultiplayerRanking() {
+    if (!isMultiplayer) return;
+
+    const allPlayers = [
+        { name: 'You', score: score, alive: player.lives > 0, isPlayer: true },
+        ...bots.map(bot => ({ name: bot.name, score: bot.score, alive: bot.alive, isPlayer: false }))
+    ];
+
+    playerRanking = allPlayers.sort((a, b) => b.score - a.score);
+}
+
+function drawMultiplayerUI() {
+    if (!isMultiplayer) return;
+
+    // Draw ranking on the right side
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillRect(canvas.width - 180, 10, 170, 200);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText('🏆 Ranking', canvas.width - 170, 30);
+
+    playerRanking.forEach((player, index) => {
+        const y = 50 + index * 35;
+        const color = player.alive ? (player.isPlayer ? '#ffff00' : '#ffffff') : '#666666';
+
+        ctx.fillStyle = color;
+        ctx.font = '14px Arial';
+
+        const position = index + 1;
+        const emoji = position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : `${position}.`;
+
+        ctx.fillText(`${emoji} ${player.name}`, canvas.width - 170, y);
+        ctx.fillText(`${Math.floor(player.score)}`, canvas.width - 170, y + 15);
+
+        if (!player.alive) {
+            ctx.fillStyle = '#ff4444';
+            ctx.font = '12px Arial';
+            ctx.fillText('💀 OUT', canvas.width - 60, y + 8);
+        }
+    });
 }
 
 function saveProgress() {
@@ -229,6 +433,16 @@ function resetGame(mode = 'infinity') {
     levelProgress = 0;
     difficultyLevel = 1;
 
+    // Multiplayer setup
+    isMultiplayer = (mode === 'multiplayer');
+    if (isMultiplayer) {
+        initializeBots();
+        multiplayerResults = null;
+    } else {
+        bots = [];
+        playerRanking = [];
+    }
+
     // Reset shield system
     temporaryShield = false;
     shieldTimeLeft = 0;
@@ -250,6 +464,9 @@ function resetGame(mode = 'infinity') {
 function updateGameInfo() {
     if (gameMode === 'infinity') {
         modeDisplay.textContent = 'Mode: Infinity';
+        levelDisplay.textContent = `Score: ${Math.floor(score)}`;
+    } else if (gameMode === 'multiplayer') {
+        modeDisplay.textContent = 'Mode: VS Bots (1v4)';
         levelDisplay.textContent = `Score: ${Math.floor(score)}`;
     } else {
         modeDisplay.textContent = `Mode: Level ${currentLevel}`;
@@ -524,6 +741,39 @@ function updateGameLogic() {
     // Langzamere score toename
     score += scoreMultiplier;
 
+    // Update bots in multiplayer mode
+    if (isMultiplayer) {
+        bots.forEach(bot => {
+            if (bot.alive) {
+                bot.update();
+
+                // Check bot collision
+                if (bot.checkCollision()) {
+                    bot.alive = false;
+                    showNotification(`${bot.name} is uitgeschakeld! 💀`, '#ff4444');
+                }
+            }
+        });
+
+        updateMultiplayerRanking();
+
+        // Check if player won/lost
+        const aliveBots = bots.filter(bot => bot.alive).length;
+        if (player.lives <= 0 || aliveBots === 0) {
+            // Game over or player won
+            setTimeout(() => {
+                let message;
+                if (player.lives <= 0) {
+                    const playerPosition = playerRanking.findIndex(p => p.isPlayer) + 1;
+                    message = `Game Over! Je eindigde op positie ${playerPosition}/5\nJe score: ${Math.floor(score)}`;
+                } else {
+                    message = `🎉 VICTORY! 🎉\nJe hebt alle bots verslagen!\nJe score: ${Math.floor(score)}`;
+                }
+                showNotification(message, '#f59e0b');
+            }, 100);
+        }
+    }
+
     // Update ghost charges elke 500 punten
     if ((player.activeSkin === 'ghost' || player.activeSkin === 'rainbow')) {
         const currentFiveHundred = Math.floor(score / 500);
@@ -685,9 +935,21 @@ function drawBackground() {
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
+
+    // Draw bots first (behind player)
+    if (isMultiplayer) {
+        bots.forEach(bot => bot.draw());
+    }
+
     drawPlayer();
     drawObstacles();
     drawLevelInfo();
+
+    // Draw multiplayer UI
+    if (isMultiplayer) {
+        drawMultiplayerUI();
+    }
+
     updateObstacles();
 
     if (Math.random() < getDynamicSpawnRate()) {
@@ -735,6 +997,9 @@ function gameLoop() {
         }
     }
 
+    // Draw notifications
+    drawNotifications();
+
     if (gameRunning) requestAnimationFrame(gameLoop);
 }
 
@@ -777,6 +1042,163 @@ function startGame(mode = 'infinity') {
 // Event listeners for gamemode buttons
 infinityBtn.onclick = () => startGame('infinity');
 levelBtn.onclick = () => startGame('level');
+document.getElementById('multiplayer-btn').onclick = () => startGame('multiplayer');
+
+// Enhanced UI Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Update log functionality
+    const showUpdatesBtn = document.getElementById('show-updates');
+    const updateLog = document.getElementById('update-log');
+    const closeUpdatesBtn = document.getElementById('close-updates');
+
+    showUpdatesBtn.onclick = () => {
+        updateLog.classList.add('active');
+    };
+
+    closeUpdatesBtn.onclick = () => {
+        updateLog.classList.remove('active');
+    };
+
+    // Shop tabs functionality
+    const shopTabs = document.querySelectorAll('.shop-tab');
+    const shopTabContents = document.querySelectorAll('.shop-tab-content');
+
+    shopTabs.forEach(tab => {
+        tab.onclick = () => {
+            // Remove active from all tabs
+            shopTabs.forEach(t => t.classList.remove('active'));
+            shopTabContents.forEach(content => content.classList.remove('active'));
+
+            // Add active to clicked tab
+            tab.classList.add('active');
+            const tabName = tab.dataset.tab;
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        };
+    });
+
+    // Ad system
+    const watchAdBtn = document.getElementById('watch-ad-btn');
+    const adModal = document.getElementById('ad-modal');
+    const adCloseBtn = document.getElementById('ad-close-btn');
+    const adClaimBtn = document.getElementById('ad-claim-btn');
+    const adCountdown = document.getElementById('ad-countdown');
+    let adTimer = null;
+
+    watchAdBtn.onclick = () => {
+        adModal.style.display = 'flex';
+        startAdTimer();
+    };
+
+    adCloseBtn.onclick = () => {
+        adModal.style.display = 'none';
+        if (adTimer) clearInterval(adTimer);
+    };
+
+    adClaimBtn.onclick = () => {
+        coins += 10;
+        coinsThisRun += 10;
+        saveProgress();
+        updateCoinDisplay();
+        showNotification('🎉 +10 Coins verdiend! 🎉', '#4ade80');
+        adModal.style.display = 'none';
+        
+        // Cooldown van 30 seconden
+        watchAdBtn.disabled = true;
+        watchAdBtn.textContent = 'Wacht...';
+        setTimeout(() => {
+            watchAdBtn.disabled = false;
+            watchAdBtn.textContent = 'Bekijk Ad';
+        }, 30000);
+    };
+
+    function startAdTimer() {
+        let countdown = 5;
+        adCountdown.textContent = countdown;
+        adClaimBtn.disabled = true;
+
+        adTimer = setInterval(() => {
+            countdown--;
+            adCountdown.textContent = countdown;
+
+            if (countdown <= 0) {
+                clearInterval(adTimer);
+                adClaimBtn.disabled = false;
+                adClaimBtn.textContent = 'Claim 10 Coins! 🎉';
+            }
+        }, 1000);
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (!gameRunning) {
+            if (e.key === 'l' || e.key === 'L') {
+                startGame('level');
+            } else if (e.key === 'm' || e.key === 'M') {
+                startGame('multiplayer');
+            }
+        }
+    });
+
+    // Update active outfit display
+    function updateActiveOutfitDisplay() {
+        const activeOutfitSpan = document.getElementById('active-outfit');
+        const skinNames = {
+            'default': 'Default',
+            'golden': 'Golden',
+            'speed': 'Speed',
+            'ghost': 'Ghost',
+            'tank': 'Tank',
+            'rainbow': 'Rainbow',
+            'neon': 'Neon'
+        };
+        activeOutfitSpan.textContent = skinNames[player.activeSkin] || 'Default';
+    }
+
+    // Stats tracking
+    let gameStats = JSON.parse(localStorage.getItem('subwayStats') || '{}');
+    if (!gameStats.infinityBest) gameStats.infinityBest = 0;
+    if (!gameStats.levelProgress) gameStats.levelProgress = 1;
+    if (!gameStats.multiplayerWins) gameStats.multiplayerWins = 0;
+
+    function updateStatsDisplay() {
+        document.getElementById('infinity-best').textContent = Math.floor(gameStats.infinityBest);
+        document.getElementById('level-progress').textContent = gameStats.levelProgress;
+        document.getElementById('multiplayer-wins').textContent = gameStats.multiplayerWins;
+    }
+
+    function updateStats(mode, score, won = false) {
+        if (mode === 'infinity' && score > gameStats.infinityBest) {
+            gameStats.infinityBest = score;
+        } else if (mode === 'level' && currentLevel > gameStats.levelProgress) {
+            gameStats.levelProgress = currentLevel;
+        } else if (mode === 'multiplayer' && won) {
+            gameStats.multiplayerWins++;
+        }
+        localStorage.setItem('subwayStats', JSON.stringify(gameStats));
+        updateStatsDisplay();
+    }
+
+    // Extend the existing resetGame to update outfit display
+    const originalResetGame = resetGame;
+    resetGame = function(mode = 'infinity') {
+        originalResetGame(mode);
+        updateActiveOutfitDisplay();
+    };
+
+    // Initialize displays
+    updateStatsDisplay();
+    updateActiveOutfitDisplay();
+});
+
+// Add new items to shop
+const newShopItems = {
+    ...shopItems,
+    neonSkin: { price: 400, name: "Neon Racer" },
+    doubleJump: { price: 75, name: "Double Jump" },
+    timeSlower: { price: 120, name: "Time Slower" },
+    coinRain: { price: 90, name: "Coin Rain" },
+    megaShield: { price: 200, name: "Mega Shield" }
+};
 
 // Initialize coin display and shop
 updateCoinDisplay();

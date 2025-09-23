@@ -9,94 +9,287 @@
 </head>
 
 <body>
-    <div id="start-screen">
-        <h1>🚇 Subway Server Game 🚇</h1>
-        <p style="color: #4CAF50; font-weight: bold;">✅ LIVE VERSION - Graphics Updated!</p>
-
-        <div id="player-stats">
-            <div class="stat-item">
-                <span class="coin-icon">🪙</span>
-                <span id="coin-display">0</span> Coins
+    <!-- Update Log Panel -->
+    <div id="update-log" class="side-panel">
+        <div class="panel-header">
+            <h3>📋 Update Log</h3>
+            <button id="close-updates" class="close-btn">×</button>
+        </div>
+        <div class="panel-content">
+            <div class="update-item latest">
+                <div class="update-version">v2.1.0 - NEW!</div>
+                <div class="update-date">23 Sep 2025</div>
+                <ul>
+                    <li>🤖 Multiplayer VS Bots mode toegevoegd</li>
+                    <li>👔 Outfit systeem met unieke powers</li>
+                    <li>📺 Advertentie systeem voor gratis coins</li>
+                    <li>🎨 Complete UI herontwerp</li>
+                    <li>📊 Live ranking systeem</li>
+                </ul>
             </div>
-        </div>
-
-        <div id="gamemode-selection">
-            <h3>Kies een gamemode:</h3>
-            <button id="infinity-btn" class="gamemode-btn">Infinity Mode</button>
-            <button id="level-btn" class="gamemode-btn">Level Mode</button>
-        </div>
-
-        <div id="shop-section">
-            <button id="shop-btn" class="shop-toggle-btn">🛒 Shop</button>
-        </div>
-
-        <p>Of druk op <strong>Enter</strong> voor Infinity Mode</p>
-        <div class="game-tips">
-            <p style="font-size: 0.8em; color: #4CAF50;">
-                💡 <strong>Tip:</strong> Elke 1000 punten krijg je automatisch 10 seconden schild! 🛡️
-            </p>
+            <div class="update-item">
+                <div class="update-version">v2.0.5</div>
+                <div class="update-date">22 Sep 2025</div>
+                <ul>
+                    <li>⚡ Snellere character movement</li>
+                    <li>🔔 In-game notification systeem</li>
+                    <li>🎯 Verbeterde difficulty balancing</li>
+                </ul>
+            </div>
+            <div class="update-item">
+                <div class="update-version">v2.0.0</div>
+                <div class="update-date">21 Sep 2025</div>
+                <ul>
+                    <li>🛒 Shop systeem met skins</li>
+                    <li>🪙 Coin economy toegevoegd</li>
+                    <li>🛡️ Automatisch schild systeem</li>
+                    <li>🌈 5 unieke skins met abilities</li>
+                </ul>
+            </div>
         </div>
     </div>
 
+    <!-- Main Game Interface -->
+    <div id="start-screen">
+        <div class="game-header">
+            <h1>🚇 Subway Server Game 🚇</h1>
+            <div class="version-badge">v2.1.0</div>
+            <button id="show-updates" class="updates-btn">📋 Updates</button>
+        </div>
+
+        <!-- Player Stats Dashboard -->
+        <div id="player-dashboard">
+            <div class="stat-card">
+                <div class="stat-icon">🪙</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="coin-display">0</span>
+                    <span class="stat-label">Coins</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👔</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="active-outfit">Default</span>
+                    <span class="stat-label">Outfit</span>
+                </div>
+            </div>
+            <div class="stat-card ad-card" id="ad-section">
+                <div class="stat-icon">📺</div>
+                <div class="stat-info">
+                    <button id="watch-ad-btn" class="ad-btn">Bekijk Ad</button>
+                    <span class="stat-label">+10 Coins</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Game Mode Selection -->
+        <div id="gamemode-selection">
+            <h3>🎮 Selecteer Game Mode</h3>
+            <div class="gamemode-grid">
+                <div class="gamemode-card" data-mode="infinity">
+                    <div class="mode-icon">♾️</div>
+                    <h4>Infinity Mode</h4>
+                    <p>Endless runner met progressieve difficulty</p>
+                    <div class="mode-stats">
+                        <span>⭐ Best: <span id="infinity-best">0</span></span>
+                    </div>
+                    <button id="infinity-btn" class="mode-btn">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="level">
+                    <div class="mode-icon">🎯</div>
+                    <h4>Level Mode</h4>
+                    <p>Gestructureerde levels met doelen</p>
+                    <div class="mode-stats">
+                        <span>🏆 Level: <span id="level-progress">1</span></span>
+                    </div>
+                    <button id="level-btn" class="mode-btn">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="multiplayer">
+                    <div class="mode-icon">🤖</div>
+                    <h4>VS Bots</h4>
+                    <p>Compete tegen 4 AI tegenstanders</p>
+                    <div class="mode-stats">
+                        <span>🥇 Wins: <span id="multiplayer-wins">0</span></span>
+                    </div>
+                    <button id="multiplayer-btn" class="mode-btn multiplayer">Spelen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop Access -->
+        <div id="shop-access">
+            <button id="shop-btn" class="main-shop-btn">
+                <span class="shop-icon">🛒</span>
+                <span>Outfits & Powers</span>
+                <span class="shop-badge">NEW</span>
+            </button>
+        </div>
+
+        <div class="quick-controls">
+            <p>⌨️ Druk <kbd>Enter</kbd> voor Infinity Mode | <kbd>L</kbd> voor Level Mode | <kbd>M</kbd> voor Multiplayer</p>
+        </div>
+
+        <div class="game-tips">
+            <div class="tip-item">💡 <strong>Tip:</strong> Elke 1000 punten = 10 sec schild!</div>
+            <div class="tip-item">🎯 <strong>Nieuw:</strong> Bekijk ads voor gratis coins!</div>
+        </div>
+    </div>
+
+    <!-- Enhanced Shop Screen -->
     <div id="shop-screen" style="display:none;">
-        <h2>🛒 Subway Shop</h2>
-        <div id="shop-items">
-            <div class="shop-item" data-item="speed">
-                <h3>⚡ Speed Boost</h3>
-                <p>Start elke run 20% sneller</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="speed-price">10</span></div>
-                <button class="buy-btn" data-item="speed">Koop</button>
-            </div>
+        <div class="shop-header">
+            <h2>🛒 Outfits & Powers Store</h2>
+            <button id="shop-close-btn" class="shop-close">×</button>
+        </div>
 
-            <div class="shop-item" data-item="shield">
-                <h3>🛡️ Shield</h3>
-                <p>Begin elke run met 1 extra leven</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="shield-price">25</span></div>
-                <button class="buy-btn" data-item="shield">Koop</button>
-            </div>
+        <div class="shop-tabs">
+            <button class="shop-tab active" data-tab="outfits">👔 Outfits</button>
+            <button class="shop-tab" data-tab="powers">⚡ Powers</button>
+            <button class="shop-tab" data-tab="boosts">🚀 Boosts</button>
+        </div>
 
-            <div class="shop-item" data-item="magnet">
-                <h3>🧲 Coin Magnet</h3>
-                <p>Verdien 2x meer coins</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="magnet-price">50</span></div>
-                <button class="buy-btn" data-item="magnet">Koop</button>
-            </div>
+        <!-- Outfits Tab -->
+        <div id="outfits-tab" class="shop-tab-content active">
+            <div class="shop-grid">
+                <div class="outfit-item" data-item="goldenSkin">
+                    <div class="outfit-preview golden-preview"></div>
+                    <h3>✨ Golden Suit</h3>
+                    <p>+25% coin bonus</p>
+                    <div class="rarity legendary">Legendary</div>
+                    <div class="price">🪙 100</div>
+                    <button class="buy-btn" data-item="goldenSkin">Koop</button>
+                </div>
 
-            <div class="shop-item" data-item="goldenSkin">
-                <h3>� Golden Skin</h3>
-                <p>+25% coin bonus & glanzend effect</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="goldenSkin-price">100</span></div>
-                <button class="buy-btn" data-item="goldenSkin">Koop</button>
-            </div>
+                <div class="outfit-item" data-item="speedSkin">
+                    <div class="outfit-preview speed-preview"></div>
+                    <h3>💨 Speed Demon</h3>
+                    <p>50% snellere movement</p>
+                    <div class="rarity epic">Epic</div>
+                    <div class="price">🪙 150</div>
+                    <button class="buy-btn" data-item="speedSkin">Koop</button>
+                </div>
 
-            <div class="shop-item" data-item="speedSkin">
-                <h3>💨 Speed Demon</h3>
-                <p>Beweeg 50% sneller tussen lanes</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="speedSkin-price">150</span></div>
-                <button class="buy-btn" data-item="speedSkin">Koop</button>
-            </div>
+                <div class="outfit-item" data-item="ghostSkin">
+                    <div class="outfit-preview ghost-preview"></div>
+                    <h3>👻 Ghost Walker</h3>
+                    <p>Fase door obstacles</p>
+                    <div class="rarity legendary">Legendary</div>
+                    <div class="price">🪙 200</div>
+                    <button class="buy-btn" data-item="ghostSkin">Koop</button>
+                </div>
 
-            <div class="shop-item" data-item="ghostSkin">
-                <h3>👻 Ghost Mode</h3>
-                <p>Fase door 1 obstakel per 500 punten</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="ghostSkin-price">200</span></div>
-                <button class="buy-btn" data-item="ghostSkin">Koop</button>
-            </div>
+                <div class="outfit-item" data-item="tankSkin">
+                    <div class="outfit-preview tank-preview"></div>
+                    <h3>🛡️ Tank Armor</h3>
+                    <p>2 extra levens per run</p>
+                    <div class="rarity epic">Epic</div>
+                    <div class="price">🪙 300</div>
+                    <button class="buy-btn" data-item="tankSkin">Koop</button>
+                </div>
 
-            <div class="shop-item" data-item="tankSkin">
-                <h3>🚗 Tank Mode</h3>
-                <p>Vernietig obstakels & krijg coins</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="tankSkin-price">300</span></div>
-                <button class="buy-btn" data-item="tankSkin">Koop</button>
-            </div>
+                <div class="outfit-item" data-item="rainbowSkin">
+                    <div class="outfit-preview rainbow-preview"></div>
+                    <h3>🌈 Rainbow Master</h3>
+                    <p>Alle abilities gecombineerd!</p>
+                    <div class="rarity mythic">Mythic</div>
+                    <div class="price">🪙 500</div>
+                    <button class="buy-btn" data-item="rainbowSkin">Koop</button>
+                </div>
 
-            <div class="shop-item" data-item="rainbowSkin">
-                <h3>🌈 Rainbow Power</h3>
-                <p>Alle skin abilities gecombineerd!</p>
-                <div class="price">Cost: <span class="coin-icon">🪙</span> <span id="rainbowSkin-price">500</span></div>
-                <button class="buy-btn" data-item="rainbowSkin">Koop</button>
+                <div class="outfit-item" data-item="neonSkin">
+                    <div class="outfit-preview neon-preview"></div>
+                    <h3>⚡ Neon Racer</h3>
+                    <p>Glow effect + 2x score</p>
+                    <div class="rarity legendary">Legendary</div>
+                    <div class="price">🪙 400</div>
+                    <button class="buy-btn" data-item="neonSkin">Koop</button>
+                </div>
             </div>
-        </div> <button id="shop-close-btn" class="shop-close-btn">Terug naar Menu</button>
+        </div>
+
+        <!-- Powers Tab -->
+        <div id="powers-tab" class="shop-tab-content">
+            <div class="shop-grid">
+                <div class="power-item" data-item="doubleJump">
+                    <div class="power-icon">🦘</div>
+                    <h3>Double Jump</h3>
+                    <p>Spring over 2 obstacles</p>
+                    <div class="price">🪙 75</div>
+                    <button class="buy-btn" data-item="doubleJump">Koop</button>
+                </div>
+
+                <div class="power-item" data-item="timeSlower">
+                    <div class="power-icon">⏰</div>
+                    <h3>Time Slower</h3>
+                    <p>Vertraag tijd 5 seconden</p>
+                    <div class="price">🪙 120</div>
+                    <button class="buy-btn" data-item="timeSlower">Koop</button>
+                </div>
+
+                <div class="power-item" data-item="coinRain">
+                    <div class="power-icon">💰</div>
+                    <h3>Coin Rain</h3>
+                    <p>Instant 50 coins per gebruik</p>
+                    <div class="price">🪙 90</div>
+                    <button class="buy-btn" data-item="coinRain">Koop</button>
+                </div>
+
+                <div class="power-item" data-item="megaShield">
+                    <div class="power-icon">🛡️</div>
+                    <h3>Mega Shield</h3>
+                    <p>30 seconden onkwetsbaar</p>
+                    <div class="price">🪙 200</div>
+                    <button class="buy-btn" data-item="megaShield">Koop</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boosts Tab -->
+        <div id="boosts-tab" class="shop-tab-content">
+            <div class="shop-grid">
+                <div class="boost-item" data-item="speed">
+                    <div class="boost-icon">⚡</div>
+                    <h3>Speed Boost</h3>
+                    <p>20% sneller starten</p>
+                    <div class="price">🪙 10</div>
+                    <button class="buy-btn" data-item="speed">Koop</button>
+                </div>
+
+                <div class="boost-item" data-item="shield">
+                    <div class="boost-icon">🛡️</div>
+                    <h3>Extra Shield</h3>
+                    <p>+1 leven per run</p>
+                    <div class="price">🪙 25</div>
+                    <button class="buy-btn" data-item="shield">Koop</button>
+                </div>
+
+                <div class="boost-item" data-item="magnet">
+                    <div class="boost-icon">🧲</div>
+                    <h3>Coin Magnet</h3>
+                    <p>2x meer coins</p>
+                    <div class="price">🪙 50</div>
+                    <button class="buy-btn" data-item="magnet">Koop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Modal -->
+    <div id="ad-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>📺 Gratis Coins Advertentie</h3>
+            <div class="ad-placeholder">
+                <p>🎬 Advertentie wordt afgespeeld...</p>
+                <div class="ad-timer">
+                    <div id="ad-progress" class="progress-bar"></div>
+                    <span id="ad-countdown">5</span> seconden
+                </div>
+            </div>
+            <button id="ad-claim-btn" class="ad-claim" disabled>Claim 10 Coins</button>
+            <button id="ad-close-btn" class="modal-close">×</button>
+        </div>
     </div>
 
     <div id="game-info" style="display:none;">
