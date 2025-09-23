@@ -473,6 +473,54 @@ body {
     transform: none !important;
 }
 
+.guest-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.guest-section input[type="text"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.guest-section input[type="text"]:focus {
+    outline: none;
+    border-color: #4ecdc4;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.guest-section input[type="text"]::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.auth-btn.guest {
+    background: linear-gradient(135deg, #6c5ce7, #74b9ff);
+    color: #fff;
+    font-weight: bold;
+    width: 100%;
+}
+
+.auth-btn.guest:hover {
+    background: linear-gradient(135deg, #a29bfe, #81ecec);
+    transform: translateY(-2px);
+}
+
+.guest-info {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 8px 0 0 0;
+    text-align: center;
+    font-style: italic;
+}
+
 .btn-icon {
     font-size: 1.1rem;
 }

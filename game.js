@@ -119,7 +119,7 @@ class AuthManager {
     validatePasswordMatch() {
         const password = document.getElementById('register-password').value;
         const confirmPassword = document.getElementById('register-confirm-password').value;
-        
+
         if (confirmPassword.length === 0) {
             return false;
         } else if (password !== confirmPassword) {
@@ -288,7 +288,7 @@ class AuthManager {
     }
 
     handleGuestPlay() {
-        const nickname = document.getElementById('guest-nickname').value.trim() || 'Guest';
+        const nickname = document.getElementById('guest-nickname')?.value.trim() || 'Gast';
 
         this.currentUser = {
             displayName: nickname,
@@ -311,8 +311,8 @@ class AuthManager {
         };
         this.isLoggedIn = false;
 
-        this.showSuccess(`Welkom ${nickname}! Veel speelplezier!`);
-        setTimeout(() => this.showMainGame(), 1000);
+        this.showSuccess(`Welkom ${nickname}! 🎮 Voortgang wordt alleen lokaal opgeslagen. Maak een account voor cloud save!`);
+        setTimeout(() => this.showMainGame(), 2000);
     }
 
     handleLogout() {
@@ -358,14 +358,29 @@ class AuthManager {
         usernameDisplay.textContent = this.currentUser.displayName;
 
         if (this.currentUser.isGuest) {
-            saveStatus.textContent = 'Local Only';
-            connectionStatus.textContent = 'Guest Mode';
-            logoutBtn.style.display = 'none';
+            saveStatus.textContent = 'Opslaan op dit apparaat';
+            connectionStatus.textContent = 'Gast Modus';
+            // Verander logout knop naar login knop voor gast gebruikers
+            logoutBtn.textContent = '🔑 Inloggen';
+            logoutBtn.style.display = 'block';
+            // Verander de onclick functie
+            logoutBtn.onclick = () => this.switchToLogin();
         } else {
             saveStatus.textContent = 'Cloud Save';
             connectionStatus.textContent = 'Connected';
+            logoutBtn.textContent = '🚪 Uitloggen';
             logoutBtn.style.display = 'block';
+            // Reset onclick functie naar uitloggen
+            logoutBtn.onclick = () => this.handleLogout();
         }
+    }
+
+    switchToLogin() {
+        // Ga terug naar login scherm zodat gebruiker kan inloggen
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+        this.showLoginForm();
+        this.clearMessages();
     }
 
     loadUserGameData() {
@@ -429,7 +444,7 @@ class AuthManager {
                 statusEl.innerHTML = '';
             }
         }
-        
+
         // Disable form buttons during loading
         const buttons = document.querySelectorAll('.auth-btn');
         buttons.forEach(btn => {
