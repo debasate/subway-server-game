@@ -358,6 +358,7 @@ class AuthManager {
         usernameDisplay.textContent = this.currentUser.displayName;
 
         if (this.currentUser.isGuest) {
+            console.log('Setting up guest mode - should show login button');
             saveStatus.textContent = 'Opslaan op dit apparaat';
             connectionStatus.textContent = 'Gast Modus';
             // Verander logout knop naar login knop voor gast gebruikers
