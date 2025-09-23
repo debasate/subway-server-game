@@ -15,6 +15,8 @@ let currentLevel = 1;
 let score = 0;
 let coins = parseInt(localStorage.getItem('subwayCoins') || '0');
 let coinsThisRun = 0;
+let crystals = parseInt(localStorage.getItem('spaceCrystals') || '0');
+let crystalsThisRun = 0;
 let speed = 7;
 let baseSpeed = 7;
 let scoreMultiplier = 0.25;
@@ -118,6 +120,7 @@ function resetGame(mode = 'infinity') {
     gameMode = mode;
     score = 0;
     coinsThisRun = 0;
+    crystalsThisRun = 0;
     speed = baseSpeed;
     currentLevel = 1;
 
@@ -666,11 +669,10 @@ function updateGameLogic() {
             console.error('❌ Failed to save crystals:', error);
         }
 
-        // Update display
-        updateCrystalDisplay();
+        // Update display - crystal counter updated automatically via localStorage
 
-        // Visual feedback - neon particle effect
-        createStarParticle(player.x + player.w / 2, player.y, 'crystal', '#ff00ff', 3);
+        // Visual feedback - crystal particle effect
+        createParticle(player.x + player.w / 2, player.y, 'crystal', '#ff00ff', 3);
         playSound('crystal');
     }
 
