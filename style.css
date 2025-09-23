@@ -40,15 +40,12 @@ body.game-mode {
     background: #1a1a2e !important;
 }
 
-/* Remove all borders and shadows in game mode */
+/* Remove all borders and shadows in game mode - NO SCALING */
 body.game-mode canvas {
     border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    max-width: 480px !important;
-    max-height: 640px !important;
-    width: auto !important;
-    height: auto !important;
+    /* Remove all width/height overrides to use HTML attributes */
     object-fit: cover !important;
 }
 
@@ -2158,13 +2155,10 @@ canvas {
     border: 3px solid rgba(78, 205, 196, 0.3);
 }
 
-/* Ensure canvas always has a background */
+/* Canvas with fixed size - no CSS scaling */
 #game-canvas {
     background: linear-gradient(135deg, #f0f0f0, #e0e0e0) !important;
-    max-width: 480px;
-    max-height: 640px;
-    width: 480px;
-    height: 640px;
+    /* Use HTML width/height attributes only - no CSS overrides */
     object-fit: contain;
 }
 
@@ -2313,13 +2307,7 @@ canvas {
         right: -100%;
     }
 
-    /* Canvas adjustments for mobile */
-    #game-canvas {
-        max-width: 480px;
-        max-height: 640px;
-        width: 480px !important;
-        height: 640px !important;
-    }
+    /* Canvas uses HTML width/height attributes only */
 
     /* Settings screen mobile optimization */
     .settings-content {

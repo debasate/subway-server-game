@@ -21,7 +21,13 @@ let scoreMultiplier = 0.25;
 
 // Game elements
 const canvas = document.getElementById('game-canvas');
+if (!canvas) {
+    console.error('❌ Canvas element not found! Make sure game-canvas exists in HTML.');
+}
 const ctx = canvas ? canvas.getContext('2d') : null;
+if (!ctx) {
+    console.error('❌ Could not get 2D context from canvas!');
+}
 const startScreen = document.getElementById('start-screen');
 const gameInfo = document.getElementById('game-info');
 
@@ -649,7 +655,7 @@ function updateGameLogic() {
         crystalsThisRun += newCrystals;
         crystals += newCrystals;
 
-        console.log(`� Earned ${newCrystals} crystals! Total: ${crystals}`);
+        console.log(`💎 Earned ${newCrystals} crystals! Total: ${crystals}`);
 
         // Immediate save voor crystals
         try {
@@ -1817,21 +1823,22 @@ function updateGameModeLogic() {
 function adjustCanvasForGameMode() {
     if (!canvas) return;
 
-    // Set internal canvas resolution first
-    canvas.width = 480;  // Fixed game resolution
+    // Force reset all canvas styling 
+    canvas.style.cssText = '';
+    canvas.style.width = '';
+    canvas.style.height = '';
+    canvas.style.maxWidth = '';
+    canvas.style.maxHeight = '';
+    canvas.style.transform = '';
+    canvas.style.position = '';
+    canvas.style.top = '';
+    canvas.style.left = '';
+
+    // Set internal canvas resolution only
+    canvas.width = 480;  // Fixed game resolution  
     canvas.height = 640;
 
-    // Set fixed display size (no viewport scaling)
-    canvas.style.width = '480px';
-    canvas.style.height = '640px';
-
-    // Center the canvas
-    canvas.style.position = 'absolute';
-    canvas.style.top = '50%';
-    canvas.style.left = '50%';
-    canvas.style.transform = 'translate(-50%, -50%)';
-
-    console.log(`🖥️ Canvas set to fixed size: ${canvas.width}x${canvas.height} (internal) | ${canvas.style.width} x ${canvas.style.height} (display)`);
+    console.log(`🖥️ Canvas style reset: ${canvas.width}x${canvas.height}`);
 }
 
 // Resize handler disabled - using fixed canvas size
@@ -1844,3 +1851,10 @@ window.addEventListener('resize', () => {
 */
 
 console.log('✅ Improved game engine loaded successfully');
+
+// Test if everything is working
+console.log('🔍 Debug info:');
+console.log('Canvas:', canvas);
+console.log('Context:', ctx);
+console.log('Start screen:', startScreen);
+console.log('Game info:', gameInfo);
