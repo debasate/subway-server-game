@@ -2896,7 +2896,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const infinityBtn2 = document.getElementById('infinity-btn');
         const levelBtn2 = document.getElementById('level-btn');
         const multiplayerBtn2 = document.getElementById('multiplayer-btn');
-        
+
         console.log('🔍 Second check - Buttons found:', {
             infinityBtn2: !!infinityBtn2,
             levelBtn2: !!levelBtn2,
@@ -2905,7 +2905,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Try with addEventListener instead of onclick
         if (infinityBtn2) {
-            infinityBtn2.addEventListener('click', function() {
+            infinityBtn2.addEventListener('click', function () {
                 console.log('🎮 Infinity button clicked via addEventListener!');
                 startGame('infinity');
             });
@@ -2913,7 +2913,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (levelBtn2) {
-            levelBtn2.addEventListener('click', function() {
+            levelBtn2.addEventListener('click', function () {
                 console.log('🎯 Level button clicked via addEventListener!');
                 startGame('level');
             });
@@ -2921,7 +2921,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (multiplayerBtn2) {
-            multiplayerBtn2.addEventListener('click', function() {
+            multiplayerBtn2.addEventListener('click', function () {
                 console.log('🤖 Multiplayer button clicked via addEventListener!');
                 startGame('multiplayer');
             });
@@ -2961,27 +2961,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // EMERGENCY BUTTON FIX - Direct attachment
     console.log('🚨 EMERGENCY BUTTON FIX STARTING...');
-    
+
     const buttonIds = ['infinity-btn', 'level-btn', 'multiplayer-btn'];
-    
+
     buttonIds.forEach(buttonId => {
         const btn = document.getElementById(buttonId);
         if (btn) {
             console.log(`✅ Found button: ${buttonId}`);
-            
+
             // Remove any existing listeners
             btn.onclick = null;
-            
+
             // Add new direct listener
-            btn.onclick = function(e) {
+            btn.onclick = function (e) {
                 e.preventDefault();
                 console.log(`🚀 BUTTON CLICKED: ${buttonId}`);
-                
+
                 const mode = buttonId.replace('-btn', '');
                 console.log(`Starting game in ${mode} mode`);
                 startGame(mode);
             };
-            
+
             console.log(`🎯 Emergency listener attached to ${buttonId}`);
         } else {
             console.error(`❌ Button not found: ${buttonId}`);
@@ -2993,11 +2993,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Additional backup button detection
     document.querySelectorAll('.mode-btn').forEach((btn, index) => {
         console.log(`🔍 Mode button ${index}:`, btn.id, btn.textContent);
-        
-        btn.addEventListener('click', function(e) {
+
+        btn.addEventListener('click', function (e) {
             console.log('🎯 Mode button clicked:', btn.id);
-            
-            switch(btn.id) {
+
+            switch (btn.id) {
                 case 'infinity-btn':
                     console.log('Starting infinity mode...');
                     startGame('infinity');
