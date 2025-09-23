@@ -19,13 +19,20 @@ let levelProgress = 0;
 let levelTarget = 1000; // Score needed to complete level
 
 // Player and game state
-let player = { x: 220, y: 540, w: 40, h: 40, color: '#ff0', lane: 1, lives: 1 };
+let player = { 
+    x: 220, y: 540, w: 40, h: 40, color: '#ff0', lane: 1, lives: 1,
+    moveSpeed: 1, // Voor lane switching snelheid
+    activeSkin: 'default',
+    ghostCharges: 0,
+    lastGhostScore: 0
+};
 let lanes = [120, 220, 320];
 let obstacles = [];
-let speed = 4;
+let speed = 2; // Start veel langzamer
 let score = 0;
-let baseSpeed = 4;
-let scoreMultiplier = 0.5; // Langzamere score toename
+let baseSpeed = 2;
+let scoreMultiplier = 0.3; // Nog langzamere score toename
+let difficultyLevel = 1;
 
 // Shield system
 let temporaryShield = false;
@@ -40,9 +47,13 @@ let coinsThisRun = 0;
 let playerUpgrades = JSON.parse(localStorage.getItem('subwayUpgrades') || '{}');
 const defaultUpgrades = {
     speed: false,
-    shield: false,
+    shield: false, 
     magnet: false,
-    skin: false
+    goldenSkin: false,
+    speedSkin: false,
+    ghostSkin: false,
+    tankSkin: false,
+    rainbowSkin: false
 };
 playerUpgrades = { ...defaultUpgrades, ...playerUpgrades };
 
@@ -51,10 +62,12 @@ const shopItems = {
     speed: { price: 10, name: "Speed Boost" },
     shield: { price: 25, name: "Shield" },
     magnet: { price: 50, name: "Coin Magnet" },
-    skin: { price: 100, name: "Golden Skin" }
-};
-
-function updateCoinDisplay() {
+    goldenSkin: { price: 100, name: "Golden Skin" },
+    speedSkin: { price: 150, name: "Speed Demon" },
+    ghostSkin: { price: 200, name: "Ghost Mode" },
+    tankSkin: { price: 300, name: "Tank Mode" },
+    rainbowSkin: { price: 500, name: "Rainbow Power" }
+};function updateCoinDisplay() {
     coinDisplay.textContent = coins;
     coinsCount.textContent = coinsThisRun;
 }
@@ -126,23 +139,42 @@ function resetGame(mode = 'infinity') {
     player.lane = 1;
     player.x = lanes[player.lane];
     player.y = 540;
-    player.lives = playerUpgrades.shield ? 2 : 1; // Shield upgrade
+    player.lives = playerUpgrades.shield ? 2 : 1;
+    player.moveSpeed = 1;
+    player.ghostCharges = 0;
+    player.lastGhostScore = 0;
+    
+    // Bepaal actieve skin
+    if (playerUpgrades.rainbowSkin) player.activeSkin = 'rainbow';
+    else if (playerUpgrades.tankSkin) player.activeSkin = 'tank';
+    else if (playerUpgrades.ghostSkin) player.activeSkin = 'ghost';
+    else if (playerUpgrades.speedSkin) player.activeSkin = 'speed';
+    else if (playerUpgrades.goldenSkin) player.activeSkin = 'golden';
+    else player.activeSkin = 'default';
+    
+    // Skin abilities toepassen
+    if (player.activeSkin === 'speed' || player.activeSkin === 'rainbow') {
+        player.moveSpeed = 1.5;
+    }
+    
     obstacles = [];
     score = 0;
     coinsThisRun = 0;
     currentLevel = 1;
     levelProgress = 0;
+    difficultyLevel = 1;
 
     // Reset shield system
     temporaryShield = false;
     shieldTimeLeft = 0;
     lastShieldScore = 0;
 
+    // Zeer easy start
     if (gameMode === 'infinity') {
-        speed = playerUpgrades.speed ? 4.8 : 4; // Speed boost upgrade
+        speed = playerUpgrades.speed ? 2.4 : 2;
         baseSpeed = speed;
     } else {
-        speed = levels[0].maxSpeed * (playerUpgrades.speed ? 0.6 : 0.5);
+        speed = levels[0].maxSpeed * (playerUpgrades.speed ? 0.4 : 0.3);
         baseSpeed = speed;
         levelTarget = levels[0].target;
     }
@@ -162,21 +194,55 @@ function updateGameInfo() {
 
 function drawPlayer() {
     const { x, y, w, h } = player;
+    const time = Date.now() * 0.01;
 
-    // Kleur bepalen op basis van golden skin upgrade
+    // Skin-gebaseerde kleuren en effecten
     const gradient = ctx.createLinearGradient(x, y, x, y + h);
-    if (playerUpgrades.skin) {
-        // Golden skin - meer glanzig goud
-        gradient.addColorStop(0, '#FFE55C');
-        gradient.addColorStop(0.3, '#FFD700');
-        gradient.addColorStop(0.7, '#FFC107');
-        gradient.addColorStop(1, '#FF8F00');
-    } else {
-        // Normale geel/goud kleur
-        gradient.addColorStop(0, '#FFD700');
-        gradient.addColorStop(0.3, '#FFC107');
-        gradient.addColorStop(0.7, '#FF9800');
-        gradient.addColorStop(1, '#F57C00');
+    
+    switch (player.activeSkin) {
+        case 'golden':
+            gradient.addColorStop(0, '#FFE55C');
+            gradient.addColorStop(0.3, '#FFD700');
+            gradient.addColorStop(0.7, '#FFC107');
+            gradient.addColorStop(1, '#FF8F00');
+            break;
+        case 'speed':
+            // Blauwe speed skin
+            gradient.addColorStop(0, '#00BFFF');
+            gradient.addColorStop(0.3, '#1E90FF');
+            gradient.addColorStop(0.7, '#0080FF');
+            gradient.addColorStop(1, '#0066CC');
+            break;
+        case 'ghost':
+            // Paarse ghost skin
+            gradient.addColorStop(0, '#E6E6FA');
+            gradient.addColorStop(0.3, '#DDA0DD');
+            gradient.addColorStop(0.7, '#BA55D3');
+            gradient.addColorStop(1, '#8B008B');
+            break;
+        case 'tank':
+            // Groene tank skin
+            gradient.addColorStop(0, '#90EE90');
+            gradient.addColorStop(0.3, '#32CD32');
+            gradient.addColorStop(0.7, '#228B22');
+            gradient.addColorStop(1, '#006400');
+            break;
+        case 'rainbow':
+            // Rainbow skin - kleur verandert over tijd
+            const hue = (time * 50) % 360;
+            const color1 = `hsl(${hue}, 100%, 70%)`;
+            const color2 = `hsl(${(hue + 60) % 360}, 100%, 60%)`;
+            const color3 = `hsl(${(hue + 120) % 360}, 100%, 50%)`;
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(0.5, color2);
+            gradient.addColorStop(1, color3);
+            break;
+        default:
+            // Normale geel/goud kleur
+            gradient.addColorStop(0, '#FFD700');
+            gradient.addColorStop(0.3, '#FFC107');
+            gradient.addColorStop(0.7, '#FF9800');
+            gradient.addColorStop(1, '#F57C00');
     }
 
     // Schaduw
@@ -188,18 +254,49 @@ function drawPlayer() {
     ctx.fillRect(x, y, w, h);
 
     // 3D effect - highlight
-    ctx.fillStyle = playerUpgrades.skin ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.4)';
+    const highlightOpacity = ['golden', 'rainbow'].includes(player.activeSkin) ? 0.6 : 0.4;
+    ctx.fillStyle = `rgba(255, 255, 255, ${highlightOpacity})`;
     ctx.fillRect(x + 2, y + 2, w - 4, 8);
 
-    // Border
-    ctx.strokeStyle = playerUpgrades.skin ? '#B8860B' : '#E65100';
+    // Border kleur per skin
+    let borderColor = '#E65100';
+    switch (player.activeSkin) {
+        case 'golden': borderColor = '#B8860B'; break;
+        case 'speed': borderColor = '#0066CC'; break;
+        case 'ghost': borderColor = '#8B008B'; break;
+        case 'tank': borderColor = '#006400'; break;
+        case 'rainbow': borderColor = `hsl(${(time * 100) % 360}, 100%, 30%)`; break;
+    }
+    
+    ctx.strokeStyle = borderColor;
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, w, h);
 
-    // Ogen (simpel karakter effect)
+    // Ogen
     ctx.fillStyle = '#000';
     ctx.fillRect(x + 8, y + 10, 4, 4);
     ctx.fillRect(x + 28, y + 10, 4, 4);
+    
+    // Skin speciale effecten
+    if (player.activeSkin === 'speed' || player.activeSkin === 'rainbow') {
+        // Speed trails
+        ctx.fillStyle = 'rgba(0, 191, 255, 0.3)';
+        ctx.fillRect(x - 10, y + 10, 8, 4);
+        ctx.fillRect(x - 15, y + 20, 12, 4);
+    }
+    
+    if (player.activeSkin === 'ghost' || player.activeSkin === 'rainbow') {
+        // Ghost charges indicator
+        ctx.fillStyle = '#BA55D3';
+        ctx.font = 'bold 10px Arial';
+        ctx.fillText(`👻${player.ghostCharges}`, x - 5, y - 5);
+    }
+    
+    if (player.activeSkin === 'tank' || player.activeSkin === 'rainbow') {
+        // Tank cannon
+        ctx.fillStyle = borderColor;
+        ctx.fillRect(x + w, y + h/2 - 2, 8, 4);
+    }
 
     // Shield indicator als speler permanent shield heeft
     if (player.lives > 1) {
@@ -297,6 +394,16 @@ function spawnObstacle() {
     obstacles.push({ x: lanes[lane], y: -60, w: 40, h: 40 });
 }
 
+function getDynamicSpawnRate() {
+    // Super easy start, wordt geleidelijk moeilijker
+    const baseRate = 0.005; // Zeer lage start rate
+    const maxRate = 0.05;   // Maximum spawn rate
+    
+    // Difficulty increases every 500 points
+    const difficultyMultiplier = Math.min(score / 500, 10);
+    return Math.min(baseRate + (difficultyMultiplier * 0.005), maxRate);
+}
+
 function updateObstacles() {
     for (let obs of obstacles) {
         obs.y += speed;
@@ -304,15 +411,45 @@ function updateObstacles() {
     obstacles = obstacles.filter(obs => obs.y < canvas.height);
 }
 
+function handleTankCollision(obstacle) {
+    if (player.activeSkin === 'tank' || player.activeSkin === 'rainbow') {
+        // Tank destroys obstacles and gets coins
+        coinsThisRun += 2;
+        return true; // Obstacle destroyed
+    }
+    return false;
+}
+
+function handleGhostCollision() {
+    if ((player.activeSkin === 'ghost' || player.activeSkin === 'rainbow') && player.ghostCharges > 0) {
+        player.ghostCharges--;
+        return true; // Phase through obstacle
+    }
+    return false;
+}
+
 function checkCollision() {
-    for (let obs of obstacles) {
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obs = obstacles[i];
         if (
             obs.x < player.x + player.w &&
             obs.x + obs.w > player.x &&
             obs.y < player.y + player.h &&
             obs.y + obs.h > player.y
         ) {
-            return true;
+            // Check tank ability first
+            if (handleTankCollision(obs)) {
+                obstacles.splice(i, 1);
+                continue;
+            }
+            
+            // Check ghost ability
+            if (handleGhostCollision()) {
+                obstacles.splice(i, 1);
+                continue;
+            }
+            
+            return true; // Normal collision
         }
     }
     return false;
@@ -321,6 +458,17 @@ function checkCollision() {
 function updateGameLogic() {
     // Langzamere score toename
     score += scoreMultiplier;
+    
+    // Update ghost charges elke 500 punten
+    if ((player.activeSkin === 'ghost' || player.activeSkin === 'rainbow')) {
+        const currentFiveHundred = Math.floor(score / 500);
+        const lastFiveHundred = Math.floor(player.lastGhostScore / 500);
+        
+        if (currentFiveHundred > lastFiveHundred) {
+            player.ghostCharges++;
+            player.lastGhostScore = score;
+        }
+    }
 
     // Check voor 1000 punten schild
     const currentThousand = Math.floor(score / 1000);
@@ -347,23 +495,37 @@ function updateGameLogic() {
         }
     }
 
-    // Coins verdienen (1 coin per 100 punten)
+    // Coins verdienen (golden skin geeft bonus)
     const newCoins = Math.floor(score / 100) - Math.floor((score - scoreMultiplier) / 100);
     if (newCoins > 0) {
-        const coinMultiplier = playerUpgrades.magnet ? 2 : 1;
+        let coinMultiplier = playerUpgrades.magnet ? 2 : 1;
+        if (player.activeSkin === 'golden' || player.activeSkin === 'rainbow') {
+            coinMultiplier *= 1.25; // 25% bonus
+        }
         coinsThisRun += newCoins * coinMultiplier;
+    }
+    
+    // Progressive difficulty system
+    const oldDifficulty = difficultyLevel;
+    difficultyLevel = Math.floor(score / 250) + 1; // Difficulty increases every 250 points
+    
+    if (difficultyLevel > oldDifficulty) {
+        setTimeout(() => {
+            alert(`🔥 DIFFICULTY LEVEL ${difficultyLevel}! 🔥\nThings are getting harder!`);
+        }, 100);
     }
 
     if (gameMode === 'infinity') {
-        // Infinity mode: gradually increase speed
-        speed += 0.001;
+        // Progressive speed increase - starts very slow
+        const speedIncrease = Math.min(difficultyLevel * 0.3, 8); // Max 8 extra speed
+        speed = baseSpeed + speedIncrease;
     } else {
         // Level mode: check for level completion
         if (score >= levelTarget && currentLevel < levels.length) {
             // Level completed!
             currentLevel++;
             const newLevel = levels[currentLevel - 1];
-            speed = newLevel.maxSpeed * (playerUpgrades.speed ? 0.6 : 0.5);
+            speed = newLevel.maxSpeed * (playerUpgrades.speed ? 0.4 : 0.3);
             baseSpeed = speed;
             levelTarget = newLevel.target;
 
@@ -463,7 +625,7 @@ function gameLoop() {
     drawLevelInfo();
     updateObstacles();
 
-    if (Math.random() < getSpawnRate()) {
+    if (Math.random() < getDynamicSpawnRate()) {
         spawnObstacle();
     }
 
@@ -528,11 +690,45 @@ document.addEventListener('keydown', e => {
 
     if (e.key === 'ArrowLeft' && player.lane > 0) {
         player.lane--;
-        player.x = lanes[player.lane];
+        // Smooth movement for speed skins
+        if (player.moveSpeed > 1) {
+            // Animate to new position
+            const targetX = lanes[player.lane];
+            const currentX = player.x;
+            const animateMove = () => {
+                const diff = targetX - player.x;
+                player.x += diff * 0.3;
+                if (Math.abs(diff) > 1) {
+                    requestAnimationFrame(animateMove);
+                } else {
+                    player.x = targetX;
+                }
+            };
+            animateMove();
+        } else {
+            player.x = lanes[player.lane];
+        }
     }
     if (e.key === 'ArrowRight' && player.lane < 2) {
         player.lane++;
-        player.x = lanes[player.lane];
+        // Smooth movement for speed skins
+        if (player.moveSpeed > 1) {
+            // Animate to new position
+            const targetX = lanes[player.lane];
+            const currentX = player.x;
+            const animateMove = () => {
+                const diff = targetX - player.x;
+                player.x += diff * 0.3;
+                if (Math.abs(diff) > 1) {
+                    requestAnimationFrame(animateMove);
+                } else {
+                    player.x = targetX;
+                }
+            };
+            animateMove();
+        } else {
+            player.x = lanes[player.lane];
+        }
     }
 });
 
