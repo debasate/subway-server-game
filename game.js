@@ -584,12 +584,19 @@ function updateGameLogic() {
         coinsThisRun += newCoins;
         coins += newCoins;
 
+        console.log(`💰 Earned ${newCoins} coins! Total: ${coins}`);
+
         // Immediate save voor coins om lag te voorkomen
         try {
             localStorage.setItem('subwayCoins', coins.toString());
+            localStorage.setItem('bestScore', Math.max(parseInt(localStorage.getItem('bestScore') || '0'), Math.floor(score)).toString());
+            console.log(`💾 Coins saved: ${coins}`);
         } catch (error) {
-            console.error('Failed to save coins:', error);
+            console.error('❌ Failed to save coins:', error);
         }
+
+        // Update display
+        updateCoinDisplay();
 
         // Visual feedback
         createParticle(player.x + player.w / 2, player.y, 'coin', '#FFD700', 2);
@@ -632,6 +639,15 @@ function endGame() {
     // FORCE SAVE alle progress onmiddellijk
     console.log(`💰 Final coins earned this run: ${coinsThisRun}`);
     console.log(`🏦 Total coins before save: ${coins}`);
+
+    // EXTRA BACKUP SAVE - Direct localStorage save
+    try {
+        localStorage.setItem('subwayCoins', coins.toString());
+        localStorage.setItem('bestScore', Math.max(parseInt(localStorage.getItem('bestScore') || '0'), Math.floor(score)).toString());
+        console.log(`🔒 Backup save completed: ${coins} coins`);
+    } catch (error) {
+        console.error('❌ Backup save failed:', error);
+    }
 
     const saveSuccess = saveGameProgress();
 
@@ -947,9 +963,9 @@ window.startGame = startGame;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Game engine initialized');
+    console.log('🚀 Loading improved game engine...');
 
-    // Load saved progress
+    // Load saved progress FIRST
     loadGameProgress();
 
     // Initialize mobile controls
@@ -972,10 +988,249 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Update initial coin display
+    // Setup shop interface
+    const shopPanel = document.getElementById('shop-panel');
+    const closeShopBtn = document.getElementById('close-shop');
+
+    // Add shop button to header if not exists
+    const gameHeader = document.querySelector('.game-header');
+    if (gameHeader && !document.getElementById('shop-btn')) {
+        const shopBtn = document.createElement('button');
+        shopBtn.id = 'shop-btn';
+        shopBtn.className = 'settings-btn';
+        shopBtn.innerHTML = '🛒 Shop';
+        shopBtn.onclick = () => {
+            if (shopPanel) shopPanel.style.display = 'block';
+        };
+        gameHeader.appendChild(shopBtn);
+    }
+
+    // Close shop functionality
+    if (closeShopBtn) {
+        closeShopBtn.onclick = () => {
+            if (shopPanel) shopPanel.style.display = 'none';
+        };
+    }
+
+    // Setup GTStijn.site redirect button
+    const gtstijnBtn = document.getElementById('gtstijn-btn');
+    if (gtstijnBtn) {
+        gtstijnBtn.onclick = () => {
+            console.log('🌐 Redirecting to GTStijn.site...');
+            window.open('https://gtstijn.site/', '_blank');
+        };
+        console.log('✅ GTStijn.site button connected');
+    }
+
+    // Update coin display immediately
     updateCoinDisplay();
 
-    console.log(`🚀 Game ready to play! Starting coins: ${coins}`);
+    // Debug localStorage contents
+    console.log('� LocalStorage contents:');
+    console.log('- subwayCoins:', localStorage.getItem('subwayCoins'));
+    console.log('- bestScore:', localStorage.getItem('bestScore'));
+    console.log('- gameStats:', localStorage.getItem('gameStats'));
+
+    console.log(`🎮 Game engine initialized! Starting coins: ${coins}`);
+
+    // Initialize shop functionality
+    initializeShop();
 });
+
+// ================================
+// SHOP SYSTEM
+// ================================
+
+// Shop data
+const shopItems = {
+    // Outfits
+    speedSkin: { type: 'outfit', price: 150, owned: false, equipped: false, name: 'Speed Demon', effect: 'speed' },
+    ghostSkin: { type: 'outfit', price: 200, owned: false, equipped: false, name: 'Ghost Walker', effect: 'ghost' },
+    tankSkin: { type: 'outfit', price: 300, owned: false, equipped: false, name: 'Tank Armor', effect: 'tank' },
+    rainbowSkin: { type: 'outfit', price: 500, owned: false, equipped: false, name: 'Rainbow Master', effect: 'rainbow' },
+    neonSkin: { type: 'outfit', price: 400, owned: false, equipped: false, name: 'Neon Racer', effect: 'neon' },
+
+    // Powers
+    doubleJump: { type: 'power', price: 75, owned: false, name: 'Double Jump', uses: 0 },
+    timeSlower: { type: 'power', price: 120, owned: false, name: 'Time Slower', uses: 0 },
+    coinRain: { type: 'power', price: 90, owned: false, name: 'Coin Rain', uses: 0 },
+    megaShield: { type: 'power', price: 200, owned: false, name: 'Mega Shield', uses: 0 },
+
+    // Boosts
+    speed: { type: 'boost', price: 10, name: 'Speed Boost' },
+    shield: { type: 'boost', price: 25, name: 'Extra Shield' },
+    magnet: { type: 'boost', price: 50, name: 'Coin Magnet' }
+};
+
+function initializeShop() {
+    console.log('🛒 Initializing shop system...');
+
+    // Load shop data from localStorage
+    const savedShop = localStorage.getItem('shopData');
+    if (savedShop) {
+        try {
+            const shopData = JSON.parse(savedShop);
+            Object.assign(shopItems, shopData);
+        } catch (error) {
+            console.error('❌ Failed to load shop data:', error);
+        }
+    }
+
+    // Setup buy buttons
+    const buyButtons = document.querySelectorAll('.buy-btn');
+    buyButtons.forEach(button => {
+        const itemId = button.getAttribute('data-item');
+        if (itemId) {
+            button.onclick = () => purchaseItem(itemId);
+            updateButtonState(itemId, button);
+        }
+    });
+
+    console.log('✅ Shop system initialized');
+}
+
+function purchaseItem(itemId) {
+    const item = shopItems[itemId];
+
+    if (!item) {
+        console.error(`❌ Item ${itemId} not found`);
+        return;
+    }
+
+    // Check if already owned (for outfits/powers)
+    if (item.owned && item.type !== 'boost') {
+        if (item.type === 'outfit') {
+            equipOutfit(itemId);
+        }
+        console.log(`✅ ${item.name} activated/equipped`);
+        return;
+    }
+
+    // Check if player has enough coins
+    if (coins < item.price) {
+        console.log(`❌ Not enough coins! Need ${item.price}, have ${coins}`);
+        alert(`Je hebt niet genoeg coins!\nNodig: ${item.price} 🪙\nHebt: ${coins} 🪙`);
+        return;
+    }
+
+    // Purchase item
+    coins -= item.price;
+
+    // Handle different item types
+    if (item.type === 'outfit') {
+        item.owned = true;
+        equipOutfit(itemId);
+        console.log(`🎽 Purchased and equipped ${item.name}`);
+    } else if (item.type === 'power') {
+        item.owned = true;
+        item.uses += 3; // Give 3 uses
+        console.log(`⚡ Purchased ${item.name} - 3 uses added`);
+    } else if (item.type === 'boost') {
+        // Boosts are consumable, apply immediately to next game
+        applyBoost(itemId);
+        console.log(`🚀 Purchased ${item.name} boost`);
+    }
+
+    // Save progress
+    saveShopData();
+    saveGameProgress();
+    updateCoinDisplay();
+
+    // Update button state
+    const button = document.querySelector(`[data-item="${itemId}"]`);
+    if (button) {
+        updateButtonState(itemId, button);
+    }
+
+    console.log(`💰 Purchase complete! Remaining coins: ${coins}`);
+}
+
+function equipOutfit(itemId) {
+    // Unequip all other outfits
+    Object.keys(shopItems).forEach(id => {
+        if (shopItems[id].type === 'outfit') {
+            shopItems[id].equipped = false;
+        }
+    });
+
+    // Equip new outfit
+    shopItems[itemId].equipped = true;
+    player.activeSkin = itemId;
+
+    // Update all outfit buttons
+    document.querySelectorAll('[data-item]').forEach(button => {
+        const id = button.getAttribute('data-item');
+        if (shopItems[id] && shopItems[id].type === 'outfit') {
+            updateButtonState(id, button);
+        }
+    });
+
+    console.log(`👔 Equipped ${shopItems[itemId].name}`);
+}
+
+function updateButtonState(itemId, button) {
+    const item = shopItems[itemId];
+
+    if (item.type === 'outfit') {
+        if (item.equipped) {
+            button.textContent = 'Uitgerust';
+            button.className = 'buy-btn equipped';
+            button.disabled = true;
+        } else if (item.owned) {
+            button.textContent = 'Selecteer';
+            button.className = 'buy-btn owned';
+            button.disabled = false;
+        } else {
+            button.textContent = 'Koop';
+            button.className = 'buy-btn';
+            button.disabled = coins < item.price;
+        }
+    } else if (item.type === 'power') {
+        if (item.owned && item.uses > 0) {
+            button.textContent = `Gebruik (${item.uses}x)`;
+            button.className = 'buy-btn owned';
+            button.disabled = false;
+        } else if (item.owned) {
+            button.textContent = 'Koop meer';
+            button.className = 'buy-btn';
+            button.disabled = coins < item.price;
+        } else {
+            button.textContent = 'Koop';
+            button.className = 'buy-btn';
+            button.disabled = coins < item.price;
+        }
+    } else {
+        button.textContent = 'Koop';
+        button.className = 'buy-btn';
+        button.disabled = coins < item.price;
+    }
+}
+
+function applyBoost(boostId) {
+    // Apply boost effects for next game
+    switch (boostId) {
+        case 'speed':
+            player.moveSpeed = 1.2;
+            console.log('🏃 Speed boost applied for next game');
+            break;
+        case 'shield':
+            player.lives += 1;
+            console.log('🛡️ Extra life added for next game');
+            break;
+        case 'magnet':
+            scoreMultiplier = 0.5; // Double coin earning
+            console.log('🧲 Coin magnet activated for next game');
+            break;
+    }
+}
+
+function saveShopData() {
+    try {
+        localStorage.setItem('shopData', JSON.stringify(shopItems));
+        console.log('💾 Shop data saved');
+    } catch (error) {
+        console.error('❌ Failed to save shop data:', error);
+    }
+}
 
 console.log('✅ Improved game engine loaded successfully');
