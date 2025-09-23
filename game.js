@@ -2842,57 +2842,24 @@ function hideMobileControls() {
     }
 }
 
-// SIMPLE TEST FUNCTION - Make sure this works
-window.testButton = function () {
-    alert('Button test works!');
-    console.log('✅ Button test function called successfully!');
-    console.log('🔍 Current game state:', {
-        gameRunning,
-        gameMode,
-        player: { x: player.x, y: player.y, lane: player.lane },
-        lanes,
-        canvas: !!canvas,
-        ctx: !!ctx,
-        startGame: typeof window.startGame
-    });
-};
-
-// DEBUG FUNCTION - Test each game mode
-window.debugStartGame = function (mode) {
-    console.log(`🐛 DEBUG: Attempting to start ${mode} mode`);
-    console.log('🔍 Before start:', { gameRunning, gameMode });
-
-    try {
-        window.startGame(mode);
-        console.log('✅ startGame completed without error');
-    } catch (error) {
-        console.error('❌ Error starting game:', error);
-    }
-
-    setTimeout(() => {
-        console.log('🔍 After start (delayed):', { gameRunning, gameMode });
-    }, 1000);
-};
-
 // ================================
-// FIXED BUTTON SYSTEM - COMPLETE
+// CLEAN BUTTON SYSTEM - WORKING
 // ================================
 
-// GLOBAL startGame function - BULLETPROOF VERSION
+// GLOBAL startGame function - CLEAN VERSION
 window.startGame = function (mode = 'infinity') {
-    console.log(`🚀 FIXED: Starting game in ${mode} mode...`);
-    console.log('🔧 Game state before start:', { gameRunning, gameMode, playerLane: player.lane });
-
+    console.log(`🚀 Starting game in ${mode} mode...`);
+    
     try {
         // FORCE STOP ANY RUNNING GAME
         if (gameRunning) {
             gameRunning = false;
             console.log('🛑 Stopped previous game');
         }
-
+        
         // CALL INTERNAL FUNCTION
         return startGameInternal(mode);
-
+        
     } catch (error) {
         console.error('❌ BUTTON ERROR:', error);
         alert(`Game Error: ${error.message}`);
