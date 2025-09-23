@@ -2849,17 +2849,17 @@ function hideMobileControls() {
 // GLOBAL startGame function - CLEAN VERSION
 window.startGame = function (mode = 'infinity') {
     console.log(`🚀 Starting game in ${mode} mode...`);
-    
+
     try {
         // FORCE STOP ANY RUNNING GAME
         if (gameRunning) {
             gameRunning = false;
             console.log('🛑 Stopped previous game');
         }
-        
+
         // CALL INTERNAL FUNCTION
         return startGameInternal(mode);
-        
+
     } catch (error) {
         console.error('❌ BUTTON ERROR:', error);
         alert(`Game Error: ${error.message}`);
