@@ -676,8 +676,10 @@ class AuthManager {
     }
 }
 
+// Authentication system disabled - using local storage only
+
 // Initialize authentication system
-let authManager;
+let authManager = null;
 
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -1385,12 +1387,10 @@ function updateCoinDisplay() {
         lastAutoSave = now;
         saveProgress();
 
-        // Show save indicator
-        if (authManager && authManager.currentUser && !authManager.currentUser.isGuest) {
-            document.getElementById('save-status').textContent = 'Saving...';
-            setTimeout(() => {
-                document.getElementById('save-status').textContent = 'Cloud Save';
-            }, 500);
+        // Show save indicator (local save only now)
+        const saveStatusElement = document.getElementById('save-status');
+        if (saveStatusElement) {
+            saveStatusElement.textContent = 'Local Save';
         }
     }
 }
@@ -1598,10 +1598,9 @@ function saveProgress() {
     localStorage.setItem('subwayCoins', coins.toString());
     localStorage.setItem('subwayUpgrades', JSON.stringify(playerUpgrades));
 
-    // Save to user account if logged in
-    if (authManager && authManager.currentUser && !authManager.currentUser.isGuest) {
-        authManager.saveUserProgress();
-    }
+    // Save to localStorage only (no cloud save)
+    localStorage.setItem('subwayCoins', coins.toString());
+    localStorage.setItem('subwayUpgrades', JSON.stringify(playerUpgrades));
 }
 
 function updateShopDisplay() {
@@ -2858,9 +2857,15 @@ document.getElementById('multiplayer-btn').onclick = () => startGame('multiplaye
 
 // Initialize canvas background on load
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize authentication system only if login screen exists
-    if (document.getElementById('login-screen')) {
-        authManager = new AuthManager();
+    // Skip authentication system - go directly to main game
+    // Initialize as guest user
+    coins = parseInt(localStorage.getItem('subwayCoins') || '0');
+    playerUpgrades = JSON.parse(localStorage.getItem('subwayUpgrades') || '{}');
+    
+    // Show start screen directly
+    const startScreen = document.getElementById('start-screen');
+    if (startScreen) {
+        startScreen.style.display = 'block';
     }
 
     // Set initial canvas background

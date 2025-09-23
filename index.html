@@ -25,79 +25,8 @@
         </div>
     </div>
 
-    <!-- Authentication Screen -->
-    <div id="login-screen">
-        <div class="auth-container">
-            <div class="auth-header">
-            </div>
-
-            <!-- Login Form -->
-            <div id="login-form" class="auth-form">
-                <h2>🔑 Inloggen</h2>
-                <div class="form-group">
-                    <label for="login-username">👤 Gebruikersnaam:</label>
-                    <input type="text" id="login-username" placeholder="Voer je gebruikersnaam in"
-                        autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="login-password">🔒 Wachtwoord:</label>
-                    <input type="password" id="login-password" placeholder="Voer je wachtwoord in"
-                        autocomplete="current-password">
-                </div>
-                <div class="form-actions">
-                    <button id="login-btn" class="auth-btn primary">🚀 Inloggen</button>
-                    <button id="show-register" class="auth-btn secondary">📝 Account Aanmaken</button>
-                    <button id="demo-login-btn" class="auth-btn secondary">🔐 Demo Code</button>
-                    <div class="guest-section">
-                        <input type="text" id="guest-nickname" placeholder="Nickname (optioneel)" maxlength="15">
-                        <button id="guest-play-btn" class="auth-btn guest">👤 Speel als Gast</button>
-                        <p class="guest-info">💡 Gast modus: Voortgang wordt alleen lokaal opgeslagen</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Register Form -->
-            <div id="register-form" class="auth-form" style="display: none;">
-                <h2>📝 Account Aanmaken</h2>
-                <div class="form-group">
-                    <label for="register-username">👤 Gebruikersnaam:</label>
-                    <input type="text" id="register-username" placeholder="Kies een gebruikersnaam"
-                        autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="register-password">🔒 Wachtwoord:</label>
-                    <input type="password" id="register-password" placeholder="Kies een wachtwoord"
-                        autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="register-confirm-password">🔒 Bevestig Wachtwoord:</label>
-                    <input type="password" id="register-confirm-password" placeholder="Bevestig je wachtwoord"
-                        autocomplete="new-password">
-                </div>
-                <div class="form-actions">
-                    <button id="register-btn" class="auth-btn primary">✨ Account Aanmaken</button>
-                    <button id="show-login" class="auth-btn secondary">🔙 Terug naar Login</button>
-                </div>
-            </div>
-
-            <!-- Auth Status Messages -->
-            <div id="auth-status" class="auth-status"></div>
-        </div>
-
-        <!-- Background Animation -->
-        <div class="auth-background">
-            <div class="floating-elements">
-                <div class="floating-coin">🪙</div>
-                <div class="floating-coin">🚇</div>
-                <div class="floating-coin">⭐</div>
-                <div class="floating-coin">🎮</div>
-                <div class="floating-coin">🏆</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Game Interface -->
-    <div id="start-screen" style="display: none;">
+    <div id="start-screen">
         <!-- User Profile Header -->
         <div id="user-profile" class="user-profile">
             <div class="user-avatar" id="user-avatar">U</div>
