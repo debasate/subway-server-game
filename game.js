@@ -2804,19 +2804,19 @@ function hideMobileControls() {
 
 function startGame(mode = 'infinity') {
     console.log(`🚀 Starting game in ${mode} mode...`);
-    
+
     resetGame(mode);
-    
+
     const startScreen = document.getElementById('start-screen');
     const canvas = document.getElementById('game-canvas');
     const gameInfo = document.getElementById('game-info');
-    
+
     console.log('🔍 Elements found:', {
         startScreen: !!startScreen,
         canvas: !!canvas,
         gameInfo: !!gameInfo
     });
-    
+
     if (startScreen) startScreen.style.display = 'none';
     if (canvas) canvas.style.display = 'block';
     if (gameInfo) gameInfo.style.display = 'block';
@@ -2883,14 +2883,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const infinityBtn = document.getElementById('infinity-btn');
     const levelBtn = document.getElementById('level-btn');
     const multiplayerBtn = document.getElementById('multiplayer-btn');
-    
+
     console.log('🔍 Button debug:', {
         infinityBtn: !!infinityBtn,
         levelBtn: !!levelBtn,
         multiplayerBtn: !!multiplayerBtn,
         startScreen: !!startScreen
     });
-    
+
+    // Force wait for DOM to be fully ready
+    setTimeout(() => {
+        const infinityBtn2 = document.getElementById('infinity-btn');
+        const levelBtn2 = document.getElementById('level-btn');
+        const multiplayerBtn2 = document.getElementById('multiplayer-btn');
+        
+        console.log('🔍 Second check - Buttons found:', {
+            infinityBtn2: !!infinityBtn2,
+            levelBtn2: !!levelBtn2,
+            multiplayerBtn2: !!multiplayerBtn2
+        });
+
+        // Try with addEventListener instead of onclick
+        if (infinityBtn2) {
+            infinityBtn2.addEventListener('click', function() {
+                console.log('🎮 Infinity button clicked via addEventListener!');
+                startGame('infinity');
+            });
+            console.log('✅ Infinity button addEventListener attached');
+        }
+
+        if (levelBtn2) {
+            levelBtn2.addEventListener('click', function() {
+                console.log('🎯 Level button clicked via addEventListener!');
+                startGame('level');
+            });
+            console.log('✅ Level button addEventListener attached');
+        }
+
+        if (multiplayerBtn2) {
+            multiplayerBtn2.addEventListener('click', function() {
+                console.log('🤖 Multiplayer button clicked via addEventListener!');
+                startGame('multiplayer');
+            });
+            console.log('✅ Multiplayer button addEventListener attached');
+        }
+    }, 100);
+
     if (infinityBtn) {
         infinityBtn.onclick = () => {
             console.log('🎮 Infinity button clicked!');
@@ -2900,7 +2938,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('❌ Infinity button not found!');
     }
-    
+
     if (levelBtn) {
         levelBtn.onclick = () => {
             console.log('🎯 Level button clicked!');
@@ -2910,7 +2948,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('❌ Level button not found!');
     }
-    
+
     if (multiplayerBtn) {
         multiplayerBtn.onclick = () => {
             console.log('🤖 Multiplayer button clicked!');
@@ -2920,6 +2958,63 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.error('❌ Multiplayer button not found!');
     }
+
+    // EMERGENCY BUTTON FIX - Direct attachment
+    console.log('🚨 EMERGENCY BUTTON FIX STARTING...');
+    
+    const buttonIds = ['infinity-btn', 'level-btn', 'multiplayer-btn'];
+    
+    buttonIds.forEach(buttonId => {
+        const btn = document.getElementById(buttonId);
+        if (btn) {
+            console.log(`✅ Found button: ${buttonId}`);
+            
+            // Remove any existing listeners
+            btn.onclick = null;
+            
+            // Add new direct listener
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log(`🚀 BUTTON CLICKED: ${buttonId}`);
+                
+                const mode = buttonId.replace('-btn', '');
+                console.log(`Starting game in ${mode} mode`);
+                startGame(mode);
+            };
+            
+            console.log(`🎯 Emergency listener attached to ${buttonId}`);
+        } else {
+            console.error(`❌ Button not found: ${buttonId}`);
+        }
+    });
+
+    console.log('🚨 EMERGENCY BUTTON FIX COMPLETE');
+
+    // Additional backup button detection
+    document.querySelectorAll('.mode-btn').forEach((btn, index) => {
+        console.log(`🔍 Mode button ${index}:`, btn.id, btn.textContent);
+        
+        btn.addEventListener('click', function(e) {
+            console.log('🎯 Mode button clicked:', btn.id);
+            
+            switch(btn.id) {
+                case 'infinity-btn':
+                    console.log('Starting infinity mode...');
+                    startGame('infinity');
+                    break;
+                case 'level-btn':
+                    console.log('Starting level mode...');
+                    startGame('level');
+                    break;
+                case 'multiplayer-btn':
+                    console.log('Starting multiplayer mode...');
+                    startGame('multiplayer');
+                    break;
+                default:
+                    console.log('Unknown button:', btn.id);
+            }
+        });
+    });
 
     // Set initial canvas background
     if (canvas && ctx) {
