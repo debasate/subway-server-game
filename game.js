@@ -1101,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCoinDisplay();
         showNotification('🎉 +10 Coins verdiend! 🎉', '#4ade80');
         adModal.style.display = 'none';
-        
+
         // Cooldown van 30 seconden
         watchAdBtn.disabled = true;
         watchAdBtn.textContent = 'Wacht...';
@@ -1180,7 +1180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Extend the existing resetGame to update outfit display
     const originalResetGame = resetGame;
-    resetGame = function(mode = 'infinity') {
+    resetGame = function (mode = 'infinity') {
         originalResetGame(mode);
         updateActiveOutfitDisplay();
     };
