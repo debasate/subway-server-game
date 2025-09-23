@@ -1,14 +1,27 @@
 // ================================
-// EMERGENCY BUTTON FIX - IMMEDIATE
+// CLEAN BUTTON SYSTEM - FINAL
 // ================================
 
-// IMMEDIATE GLOBAL FUNCTION
+// IMMEDIATE GLOBAL FUNCTION - CLEAN VERSION
 console.log('🚨 LOADING BUTTON FIX...');
 
 function startGame(mode) {
-    alert(`BUTTON WORKS! Starting ${mode}`);
-    console.log(`🎯 EMERGENCY START: ${mode}`);
-    return true;
+    console.log(`🎯 STARTING: ${mode}`);
+    
+    try {
+        // FORCE STOP ANY RUNNING GAME
+        if (gameRunning) {
+            gameRunning = false;
+            console.log('🛑 Stopped previous game');
+        }
+
+        // CALL INTERNAL FUNCTION
+        return startGameInternal(mode);
+
+    } catch (error) {
+        console.error('❌ BUTTON ERROR:', error);
+        return false;
+    }
 }
 
 // FORCE TO WINDOW
@@ -2686,7 +2699,8 @@ document.addEventListener('keydown', e => {
 
     // Movement works in all modes when game is running
     if (gameRunning) {
-        if (e.key === 'ArrowLeft' && player.lane > 0) {
+        // LEFT MOVEMENT - Arrow Left OR A key
+        if ((e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') && player.lane > 0) {
             player.lane--;
             // Instant snelle movement voor iedereen
             player.x = lanes[player.lane];
@@ -2694,7 +2708,9 @@ document.addEventListener('keydown', e => {
             createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
             console.log('👈 Moved left to lane:', player.lane);
         }
-        if (e.key === 'ArrowRight' && player.lane < 2) {
+        
+        // RIGHT MOVEMENT - Arrow Right OR D key
+        if ((e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') && player.lane < 2) {
             player.lane++;
             // Instant snelle movement voor iedereen
             player.x = lanes[player.lane];
@@ -2862,13 +2878,12 @@ function hideMobileControls() {
 }
 
 // ================================
-// ULTRA SIMPLE BUTTON FIX - DIRECT
+// CLEAN WORKING STARTGAME
 // ================================
 
-// FORCE GLOBAL FUNCTION IMMEDIATELY
-function startGame(mode = 'infinity') {
-    alert(`Starting ${mode} mode!`);
-    console.log(`🚀 DIRECT: Starting game in ${mode} mode...`);
+// CLEAN FUNCTION WITHOUT ALERTS
+function startGameClean(mode = 'infinity') {
+    console.log(`🚀 CLEAN: Starting game in ${mode} mode...`);
 
     try {
         // FORCE STOP ANY RUNNING GAME
@@ -2882,13 +2897,14 @@ function startGame(mode = 'infinity') {
 
     } catch (error) {
         console.error('❌ BUTTON ERROR:', error);
-        alert(`Game Error: ${error.message}`);
         return false;
     }
 }
 
-// MAKE IT GLOBAL IMMEDIATELY
-window.startGame = startGame;
+// BACKUP GLOBAL ASSIGNMENT
+if (!window.startGame) {
+    window.startGame = startGameClean;
+}
 
 // INTERNAL GAME STARTER
 function startGameInternal(mode = 'infinity') {
