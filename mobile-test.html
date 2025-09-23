@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mobile Test - Subway Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+            min-height: 48px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .test-button:active {
+            transform: scale(0.98);
+            background: #45a049;
+        }
+
+        .mobile-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .status {
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #4CAF50;
+        }
+
+        .warning {
+            color: #FFC107;
+        }
+
+        .error {
+            color: #FF6B6B;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>📱 Mobile Test</h1>
+
+        <div class="mobile-info">
+            <div class="status" id="device-type">Detecting device...</div>
+            <div class="status" id="screen-size">Screen: Loading...</div>
+            <div class="status" id="touch-support">Touch: Loading...</div>
+            <div class="status" id="orientation">Orientation: Loading...</div>
+        </div>
+
+        <button class="test-button" onclick="testTouch()">Test Touch</button>
+        <button class="test-button" onclick="testKeyboard()">Test Virtual Keyboard</button>
+        <button class="test-button" onclick="loadGame()">Load Game</button>
+
+        <div id="test-results"></div>
+
+        <input type="text" placeholder="Test input (16px font)" style="
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: rgba(255,255,255,0.9);
+        ">
+    </div>
+
+    <script>
+        // Device detection
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isTablet = /iPad|Android/i.test(navigator.userAgent) && window.innerWidth >= 768;
+        const isPhone = isMobile && !isTablet;
+
+        function updateDeviceInfo() {
+            document.getElementById('device-type').innerHTML =
+                `Device: ${isPhone ? '📱 Phone' : isTablet ? '📱 Tablet' : '💻 Desktop'}`;
+            document.getElementById('device-type').className =
+                `status ${isMobile ? 'success' : 'warning'}`;
+
+            document.getElementById('screen-size').innerHTML =
+                `Screen: ${window.innerWidth}x${window.innerHeight}px`;
+
+            document.getElementById('touch-support').innerHTML =
+                `Touch: ${'ontouchstart' in window ? '✅ Supported' : '❌ Not supported'}`;
+            document.getElementById('touch-support').className =
+                `status ${'ontouchstart' in window ? 'success' : 'error'}`;
+
+            document.getElementById('orientation').innerHTML =
+                `Orientation: ${window.innerHeight > window.innerWidth ? '📱 Portrait' : '📱 Landscape'}`;
+        }
+
+        function testTouch() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div style="color: #4CAF50; margin: 10px 0;">✅ Touch test completed! Button responded correctly.</div>';
+        }
+
+        function testKeyboard() {
+            const input = document.querySelector('input');
+            input.focus();
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div style="color: #FFC107; margin: 10px 0;">⌨️ Virtual keyboard should appear. Test typing in the input field above.</div>';
+        }
+
+        function loadGame() {
+            window.location.href = '/index.html';
+        }
+
+        // Initial load
+        updateDeviceInfo();
+
+        // Update on orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateDeviceInfo, 500);
+        });
+
+        window.addEventListener('resize', updateDeviceInfo);
+
+        console.log('Mobile test page loaded');
+        console.log('User Agent:', navigator.userAgent);
+        console.log('Touch Events:', 'ontouchstart' in window);
+        console.log('Screen:', window.screen.width + 'x' + window.screen.height);
+    </script>
+</body>
+
+</html>

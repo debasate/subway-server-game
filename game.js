@@ -5,10 +5,15 @@ class AuthManager {
         this.isLoggedIn = false;
         this.users = JSON.parse(localStorage.getItem('gameUsers')) || {};
 
+        // Mobile detection
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
         // Only initialize listeners if DOM elements exist
         if (document.getElementById('login-screen')) {
             this.initAuthListeners();
+            this.initMobileTouchHandlers();
             this.checkAutoLogin();
+            this.optimizeForMobile();
         }
     }
 
@@ -451,6 +456,108 @@ class AuthManager {
     clearMessages() {
         document.getElementById('auth-error').style.display = 'none';
         document.getElementById('auth-success').style.display = 'none';
+    }
+
+    initMobileTouchHandlers() {
+        if (!this.isMobile) return;
+
+        // Prevent default touch behaviors on form elements
+        const formElements = document.querySelectorAll('.auth-form input, .auth-form button');
+        formElements.forEach(element => {
+            element.addEventListener('touchstart', (e) => {
+                // Allow normal touch behavior for form elements
+                e.stopPropagation();
+            }, { passive: true });
+        });
+
+        // Add touch feedback for buttons
+        const buttons = document.querySelectorAll('.auth-btn');
+        buttons.forEach(button => {
+            button.addEventListener('touchstart', () => {
+                button.style.transform = 'scale(0.98)';
+            }, { passive: true });
+
+            button.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 100);
+            }, { passive: true });
+        });
+    }
+
+    optimizeForMobile() {
+        if (!this.isMobile) return;
+
+        // Add mobile-specific class to body
+        document.body.classList.add('mobile-device');
+
+        // Optimize viewport for mobile keyboards
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            viewport.setAttribute('content',
+                'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'
+            );
+        }
+
+        // Handle mobile keyboard
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                // Scroll to input on focus to avoid keyboard overlap
+                setTimeout(() => {
+                    input.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }, 300);
+            });
+
+            input.addEventListener('blur', () => {
+                // Reset scroll position
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 100);
+            });
+        });
+
+        // Add mobile gesture hints
+        this.addMobileHints();
+    }
+
+    addMobileHints() {
+        const authContainer = document.querySelector('.auth-container');
+        if (!authContainer) return;
+
+        // Add mobile tip at bottom
+        const mobileTip = document.createElement('div');
+        mobileTip.className = 'mobile-tip';
+        mobileTip.innerHTML = '💡 <strong>Tip:</strong> Swipe up/down to navigate forms';
+        mobileTip.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 10001;
+            animation: fadeInUp 0.5s ease-out;
+        `;
+
+        document.body.appendChild(mobileTip);
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            mobileTip.style.opacity = '0';
+            setTimeout(() => {
+                if (mobileTip.parentNode) {
+                    mobileTip.parentNode.removeChild(mobileTip);
+                }
+            }, 300);
+        }, 5000);
     }
 
     delay(ms) {

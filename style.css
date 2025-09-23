@@ -47,6 +47,46 @@ body {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* Mobile-first responsive design for auth container */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 25px 20px;
+        width: 95%;
+        max-width: none;
+        margin: 10px;
+        border-radius: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 20px 15px;
+        width: 98%;
+        margin: 5px;
+        border-radius: 10px;
+    }
+
+    .game-logo h1 {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+    }
+
+    .version-badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        margin-bottom: 15px;
+    }
+
+    .auth-tabs {
+        margin-bottom: 20px;
+    }
+
+    .auth-tab {
+        padding: 10px 6px;
+        font-size: 0.8rem;
+    }
+}
+
 @keyframes slideInUp {
     from {
         opacity: 0;
@@ -183,6 +223,35 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* Mobile optimizations for input fields */
+@media (max-width: 768px) {
+    .input-group input {
+        padding: 12px 15px;
+        font-size: 1rem;
+        border-radius: 10px;
+        /* Prevent zoom on iOS */
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-group input {
+        padding: 14px 16px;
+        font-size: 16px;
+        /* Prevents iOS zoom */
+        border-radius: 8px;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+    }
+
+    .input-group label {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+    }
+}
+
 .input-group input:focus {
     outline: none;
     border-color: #4CAF50;
@@ -304,6 +373,36 @@ body {
     margin-bottom: 15px;
     position: relative;
     overflow: hidden;
+    /* Mobile touch optimization */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Mobile button optimizations */
+@media (max-width: 768px) {
+    .auth-btn {
+        padding: 14px 20px;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        /* Larger touch target */
+        min-height: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-btn {
+        padding: 16px 20px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        /* Ensure good touch target size */
+        min-height: 44px;
+    }
+
+    .btn-icon {
+        font-size: 1rem;
+    }
 }
 
 .auth-btn.primary {
@@ -372,10 +471,34 @@ body {
     text-align: left;
 }
 
+/* Mobile optimizations for feature list */
+@media (max-width: 768px) {
+    .feature-list {
+        padding: 15px;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .feature-list {
+        padding: 12px;
+        border-radius: 6px;
+    }
+}
+
 .feature-item {
     margin: 8px 0;
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.8);
+}
+
+/* Mobile feature item adjustments */
+@media (max-width: 480px) {
+    .feature-item {
+        margin: 6px 0;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
 }
 
 .guest-disclaimer {
@@ -522,6 +645,46 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* Mobile optimizations for user profile */
+@media (max-width: 768px) {
+    .user-profile {
+        padding: 10px 15px;
+        gap: 12px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-profile {
+        padding: 8px 12px;
+        gap: 10px;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        /* Stack elements on very small screens */
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-info {
+        margin: 0;
+    }
+
+    .user-stats {
+        gap: 10px;
+        font-size: 0.8rem;
+        justify-content: center;
+    }
+
+    .logout-btn {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+}
+
 .user-avatar {
     width: 50px;
     height: 50px;
@@ -564,6 +727,123 @@ body {
 .logout-btn:hover {
     background: rgba(255, 107, 107, 0.3);
     transform: translateY(-1px);
+}
+
+/* Mobile-specific optimizations */
+.mobile-device {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.mobile-device * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mobile-device input,
+.mobile-device textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Mobile keyboard handling */
+@media (max-height: 500px) {
+    .auth-container {
+        padding: 15px;
+        margin: 5px auto;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .auth-form {
+        max-height: none;
+    }
+
+    .input-group {
+        margin-bottom: 10px;
+    }
+
+    .auth-btn {
+        margin-bottom: 8px;
+        min-height: 40px;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .auth-btn:hover {
+        transform: none;
+    }
+
+    .auth-btn:active {
+        transform: scale(0.98);
+        background: linear-gradient(45deg, #45a049, #3d8b40);
+    }
+
+    .auth-tab:active {
+        transform: scale(0.98);
+    }
+
+    .input-group input:focus {
+        transform: scale(1.02);
+        transition: transform 0.2s ease;
+    }
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+
+    select,
+    textarea,
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+        font-size: 16px !important;
+    }
+}
+
+/* Mobile landscape optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+    .auth-container {
+        padding: 10px 15px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+
+    .game-logo h1 {
+        font-size: 1.2rem;
+        margin-bottom: 3px;
+    }
+
+    .version-badge {
+        font-size: 0.6rem;
+        margin-bottom: 10px;
+    }
+
+    .auth-tabs {
+        margin-bottom: 15px;
+    }
+
+    .input-group {
+        margin-bottom: 8px;
+    }
+
+    .input-group input {
+        padding: 10px 12px;
+    }
+
+    .auth-btn {
+        padding: 12px 16px;
+        margin-bottom: 6px;
+        min-height: 36px;
+    }
 }
 
 /* Animated background gradient */
