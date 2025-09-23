@@ -1378,8 +1378,11 @@ let lastAutoSave = 0;
 const AUTO_SAVE_INTERVAL = 5000; // Save every 5 seconds
 
 function updateCoinDisplay() {
-    coinDisplay.textContent = coins;
-    coinsCount.textContent = coinsThisRun;
+    const coinDisplayElement = document.getElementById('coin-display');
+    const coinsCountElement = document.getElementById('coins-count');
+    
+    if (coinDisplayElement) coinDisplayElement.textContent = coins;
+    if (coinsCountElement) coinsCountElement.textContent = coinsThisRun;
 
     // Auto-save with throttling
     const now = Date.now();
@@ -2850,11 +2853,6 @@ function adjustCanvasForMobile() {
     touchSensitivity = Math.max(30, newWidth * 0.1);
 }
 
-// Event listeners for gamemode buttons
-infinityBtn.onclick = () => startGame('infinity');
-levelBtn.onclick = () => startGame('level');
-document.getElementById('multiplayer-btn').onclick = () => startGame('multiplayer');
-
 // Initialize canvas background on load
 document.addEventListener('DOMContentLoaded', () => {
     // Skip authentication system - go directly to main game
@@ -2868,7 +2866,14 @@ document.addEventListener('DOMContentLoaded', () => {
         startScreen.style.display = 'block';
     }
 
-    // Set initial canvas background
+    // Event listeners for gamemode buttons
+    const infinityBtn = document.getElementById('infinity-btn');
+    const levelBtn = document.getElementById('level-btn');
+    const multiplayerBtn = document.getElementById('multiplayer-btn');
+    
+    if (infinityBtn) infinityBtn.onclick = () => startGame('infinity');
+    if (levelBtn) levelBtn.onclick = () => startGame('level');
+    if (multiplayerBtn) multiplayerBtn.onclick = () => startGame('multiplayer');    // Set initial canvas background
     if (canvas && ctx) {
         ctx.fillStyle = '#2C3E50';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
