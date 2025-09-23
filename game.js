@@ -4,34 +4,54 @@ class AuthManager {
         this.currentUser = null;
         this.isLoggedIn = false;
         this.users = JSON.parse(localStorage.getItem('gameUsers')) || {};
-        this.initAuthListeners();
-        this.checkAutoLogin();
+
+        // Only initialize listeners if DOM elements exist
+        if (document.getElementById('login-screen')) {
+            this.initAuthListeners();
+            this.checkAutoLogin();
+        }
     }
 
     initAuthListeners() {
+        // Check if elements exist before adding listeners
+        const elements = {
+            loginBtn: document.getElementById('login-btn'),
+            registerBtn: document.getElementById('register-btn'),
+            guestBtn: document.getElementById('guest-play-btn'),
+            demoBtn: document.getElementById('demo-login-btn'),
+            logoutBtn: document.getElementById('logout-btn')
+        };
+
+        // Only add listeners if elements exist
+        if (elements.loginBtn) elements.loginBtn.addEventListener('click', () => this.handleLogin());
+        if (elements.registerBtn) elements.registerBtn.addEventListener('click', () => this.handleRegister());
+        if (elements.guestBtn) elements.guestBtn.addEventListener('click', () => this.handleGuestPlay());
+        if (elements.demoBtn) elements.demoBtn.addEventListener('click', () => this.handleDemoLogin());
+        if (elements.logoutBtn) elements.logoutBtn.addEventListener('click', () => this.handleLogout());
+
         // Tab switching
         document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+            if (tab) tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
         });
 
-        // Form submissions
-        document.getElementById('login-btn').addEventListener('click', () => this.handleLogin());
-        document.getElementById('register-btn').addEventListener('click', () => this.handleRegister());
-        document.getElementById('guest-play-btn').addEventListener('click', () => this.handleGuestPlay());
-        document.getElementById('demo-login-btn').addEventListener('click', () => this.handleDemoLogin());
-        document.getElementById('logout-btn').addEventListener('click', () => this.handleLogout());
+        // Real-time validation - only if elements exist
+        const regUsername = document.getElementById('register-username');
+        const regPassword = document.getElementById('register-password');
+        const regPasswordConfirm = document.getElementById('register-password-confirm');
+        const termsAgree = document.getElementById('terms-agree');
+        const loginUsername = document.getElementById('login-username');
+        const loginPassword = document.getElementById('login-password');
 
-        // Real-time validation
-        document.getElementById('register-username').addEventListener('input', (e) => this.validateUsername(e.target.value));
-        document.getElementById('register-password').addEventListener('input', (e) => this.validatePassword(e.target.value));
-        document.getElementById('register-password-confirm').addEventListener('input', (e) => this.validatePasswordMatch());
-        document.getElementById('terms-agree').addEventListener('change', (e) => this.toggleRegisterButton());
+        if (regUsername) regUsername.addEventListener('input', (e) => this.validateUsername(e.target.value));
+        if (regPassword) regPassword.addEventListener('input', (e) => this.validatePassword(e.target.value));
+        if (regPasswordConfirm) regPasswordConfirm.addEventListener('input', (e) => this.validatePasswordMatch());
+        if (termsAgree) termsAgree.addEventListener('change', (e) => this.toggleRegisterButton());
 
         // Enter key handling
-        document.getElementById('login-username').addEventListener('keypress', (e) => {
+        if (loginUsername) loginUsername.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleLogin();
         });
-        document.getElementById('login-password').addEventListener('keypress', (e) => {
+        if (loginPassword) loginPassword.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleLogin();
         });
     }
@@ -53,7 +73,8 @@ class AuthManager {
 
     validateUsername(username) {
         const feedback = document.getElementById('username-feedback');
-        
+        if (!feedback) return false; // Safety check
+
         if (username.length < 3) {
             feedback.textContent = 'Gebruikersnaam moet minimaal 3 tekens lang zijn';
             feedback.className = 'input-feedback error';
@@ -76,7 +97,10 @@ class AuthManager {
     validatePassword(password) {
         const strengthBar = document.querySelector('.strength-fill');
         const strengthText = document.querySelector('.strength-text');
-        
+
+        // Safety checks
+        if (!strengthBar || !strengthText) return false;
+
         let strength = 0;
         let feedback = '';
 
@@ -132,10 +156,10 @@ class AuthManager {
         const termsAgreed = document.getElementById('terms-agree').checked;
         const registerBtn = document.getElementById('register-btn');
 
-        const isValid = this.validateUsername(username) && 
-                       this.validatePassword(password) && 
-                       this.validatePasswordMatch() && 
-                       termsAgreed;
+        const isValid = this.validateUsername(username) &&
+            this.validatePassword(password) &&
+            this.validatePasswordMatch() &&
+            termsAgreed;
 
         registerBtn.disabled = !isValid;
     }
@@ -273,7 +297,7 @@ class AuthManager {
 
     handleGuestPlay() {
         const nickname = document.getElementById('guest-nickname').value.trim() || 'Guest';
-        
+
         this.currentUser = {
             displayName: nickname,
             username: null,
@@ -303,16 +327,16 @@ class AuthManager {
         this.currentUser = null;
         this.isLoggedIn = false;
         localStorage.removeItem('rememberedUser');
-        
+
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
-        
+
         // Reset forms
         document.querySelectorAll('input').forEach(input => {
             if (input.type !== 'checkbox') input.value = '';
             else input.checked = false;
         });
-        
+
         this.switchTab('login');
     }
 
@@ -326,7 +350,7 @@ class AuthManager {
     showMainGame() {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('start-screen').style.display = 'block';
-        
+
         this.updateUserProfile();
         this.loadUserGameData();
     }
@@ -340,7 +364,7 @@ class AuthManager {
 
         avatar.textContent = this.currentUser.displayName.charAt(0).toUpperCase();
         usernameDisplay.textContent = this.currentUser.displayName;
-        
+
         if (this.currentUser.isGuest) {
             saveStatus.textContent = 'Local Only';
             connectionStatus.textContent = 'Guest Mode';
@@ -381,7 +405,7 @@ class AuthManager {
         // Update UI elements
         document.getElementById('infinity-best').textContent = highScore;
         document.getElementById('level-progress').textContent = gameData.level || 1;
-        
+
         // Update shop display
         updateShopDisplay();
     }
@@ -1127,7 +1151,7 @@ const shopItems = {
     ghostSkin: { price: 200, name: "Ghost Mode" },
     tankSkin: { price: 300, name: "Tank Mode" },
     rainbowSkin: { price: 500, name: "Rainbow Power" }
-}; 
+};
 
 // Auto-save throttling
 let lastAutoSave = 0;
@@ -1136,13 +1160,13 @@ const AUTO_SAVE_INTERVAL = 5000; // Save every 5 seconds
 function updateCoinDisplay() {
     coinDisplay.textContent = coins;
     coinsCount.textContent = coinsThisRun;
-    
+
     // Auto-save with throttling
     const now = Date.now();
     if (now - lastAutoSave > AUTO_SAVE_INTERVAL) {
         lastAutoSave = now;
         saveProgress();
-        
+
         // Show save indicator
         if (authManager && authManager.currentUser && !authManager.currentUser.isGuest) {
             document.getElementById('save-status').textContent = 'Saving...';
@@ -1355,7 +1379,7 @@ function saveProgress() {
     // Save to localStorage for backwards compatibility
     localStorage.setItem('subwayCoins', coins.toString());
     localStorage.setItem('subwayUpgrades', JSON.stringify(playerUpgrades));
-    
+
     // Save to user account if logged in
     if (authManager && authManager.currentUser && !authManager.currentUser.isGuest) {
         authManager.saveUserProgress();
@@ -2616,9 +2640,11 @@ document.getElementById('multiplayer-btn').onclick = () => startGame('multiplaye
 
 // Initialize canvas background on load
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize authentication system
-    authManager = new AuthManager();
-    
+    // Initialize authentication system only if login screen exists
+    if (document.getElementById('login-screen')) {
+        authManager = new AuthManager();
+    }
+
     // Set initial canvas background
     if (canvas && ctx) {
         ctx.fillStyle = '#2C3E50';

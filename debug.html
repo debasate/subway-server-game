@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subway Server Game - Debug</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        .debug-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🚇 Subway Server Game - Debug Mode</h1>
+
+    <div class="debug-info">
+        <h2>Debug Information</h2>
+        <p id="status">Loading...</p>
+        <button onclick="testGame()">Test Game Load</button>
+    </div>
+
+    <script>
+        console.log('Debug page loaded');
+        document.getElementById('status').textContent = 'Debug page loaded successfully';
+
+        function testGame() {
+            console.log('Testing game load...');
+            window.location.href = '/index.html';
+        }
+
+        // Test localStorage
+        try {
+            localStorage.setItem('test', 'working');
+            console.log('localStorage working');
+        } catch (e) {
+            console.error('localStorage error:', e);
+        }
+    </script>
+</body>
+
+</html>

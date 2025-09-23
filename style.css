@@ -52,6 +52,7 @@ body {
         opacity: 0;
         transform: translateY(50px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -70,8 +71,15 @@ body {
 }
 
 @keyframes gradientText {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .version-badge {
@@ -127,8 +135,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .auth-form h2 {
@@ -213,9 +228,17 @@ body {
     border-radius: 2px;
 }
 
-.strength-fill.weak { background: #FF6B6B; }
-.strength-fill.medium { background: #FFC107; }
-.strength-fill.strong { background: #4CAF50; }
+.strength-fill.weak {
+    background: #FF6B6B;
+}
+
+.strength-fill.medium {
+    background: #FFC107;
+}
+
+.strength-fill.strong {
+    background: #4CAF50;
+}
 
 .strength-text {
     font-size: 0.8rem;
@@ -249,12 +272,12 @@ body {
     transition: all 0.3s ease;
 }
 
-.checkbox-wrapper input:checked + .checkmark {
+.checkbox-wrapper input:checked+.checkmark {
     background: #4CAF50;
     border-color: #4CAF50;
 }
 
-.checkbox-wrapper input:checked + .checkmark::after {
+.checkbox-wrapper input:checked+.checkmark::after {
     content: '✓';
     position: absolute;
     color: white;
@@ -378,8 +401,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .auth-message {
@@ -410,6 +438,7 @@ body {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -470,9 +499,12 @@ body {
 }
 
 @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0px) rotate(0deg);
     }
+
     50% {
         transform: translateY(-20px) rotate(180deg);
     }

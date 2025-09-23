@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subway Server Game - Simple Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚇 Subway Server Game</h1>
+        <p>Testing basic functionality...</p>
+        <button onclick="loadFullGame()">Load Full Game</button>
+        <button onclick="testLocalStorage()">Test Storage</button>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        console.log('Simple test page loaded');
+
+        function loadFullGame() {
+            console.log('Loading full game...');
+            window.location.href = '/index.html';
+        }
+
+        function testLocalStorage() {
+            const output = document.getElementById('output');
+            try {
+                localStorage.setItem('test', new Date().toString());
+                const result = localStorage.getItem('test');
+                output.innerHTML = '<p style="color: #4CAF50;">✅ LocalStorage working: ' + result + '</p>';
+            } catch (e) {
+                output.innerHTML = '<p style="color: #FF6B6B;">❌ LocalStorage error: ' + e.message + '</p>';
+            }
+        }
+
+        // Auto test on load
+        setTimeout(testLocalStorage, 1000);
+    </script>
+</body>
+
+</html>
