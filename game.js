@@ -243,7 +243,7 @@ class AuthManager {
         // Check demo code first
         const enteredCode = prompt('🔐 Voer de demo code in (regenereert elke 10 minuten):');
         const currentValidCode = this.generateDemoCode();
-        
+
         if (enteredCode !== currentValidCode) {
             this.showError(`❌ Onjuiste demo code! Huidige code: ${currentValidCode}`);
             return;
@@ -296,7 +296,7 @@ class AuthManager {
         // Generate code based on current time (updates every 10 minutes)
         const now = new Date();
         const tenMinuteSlot = Math.floor(now.getTime() / (10 * 60 * 1000));
-        
+
         // Simple hash function for consistent code generation
         const codeBase = tenMinuteSlot.toString();
         let hash = 0;
@@ -305,7 +305,7 @@ class AuthManager {
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash; // Convert to 32-bit integer
         }
-        
+
         // Convert to 4-digit code
         const code = Math.abs(hash % 9000) + 1000;
         return code.toString();
@@ -329,7 +329,7 @@ class AuthManager {
     updateDemoCodeDisplay() {
         const codeElement = document.getElementById('current-demo-code');
         const timeElement = document.getElementById('next-code-time');
-        
+
         if (codeElement && timeElement) {
             codeElement.textContent = this.generateDemoCode();
             timeElement.textContent = this.getNextCodeTime();
