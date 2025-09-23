@@ -20,6 +20,161 @@ body {
     color: #ccc;
 }
 
+#player-stats {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.stat-item {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.coin-icon {
+    font-size: 1.3em;
+    margin-right: 5px;
+}
+
+#shop-section {
+    margin: 20px 0;
+}
+
+.shop-toggle-btn {
+    background: #9C27B0;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.shop-toggle-btn:hover {
+    background: #7B1FA2;
+}
+
+#shop-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    border: 2px solid #FFD700;
+    max-height: 80vh;
+    overflow-y: auto;
+    width: 90%;
+    max-width: 600px;
+}
+
+#shop-screen h2 {
+    text-align: center;
+    color: #FFD700;
+    margin-bottom: 30px;
+}
+
+#shop-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.shop-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #4CAF50;
+    text-align: center;
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.shop-item:hover {
+    transform: translateY(-5px);
+    border-color: #FFD700;
+}
+
+.shop-item.owned {
+    border-color: #FFD700;
+    background: rgba(255, 215, 0, 0.2);
+}
+
+.shop-item h3 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.shop-item.owned h3 {
+    color: #FFD700;
+}
+
+.shop-item p {
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #FFD700;
+    margin-bottom: 15px;
+}
+
+.buy-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.buy-btn:hover {
+    background: #45a049;
+}
+
+.buy-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+.shop-close-btn {
+    display: block;
+    margin: 0 auto;
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.shop-close-btn:hover {
+    background: #da190b;
+}
+
+#coins-ingame {
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.game-tips {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
 #gamemode-selection {
     margin: 30px 0;
 }

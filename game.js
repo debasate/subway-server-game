@@ -1,11 +1,16 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 const startScreen = document.getElementById('start-screen');
+const shopScreen = document.getElementById('shop-screen');
 const infinityBtn = document.getElementById('infinity-btn');
 const levelBtn = document.getElementById('level-btn');
+const shopBtn = document.getElementById('shop-btn');
+const shopCloseBtn = document.getElementById('shop-close-btn');
 const gameInfo = document.getElementById('game-info');
 const modeDisplay = document.getElementById('mode-display');
 const levelDisplay = document.getElementById('level-display');
+const coinDisplay = document.getElementById('coin-display');
+const coinsCount = document.getElementById('coins-count');
 
 let gameRunning = false;
 let gameMode = 'infinity'; // 'infinity' or 'level'
@@ -13,12 +18,99 @@ let currentLevel = 1;
 let levelProgress = 0;
 let levelTarget = 1000; // Score needed to complete level
 
-let player = { x: 220, y: 540, w: 40, h: 40, color: '#ff0', lane: 1 };
+// Player and game state
+let player = { x: 220, y: 540, w: 40, h: 40, color: '#ff0', lane: 1, lives: 1 };
 let lanes = [120, 220, 320];
 let obstacles = [];
 let speed = 4;
 let score = 0;
 let baseSpeed = 4;
+let scoreMultiplier = 0.5; // Langzamere score toename
+
+// Shield system
+let temporaryShield = false;
+let shieldTimeLeft = 0;
+let lastShieldScore = 0;
+
+// Coin system
+let coins = parseInt(localStorage.getItem('subwayCoins') || '0');
+let coinsThisRun = 0;
+
+// Shop items and upgrades
+let playerUpgrades = JSON.parse(localStorage.getItem('subwayUpgrades') || '{}');
+const defaultUpgrades = {
+    speed: false,
+    shield: false, 
+    magnet: false,
+    skin: false
+};
+playerUpgrades = { ...defaultUpgrades, ...playerUpgrades };
+
+// Shop system
+const shopItems = {
+    speed: { price: 10, name: "Speed Boost" },
+    shield: { price: 25, name: "Shield" },
+    magnet: { price: 50, name: "Coin Magnet" },
+    skin: { price: 100, name: "Golden Skin" }
+};
+
+function updateCoinDisplay() {
+    coinDisplay.textContent = coins;
+    coinsCount.textContent = coinsThisRun;
+}
+
+function saveProgress() {
+    localStorage.setItem('subwayCoins', coins.toString());
+    localStorage.setItem('subwayUpgrades', JSON.stringify(playerUpgrades));
+}
+
+function updateShopDisplay() {
+    Object.keys(shopItems).forEach(item => {
+        const shopItem = document.querySelector(`.shop-item[data-item="${item}"]`);
+        const buyBtn = shopItem.querySelector('.buy-btn');
+        
+        if (playerUpgrades[item]) {
+            shopItem.classList.add('owned');
+            buyBtn.textContent = 'Eigendom';
+            buyBtn.disabled = true;
+        } else {
+            const canAfford = coins >= shopItems[item].price;
+            buyBtn.disabled = !canAfford;
+            buyBtn.style.background = canAfford ? '#4CAF50' : '#666';
+        }
+    });
+}
+
+function buyItem(itemName) {
+    const item = shopItems[itemName];
+    if (coins >= item.price && !playerUpgrades[itemName]) {
+        coins -= item.price;
+        playerUpgrades[itemName] = true;
+        saveProgress();
+        updateCoinDisplay();
+        updateShopDisplay();
+        alert(`${item.name} gekocht! 🎉`);
+    }
+}
+
+// Event listeners voor shop
+shopBtn.onclick = () => {
+    startScreen.style.display = 'none';
+    shopScreen.style.display = 'block';
+    updateShopDisplay();
+};
+
+shopCloseBtn.onclick = () => {
+    shopScreen.style.display = 'none';
+    startScreen.style.display = 'block';
+};
+
+document.querySelectorAll('.buy-btn').forEach(btn => {
+    btn.onclick = (e) => {
+        const item = e.target.getAttribute('data-item');
+        buyItem(item);
+    };
+});
 
 // Level definitions
 const levels = [
@@ -34,42 +126,58 @@ function resetGame(mode = 'infinity') {
     player.lane = 1;
     player.x = lanes[player.lane];
     player.y = 540;
+    player.lives = playerUpgrades.shield ? 2 : 1; // Shield upgrade
     obstacles = [];
     score = 0;
+    coinsThisRun = 0;
     currentLevel = 1;
     levelProgress = 0;
-
+    
+    // Reset shield system
+    temporaryShield = false;
+    shieldTimeLeft = 0;
+    lastShieldScore = 0;
+    
     if (gameMode === 'infinity') {
-        speed = 4;
-        baseSpeed = 4;
+        speed = playerUpgrades.speed ? 4.8 : 4; // Speed boost upgrade
+        baseSpeed = speed;
     } else {
-        speed = levels[0].maxSpeed * 0.5;
+        speed = levels[0].maxSpeed * (playerUpgrades.speed ? 0.6 : 0.5);
         baseSpeed = speed;
         levelTarget = levels[0].target;
     }
-
+    
     updateGameInfo();
+    updateCoinDisplay();
 }
-
 function updateGameInfo() {
     if (gameMode === 'infinity') {
         modeDisplay.textContent = 'Mode: Infinity';
-        levelDisplay.textContent = `Score: ${score}`;
+        levelDisplay.textContent = `Score: ${Math.floor(score)}`;
     } else {
         modeDisplay.textContent = `Mode: Level ${currentLevel}`;
-        levelDisplay.textContent = `Progress: ${score}/${levelTarget}`;
+        levelDisplay.textContent = `Progress: ${Math.floor(score)}/${levelTarget}`;
     }
 }
 
 function drawPlayer() {
     const { x, y, w, h } = player;
 
-    // Hoofdkleur (geel/goud)
+    // Kleur bepalen op basis van golden skin upgrade
     const gradient = ctx.createLinearGradient(x, y, x, y + h);
-    gradient.addColorStop(0, '#FFD700');
-    gradient.addColorStop(0.3, '#FFC107');
-    gradient.addColorStop(0.7, '#FF9800');
-    gradient.addColorStop(1, '#F57C00');
+    if (playerUpgrades.skin) {
+        // Golden skin - meer glanzig goud
+        gradient.addColorStop(0, '#FFE55C');
+        gradient.addColorStop(0.3, '#FFD700');
+        gradient.addColorStop(0.7, '#FFC107');
+        gradient.addColorStop(1, '#FF8F00');
+    } else {
+        // Normale geel/goud kleur
+        gradient.addColorStop(0, '#FFD700');
+        gradient.addColorStop(0.3, '#FFC107');
+        gradient.addColorStop(0.7, '#FF9800');
+        gradient.addColorStop(1, '#F57C00');
+    }
 
     // Schaduw
     ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
@@ -80,11 +188,11 @@ function drawPlayer() {
     ctx.fillRect(x, y, w, h);
 
     // 3D effect - highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.fillStyle = playerUpgrades.skin ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.4)';
     ctx.fillRect(x + 2, y + 2, w - 4, 8);
 
     // Border
-    ctx.strokeStyle = '#E65100';
+    ctx.strokeStyle = playerUpgrades.skin ? '#B8860B' : '#E65100';
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, w, h);
 
@@ -92,6 +200,33 @@ function drawPlayer() {
     ctx.fillStyle = '#000';
     ctx.fillRect(x + 8, y + 10, 4, 4);
     ctx.fillRect(x + 28, y + 10, 4, 4);
+    
+    // Shield indicator als speler permanent shield heeft
+    if (player.lives > 1) {
+        ctx.strokeStyle = '#00BFFF';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(x + w/2, y + h/2, w/2 + 5, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    
+    // Tijdelijk schild indicator (1000 punten schild)
+    if (temporaryShield && shieldTimeLeft > 0) {
+        // Animatie effect - pulseren
+        const pulse = Math.sin(Date.now() * 0.01) * 0.3 + 0.7;
+        ctx.strokeStyle = `rgba(255, 215, 0, ${pulse})`;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(x + w/2, y + h/2, w/2 + 8, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Schild timer tekst
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`🛡️${Math.ceil(shieldTimeLeft)}s`, x + w/2, y - 10);
+        ctx.textAlign = 'left';
+    }
 }
 
 function drawObstacles() {
@@ -184,19 +319,51 @@ function checkCollision() {
 }
 
 function updateGameLogic() {
+    // Langzamere score toename
+    score += scoreMultiplier;
+    
+    // Check voor 1000 punten schild
+    const currentThousand = Math.floor(score / 1000);
+    const lastThousand = Math.floor(lastShieldScore / 1000);
+    
+    if (currentThousand > lastThousand) {
+        // Nieuwe 1000 punten bereikt - activeer schild!
+        temporaryShield = true;
+        shieldTimeLeft = 10; // 10 seconden
+        lastShieldScore = score;
+        
+        // Visual feedback
+        setTimeout(() => {
+            alert(`🛡️ SCHILD GEACTIVEERD! 🛡️\n10 seconden bescherming!`);
+        }, 100);
+    }
+    
+    // Update schild timer
+    if (temporaryShield && shieldTimeLeft > 0) {
+        shieldTimeLeft -= 1/60; // Verminderen per frame (60fps)
+        if (shieldTimeLeft <= 0) {
+            temporaryShield = false;
+            shieldTimeLeft = 0;
+        }
+    }
+    
+    // Coins verdienen (1 coin per 100 punten)
+    const newCoins = Math.floor(score / 100) - Math.floor((score - scoreMultiplier) / 100);
+    if (newCoins > 0) {
+        const coinMultiplier = playerUpgrades.magnet ? 2 : 1;
+        coinsThisRun += newCoins * coinMultiplier;
+    }
+    
     if (gameMode === 'infinity') {
         // Infinity mode: gradually increase speed
         speed += 0.001;
-        score++;
     } else {
         // Level mode: check for level completion
-        score++;
-
         if (score >= levelTarget && currentLevel < levels.length) {
             // Level completed!
             currentLevel++;
             const newLevel = levels[currentLevel - 1];
-            speed = newLevel.maxSpeed * 0.5;
+            speed = newLevel.maxSpeed * (playerUpgrades.speed ? 0.6 : 0.5);
             baseSpeed = speed;
             levelTarget = newLevel.target;
 
@@ -208,23 +375,24 @@ function updateGameLogic() {
             // Game completed!
             gameRunning = false;
             setTimeout(() => {
-                alert(`🎉 GAME COMPLETED! 🎉\nYou finished all levels!\nFinal Score: ${score}`);
+                coins += coinsThisRun;
+                saveProgress();
+                alert(`🎉 GAME COMPLETED! 🎉\nYou finished all levels!\nFinal Score: ${Math.floor(score)}\nCoins Earned: ${coinsThisRun} 🪙`);
                 backToMenu();
             }, 100);
             return;
         }
-
+        
         // Gradually increase speed within level
         const level = levels[currentLevel - 1];
-        const levelProgress = (score - (currentLevel > 1 ? levels[currentLevel - 2].target : 0)) /
-            (levelTarget - (currentLevel > 1 ? levels[currentLevel - 2].target : 0));
+        const levelProgress = (score - (currentLevel > 1 ? levels[currentLevel - 2].target : 0)) / 
+                            (levelTarget - (currentLevel > 1 ? levels[currentLevel - 2].target : 0));
         speed = baseSpeed + (level.maxSpeed - baseSpeed) * levelProgress;
     }
-
+    
     updateGameInfo();
-}
-
-function getSpawnRate() {
+    updateCoinDisplay();
+}function getSpawnRate() {
     if (gameMode === 'infinity') {
         return 0.03;
     } else {
@@ -302,16 +470,42 @@ function gameLoop() {
     updateGameLogic();
 
     if (checkCollision()) {
-        gameRunning = false;
-        setTimeout(() => {
-            let message = `Game Over!\nScore: ${score}`;
-            if (gameMode === 'level') {
-                message += `\nReached Level: ${currentLevel}`;
-            }
-            alert(message);
-            backToMenu();
-        }, 100);
-        return;
+        if (temporaryShield && shieldTimeLeft > 0) {
+            // Tijdelijk schild absorbeert hit
+            temporaryShield = false;
+            shieldTimeLeft = 0;
+            // Remove colliding obstacle
+            obstacles = obstacles.filter(obs => {
+                return !(obs.x < player.x + player.w &&
+                        obs.x + obs.w > player.x &&
+                        obs.y < player.y + player.h &&
+                        obs.y + obs.h > player.y);
+            });
+        } else if (player.lives > 1) {
+            // Permanent shield absorbs hit
+            player.lives--;
+            // Remove colliding obstacle
+            obstacles = obstacles.filter(obs => {
+                return !(obs.x < player.x + player.w &&
+                        obs.x + obs.w > player.x &&
+                        obs.y < player.y + player.h &&
+                        obs.y + obs.h > player.y);
+            });
+        } else {
+            // Game over
+            gameRunning = false;
+            setTimeout(() => {
+                coins += coinsThisRun;
+                saveProgress();
+                let message = `Game Over!\nScore: ${Math.floor(score)}\nCoins Earned: ${coinsThisRun} 🪙`;
+                if (gameMode === 'level') {
+                    message += `\nReached Level: ${currentLevel}`;
+                }
+                alert(message);
+                backToMenu();
+            }, 100);
+            return;
+        }
     }
 
     if (gameRunning) requestAnimationFrame(gameLoop);
@@ -354,3 +548,7 @@ function startGame(mode = 'infinity') {
 // Event listeners for gamemode buttons
 infinityBtn.onclick = () => startGame('infinity');
 levelBtn.onclick = () => startGame('level');
+
+// Initialize coin display and shop
+updateCoinDisplay();
+updateShopDisplay();
