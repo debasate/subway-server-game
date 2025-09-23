@@ -12,7 +12,6 @@ class AuthManager {
         if (document.getElementById('login-screen')) {
             this.initAuthListeners();
             this.initMobileTouchHandlers();
-            this.checkAutoLogin();
             this.optimizeForMobile();
         }
     }
@@ -147,7 +146,6 @@ class AuthManager {
     async handleLogin() {
         const username = document.getElementById('login-username').value.trim();
         const password = document.getElementById('login-password').value;
-        const rememberMe = document.getElementById('remember-me').checked;
 
         if (!username || !password) {
             this.showError('Vul alle velden in');
@@ -163,10 +161,6 @@ class AuthManager {
         if (user && user.password === password) {
             this.currentUser = { ...user, username: username.toLowerCase() };
             this.isLoggedIn = true;
-
-            if (rememberMe) {
-                localStorage.setItem('rememberedUser', username.toLowerCase());
-            }
 
             this.showSuccess(`Welkom terug, ${user.displayName}!`);
             setTimeout(() => this.showMainGame(), 1500);
@@ -319,7 +313,6 @@ class AuthManager {
     handleLogout() {
         this.currentUser = null;
         this.isLoggedIn = false;
-        localStorage.removeItem('rememberedUser');
 
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
@@ -330,14 +323,7 @@ class AuthManager {
             else input.checked = false;
         });
 
-        this.switchTab('login');
-    }
-
-    checkAutoLogin() {
-        const rememberedUser = localStorage.getItem('rememberedUser');
-        if (rememberedUser && this.users[rememberedUser]) {
-            document.getElementById('login-username').value = this.users[rememberedUser].displayName;
-        }
+        this.showLoginForm();
     }
 
     showMainGame() {
@@ -376,7 +362,7 @@ class AuthManager {
             console.log('👤 Setting up GUEST mode UI');
             saveStatus.textContent = '💾 Lokaal Opgeslagen';
             connectionStatus.textContent = '🔒 Gast Modus';
-            
+
             // FORCE update logout button to login button
             logoutBtn.innerHTML = '🔑 Inloggen';
             logoutBtn.style.display = 'block';
@@ -385,13 +371,13 @@ class AuthManager {
                 console.log('🔑 Login button clicked!');
                 this.switchToLogin();
             };
-            
+
             console.log('✅ Guest UI setup complete');
         } else {
             console.log('👥 Setting up LOGGED IN user UI');
             saveStatus.textContent = '☁️ Cloud Save';
             connectionStatus.textContent = '🟢 Verbonden';
-            
+
             logoutBtn.innerHTML = '🚪 Uitloggen';
             logoutBtn.style.display = 'block';
             logoutBtn.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
@@ -399,10 +385,10 @@ class AuthManager {
                 console.log('🚪 Logout button clicked!');
                 this.handleLogout();
             };
-            
+
             console.log('✅ Logged in UI setup complete');
         }
-        
+
         // Force refresh display
         setTimeout(() => {
             if (this.currentUser.isGuest) {
@@ -418,7 +404,7 @@ class AuthManager {
         document.getElementById('login-screen').style.display = 'flex';
         this.showLoginForm();
         this.clearMessages();
-        
+
         // Show helpful message
         setTimeout(() => {
             this.showSuccess('💡 Log in om je voortgang op te slaan in de cloud!');
@@ -630,7 +616,7 @@ class AuthManager {
         this.users = {};
         this.currentUser = null;
         this.isLoggedIn = false;
-        
+
         // Force reload page
         window.location.reload();
     }
