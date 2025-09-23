@@ -2858,17 +2858,17 @@ window.testButton = function () {
 };
 
 // DEBUG FUNCTION - Test each game mode
-window.debugStartGame = function(mode) {
+window.debugStartGame = function (mode) {
     console.log(`🐛 DEBUG: Attempting to start ${mode} mode`);
     console.log('🔍 Before start:', { gameRunning, gameMode });
-    
+
     try {
         window.startGame(mode);
         console.log('✅ startGame completed without error');
     } catch (error) {
         console.error('❌ Error starting game:', error);
     }
-    
+
     setTimeout(() => {
         console.log('🔍 After start (delayed):', { gameRunning, gameMode });
     }, 1000);
@@ -2879,20 +2879,20 @@ window.debugStartGame = function(mode) {
 // ================================
 
 // GLOBAL startGame function - BULLETPROOF VERSION
-window.startGame = function(mode = 'infinity') {
+window.startGame = function (mode = 'infinity') {
     console.log(`🚀 FIXED: Starting game in ${mode} mode...`);
     console.log('🔧 Game state before start:', { gameRunning, gameMode, playerLane: player.lane });
-    
+
     try {
         // FORCE STOP ANY RUNNING GAME
         if (gameRunning) {
             gameRunning = false;
             console.log('🛑 Stopped previous game');
         }
-        
+
         // CALL INTERNAL FUNCTION
         return startGameInternal(mode);
-        
+
     } catch (error) {
         console.error('❌ BUTTON ERROR:', error);
         alert(`Game Error: ${error.message}`);
@@ -3015,7 +3015,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             console.log('✅ Infinity button listener added');
         }
-        
+
         if (levelBtn2) {
             levelBtn2.addEventListener('click', function () {
                 console.log('🎮 Level button clicked via addEventListener!');
@@ -3023,7 +3023,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             console.log('✅ Level button listener added');
         }
-        
+
         if (multiplayerBtn2) {
             multiplayerBtn2.addEventListener('click', function () {
                 console.log('🎮 Multiplayer button clicked via addEventListener!');
