@@ -1451,29 +1451,35 @@ class Bot {
 
     getDifficultyReactionTime() {
         switch (this.difficulty) {
-            case 'easy': return 800 + Math.random() * 400; // 800-1200ms
-            case 'medium': return 400 + Math.random() * 300; // 400-700ms 
-            case 'hard': return 150 + Math.random() * 200; // 150-350ms
-            default: return 500;
+            case 'easy': return 200 + Math.random() * 200; // 200-400ms (was 800-1200ms)
+            case 'medium': return 100 + Math.random() * 150; // 100-250ms (was 400-700ms) 
+            case 'hard': return 50 + Math.random() * 100; // 50-150ms (was 150-350ms)
+            default: return 150;
         }
     }
 
     update() {
         if (!this.alive) return;
 
-        // Update position if moving between lanes
+        console.log(`🤖 Bot ${this.name} updating - Current lane: ${this.lane}, Moving: ${this.isMoving}`);
+
+        // Update position if moving between lanes - FASTER MOVEMENT
         if (this.isMoving) {
             const targetX = lanes[this.targetLane];
             const diff = targetX - this.x;
-            this.x += diff * 0.2;
-            if (Math.abs(diff) < 2) {
+            
+            // INSTANT movement like player
+            if (Math.abs(diff) > 5) {
+                this.x += diff * 0.8; // Much faster movement
+            } else {
                 this.x = targetX;
                 this.lane = this.targetLane;
                 this.isMoving = false;
+                console.log(`✅ Bot ${this.name} reached lane ${this.lane}`);
             }
         }
 
-        // AI decision making
+        // AI decision making - FASTER REACTIONS
         const now = Date.now();
         if (now - this.lastDecision > this.reactionTime) {
             this.makeDecision();
@@ -1488,31 +1494,42 @@ class Bot {
     makeDecision() {
         if (this.isMoving) return;
 
+        console.log(`🧠 Bot ${this.name} making decision in lane ${this.lane}`);
+
         // Look ahead for obstacles
         const dangerAhead = this.checkDangerInLane(this.lane);
-        const leftSafe = this.lane > 0 ? this.checkDangerInLane(this.lane - 1) : false;
-        const rightSafe = this.lane < 2 ? this.checkDangerInLane(this.lane + 1) : false;
+        const leftSafe = this.lane > 0 ? !this.checkDangerInLane(this.lane - 1) : false;
+        const rightSafe = this.lane < 2 ? !this.checkDangerInLane(this.lane + 1) : false;
+
+        console.log(`🚨 Bot ${this.name} danger assessment:`, { dangerAhead, leftSafe, rightSafe });
 
         if (dangerAhead) {
+            console.log(`⚠️ Bot ${this.name} detected danger ahead!`);
             // Try to move to safer lane
             if (leftSafe && !rightSafe) {
+                console.log(`⬅️ Bot ${this.name} moving left to escape danger`);
                 this.moveTo(this.lane - 1);
             } else if (rightSafe && !leftSafe) {
+                console.log(`➡️ Bot ${this.name} moving right to escape danger`);
                 this.moveTo(this.lane + 1);
             } else if (leftSafe && rightSafe) {
                 // Both safe, choose randomly
                 const direction = Math.random() < 0.5 ? -1 : 1;
+                console.log(`🎲 Bot ${this.name} has both options, choosing ${direction > 0 ? 'right' : 'left'}`);
                 this.moveTo(this.lane + direction);
+            } else {
+                console.log(`💀 Bot ${this.name} is trapped! No safe lanes available`);
             }
             // If no safe lane, stay put and hope for the best
         } else {
-            // Randomly move sometimes to make bots more dynamic
-            if (Math.random() < 0.1) { // 10% chance to move randomly
+            // Randomly move sometimes to make bots more dynamic - INCREASED MOVEMENT
+            if (Math.random() < 0.25) { // 25% chance to move randomly (was 10%)
                 const possibleMoves = [];
                 if (this.lane > 0) possibleMoves.push(this.lane - 1);
                 if (this.lane < 2) possibleMoves.push(this.lane + 1);
                 if (possibleMoves.length > 0) {
                     const randomLane = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                    console.log(`🎯 Bot ${this.name} making random move to lane ${randomLane}`);
                     this.moveTo(randomLane);
                 }
             }
@@ -1533,9 +1550,18 @@ class Bot {
     }
 
     moveTo(newLane) {
-        if (newLane >= 0 && newLane <= 2 && newLane !== this.lane) {
+        if (newLane >= 0 && newLane <= 2 && newLane !== this.lane && !this.isMoving) {
+            console.log(`🎯 Bot ${this.name} initiating move from lane ${this.lane} to lane ${newLane}`);
             this.targetLane = newLane;
             this.isMoving = true;
+            
+            // For instant movement like player (uncomment for debugging)
+            // this.x = lanes[newLane];
+            // this.lane = newLane;
+            // this.isMoving = false;
+            // console.log(`⚡ Bot ${this.name} INSTANT move to lane ${newLane}, x=${this.x}`);
+        } else {
+            console.log(`❌ Bot ${this.name} move blocked:`, { newLane, currentLane: this.lane, isMoving: this.isMoving });
         }
     }
 
@@ -1570,6 +1596,7 @@ class Bot {
 }
 
 function initializeBots() {
+    console.log('🤖 Initializing bots...');
     bots = [];
     const botConfigs = [
         { name: 'Bot Alpha', color: '#ff4444', difficulty: 'hard' },
@@ -1581,8 +1608,20 @@ function initializeBots() {
     botConfigs.forEach((config, index) => {
         const bot = new Bot(config.name, config.color, config.difficulty);
         bot.y += (index - 1.5) * 15; // Spread bots vertically
+        
+        // Verify bot positioning
+        console.log(`🤖 Created ${bot.name}:`, { 
+            x: bot.x, 
+            y: bot.y, 
+            lane: bot.lane, 
+            targetX: lanes[bot.lane],
+            difficulty: bot.difficulty 
+        });
+        
         bots.push(bot);
     });
+    
+    console.log(`✅ ${bots.length} bots created for multiplayer mode`);
 }
 
 function updateMultiplayerRanking() {
@@ -1697,6 +1736,7 @@ const levels = [
 
 function resetGame(mode = 'infinity') {
     console.log(`🔄 Resetting game for mode: ${mode}`);
+    console.log(`🎮 Lanes array check:`, lanes, 'Type:', typeof lanes, 'Length:', lanes ? lanes.length : 'undefined');
 
     gameMode = mode;
     player.lane = 1;
@@ -1709,6 +1749,15 @@ function resetGame(mode = 'infinity') {
 
     console.log(`👤 Player reset to: x=${player.x}, y=${player.y}, lane=${player.lane}`);
     console.log(`🎮 Lanes available: ${JSON.stringify(lanes)}`);
+    console.log(`🎯 Player should be at x=${lanes[1]} (lane 1)`);
+
+    // Verify lanes array is accessible
+    if (!lanes || !Array.isArray(lanes) || lanes.length !== 3) {
+        console.error('❌ CRITICAL: Lanes array is broken!', lanes);
+        lanes = [120, 220, 320]; // Force reset
+        player.x = lanes[player.lane];
+        console.log('🔧 FIXED: Lanes array reset to default', lanes);
+    }
 
     // Bepaal actieve skin
     if (playerUpgrades.rainbowSkin) player.activeSkin = 'rainbow';
@@ -2684,6 +2733,7 @@ function backToMenu() {
 
 document.addEventListener('keydown', e => {
     console.log('🔍 Key pressed:', e.key, 'Game running:', gameRunning, 'Game mode:', gameMode);
+    console.log('🎮 Player state:', { x: player.x, y: player.y, lane: player.lane, lanes: lanes });
 
     // Als het spel niet loopt en Enter wordt ingedrukt, start infinity mode
     if (!gameRunning && e.key === 'Enter') {
@@ -2699,24 +2749,44 @@ document.addEventListener('keydown', e => {
 
     // Movement works in all modes when game is running
     if (gameRunning) {
+        console.log('🎯 Movement attempt - Current lane:', player.lane, 'Lanes array:', lanes);
+        
         // LEFT MOVEMENT - Arrow Left OR A key
         if ((e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') && player.lane > 0) {
+            console.log('⬅️ BEFORE LEFT: lane =', player.lane, 'x =', player.x);
             player.lane--;
-            // Instant snelle movement voor iedereen
             player.x = lanes[player.lane];
+            console.log('⬅️ AFTER LEFT: lane =', player.lane, 'x =', player.x);
+            
+            // Forced position update
+            if (typeof lanes[player.lane] === 'number') {
+                player.x = lanes[player.lane];
+                console.log('✅ LEFT MOVEMENT CONFIRMED: New position x =', player.x);
+            } else {
+                console.error('❌ LANES ARRAY PROBLEM:', lanes);
+            }
+            
             playSound('jump');
             createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
-            console.log('👈 Moved left to lane:', player.lane);
         }
 
         // RIGHT MOVEMENT - Arrow Right OR D key
         if ((e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') && player.lane < 2) {
+            console.log('➡️ BEFORE RIGHT: lane =', player.lane, 'x =', player.x);
             player.lane++;
-            // Instant snelle movement voor iedereen
             player.x = lanes[player.lane];
+            console.log('➡️ AFTER RIGHT: lane =', player.lane, 'x =', player.x);
+            
+            // Forced position update
+            if (typeof lanes[player.lane] === 'number') {
+                player.x = lanes[player.lane];
+                console.log('✅ RIGHT MOVEMENT CONFIRMED: New position x =', player.x);
+            } else {
+                console.error('❌ LANES ARRAY PROBLEM:', lanes);
+            }
+            
             playSound('jump');
             createParticle(player.x + player.w / 2, player.y + player.h / 2, 'speed', '#00BFFF', 3);
-            console.log('👉 Moved right to lane:', player.lane);
         }
     }
 
