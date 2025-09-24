@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍪 Cookie Clicker Game</title>
+    <link rel="stylesheet" href="cookie-style.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🍪 Cookie Clicker</h1>
+            <div class="navigation">
+                <a href="index.html" class="nav-btn">🚇 Subway Runner</a>
+                <a href="cookie-clicker.html" class="nav-btn active">🍪 Cookie Clicker</a>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <div class="main-game">
+            <!-- Cookie Display -->
+            <div class="cookie-section">
+                <div class="cookie-counter">
+                    <div class="cookie-count" id="cookie-count">0</div>
+                    <div class="cookie-label">cookies</div>
+                    <div class="cookies-per-second">
+                        per second: <span id="cps">0</span>
+                    </div>
+                </div>
+
+                <!-- Big Cookie -->
+                <div class="cookie-container">
+                    <div class="big-cookie" id="big-cookie">
+                        🍪
+                    </div>
+                    <div class="click-effects" id="click-effects"></div>
+                </div>
+            </div>
+
+            <!-- Shop Section -->
+            <div class="shop-section">
+                <h2>🛒 Shop</h2>
+                <div class="shop-container" id="shop-container">
+                    <!-- Buildings will be added by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Upgrades Panel -->
+        <div class="upgrades-panel">
+            <h3>⬆️ Upgrades</h3>
+            <div class="upgrades-container" id="upgrades-container">
+                <!-- Upgrades will be added by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Achievements Panel -->
+        <div class="achievements-panel">
+            <h3>🏆 Achievements</h3>
+            <div class="achievements-container" id="achievements-container">
+                <!-- Achievements will be added by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <h3>📊 Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Cookies baked all time:</span>
+                    <span class="stat-value" id="total-cookies">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Cookies baked this game:</span>
+                    <span class="stat-value" id="session-cookies">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Hand-made cookies:</span>
+                    <span class="stat-value" id="hand-made">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Cookies per click:</span>
+                    <span class="stat-value" id="per-click">1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="cookie-game.js"></script>
+</body>
+
+</html>

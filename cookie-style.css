@@ -1,0 +1,486 @@
+/* Cookie Clicker Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #8B4513, #D2691E, #CD853F);
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.game-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px 25px;
+    border-radius: 15px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.navigation {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    text-decoration: none;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.nav-btn.active {
+    background: #8B4513;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Main Game Layout */
+.main-game {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Cookie Section */
+.cookie-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+}
+
+.cookie-counter {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cookie-count {
+    font-size: 4em;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
+}
+
+.cookie-label {
+    font-size: 1.5em;
+    color: #FFF8DC;
+    margin-bottom: 10px;
+}
+
+.cookies-per-second {
+    font-size: 1.2em;
+    color: #90EE90;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+/* Big Cookie */
+.cookie-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.big-cookie {
+    font-size: 12em;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.1s ease;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+    animation: float 3s ease-in-out infinite;
+}
+
+.big-cookie:hover {
+    transform: scale(1.05);
+}
+
+.big-cookie:active {
+    transform: scale(0.95);
+    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8));
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Click Effects */
+.click-effects {
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+}
+
+.click-effect {
+    position: absolute;
+    font-size: 2em;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    animation: clickFloat 1s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes clickFloat {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1.2);
+    }
+}
+
+/* Shop Section */
+.shop-section {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.shop-section h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: #FFD700;
+}
+
+.shop-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.shop-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+.shop-item.affordable {
+    border-color: #90EE90;
+}
+
+.shop-item.too-expensive {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.shop-icon {
+    font-size: 2.5em;
+    margin-right: 15px;
+    min-width: 60px;
+}
+
+.shop-info {
+    flex: 1;
+}
+
+.shop-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.shop-description {
+    font-size: 0.9em;
+    color: #CCC;
+    margin-bottom: 5px;
+}
+
+.shop-owned {
+    font-size: 0.9em;
+    color: #90EE90;
+}
+
+.shop-price {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #FFD700;
+    text-align: right;
+}
+
+/* Upgrades Panel */
+.upgrades-panel {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.upgrades-panel h3 {
+    color: #FFD700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.upgrades-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.upgrade-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.upgrade-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.upgrade-item.affordable {
+    border-color: #90EE90;
+}
+
+.upgrade-item.too-expensive {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.upgrade-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.upgrade-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.upgrade-description {
+    font-size: 0.8em;
+    color: #CCC;
+    margin-bottom: 10px;
+}
+
+.upgrade-price {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+/* Achievements Panel */
+.achievements-panel {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.achievements-panel h3 {
+    color: #FFD700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.achievements-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.achievement-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.achievement-item.unlocked {
+    background: rgba(144, 238, 144, 0.3);
+    border: 2px solid #90EE90;
+}
+
+.achievement-item.locked {
+    opacity: 0.5;
+}
+
+.achievement-icon {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+}
+
+.achievement-name {
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.achievement-description {
+    font-size: 0.7em;
+    color: #CCC;
+}
+
+/* Stats Panel */
+.stats-panel {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.stats-panel h3 {
+    color: #FFD700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.stat-label {
+    color: #CCC;
+}
+
+.stat-value {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-game {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .cookie-count {
+        font-size: 2.5em;
+    }
+
+    .big-cookie {
+        font-size: 8em;
+    }
+
+    .upgrades-container,
+    .achievements-container {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+/* Animations */
+@keyframes newAchievement {
+    0% {
+        transform: scale(0.5) rotate(-180deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2) rotate(0deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.achievement-unlock {
+    animation: newAchievement 0.8s ease-out;
+}
+
+/* Golden Cookie */
+.golden-cookie {
+    position: fixed;
+    font-size: 3em;
+    cursor: pointer;
+    z-index: 1000;
+    animation: goldenFloat 2s ease-in-out infinite, goldenGlow 1s ease-in-out infinite alternate;
+    transition: all 0.1s ease;
+}
+
+.golden-cookie:hover {
+    transform: scale(1.1);
+}
+
+@keyframes goldenFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-20px) rotate(10deg);
+    }
+}
+
+@keyframes goldenGlow {
+    0% {
+        filter: drop-shadow(0 0 10px gold);
+    }
+
+    100% {
+        filter: drop-shadow(0 0 25px gold);
+    }
+}

@@ -2581,3 +2581,73 @@ canvas {
 #shop-panel.show {
     display: block !important;
 }
+
+/* ===== NAVIGATION STYLES ===== */
+.main-nav {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 15px 20px;
+    border-bottom: 2px solid #0f3460;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.nav-link {
+    display: inline-block;
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #0f3460, #16213e);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link:hover {
+    background: linear-gradient(135deg, #16213e, #0f3460);
+    border-color: #00d4ff;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.nav-link.active {
+    background: linear-gradient(135deg, #00d4ff, #0080ff);
+    border-color: #fff;
+    box-shadow: 0 0 25px rgba(0, 212, 255, 0.5);
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.nav-link:hover::before {
+    left: 100%;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        gap: 10px;
+    }
+
+    .nav-link {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}

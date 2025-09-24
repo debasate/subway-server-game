@@ -21,6 +21,12 @@ let speed = 7;
 let baseSpeed = 7;
 let scoreMultiplier = 0.25;
 
+// Animation frame management and performance
+let animationFrameId = null;
+let lastFrameTime = 0;
+const targetFPS = 60;
+const frameInterval = 1000 / targetFPS;
+
 // Game elements
 const canvas = document.getElementById('game-canvas');
 if (!canvas) {
@@ -77,10 +83,14 @@ function startGame(mode = 'infinity') {
     console.log(`🎮 Starting game in ${mode} mode`);
 
     try {
-        // Stop any existing game
+        // Stop any existing game and cancel animation frames
         if (gameRunning) {
             gameRunning = false;
-            console.log('🛑 Stopped previous game');
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            console.log('🛑 Stopped previous game and cancelled animation frames');
         }
 
         // Validate canvas
@@ -95,7 +105,7 @@ function startGame(mode = 'infinity') {
         gameRunning = true;
 
         console.log('✅ Game started successfully');
-        requestAnimationFrame(gameLoop);
+        animationFrameId = requestAnimationFrame(gameLoop);
 
         return true;
     } catch (error) {
@@ -178,6 +188,13 @@ function showGameScreen() {
  */
 function backToMenu() {
     gameRunning = false;
+
+    // Stop animation frames
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        console.log('🔄 Animation frames stopped - returning to menu');
+    }
 
     if (startScreen) startScreen.style.display = 'block';
     if (canvas) canvas.style.display = 'none';
@@ -715,6 +732,13 @@ function updateGameLogic() {
 function endGame() {
     gameRunning = false;
 
+    // Stop animation frames immediately
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        console.log('🛑 Animation frames cancelled');
+    }
+
     // Debug info voor score opslaan
     console.log(`🎯 Final Score: ${Math.floor(score)}`);
     console.log(`🏆 Current Best Score: ${localStorage.getItem('bestScore')}`);
@@ -1119,8 +1143,17 @@ function hideMobileControls() {
 // MAIN GAME LOOP
 // ================================
 
-function gameLoop() {
+function gameLoop(currentTime = 0) {
     if (!gameRunning || !ctx) return;
+
+    // FPS limiting - skip frame if too soon
+    if (currentTime - lastFrameTime < frameInterval) {
+        if (gameRunning) {
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+        return;
+    }
+    lastFrameTime = currentTime;
 
     // Clear and draw background
     drawBackground();
@@ -1160,9 +1193,9 @@ function gameLoop() {
         }
     }
 
-    // Continue loop
+    // Continue loop with frame tracking
     if (gameRunning) {
-        requestAnimationFrame(gameLoop);
+        animationFrameId = requestAnimationFrame(gameLoop);
     }
 }
 
@@ -1851,6 +1884,27 @@ window.addEventListener('resize', () => {
     }
 });
 */
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        console.log('🧹 Cleanup: Animation frames cancelled on page unload');
+    }
+});
+
+// Cleanup on visibility change (tab switching)
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && gameRunning) {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            console.log('👁️ Tab hidden: Pausing animation frames');
+        }
+    } else if (!document.hidden && gameRunning) {
+        animationFrameId = requestAnimationFrame(gameLoop);
+        console.log('👁️ Tab visible: Resuming animation frames');
+    }
+});
 
 console.log('✅ Improved game engine loaded successfully');
 
