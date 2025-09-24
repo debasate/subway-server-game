@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚇 Subway Surfer Game</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+</head>
+
+<body>
+    <!-- Mobile Controls -->
+    <div id="mobile-controls" class="mobile-controls" style="display: none;">
+        <div class="control-section left">
+            <button id="mobile-left" class="control-btn">◀</button>
+        </div>
+        <div class="control-section right">
+            <button id="mobile-right" class="control-btn">▶</button>
+        </div>
+        <div class="control-section center">
+            <button id="mobile-jump" class="control-btn jump-btn">⬆</button>
+        </div>
+    </div>
+
+    <!-- Main Game Interface -->
+    <div id="start-screen" style="display: block;">
+        <!-- User Profile Header -->
+        <div id="user-profile" class="user-profile">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <div class="user-info">
+                <h3 id="username-display">Guest Player</h3>
+                <div class="user-stats">
+                    <span>💾 <span id="save-status">Local Save</span></span>
+                    <span>⚡ Online: <span id="connection-status">Offline</span></span>
+                </div>
+            </div>
+            <button id="logout-btn" class="logout-btn" style="display: none;">
+                <span>🚪</span> Uitloggen
+            </button>
+        </div>
+
+        <!-- Update Log Panel -->
+        <div id="update-log" class="side-panel">
+            <div class="panel-header">
+                <h3>📋 Update Log</h3>
+                <button id="close-updates" class="close-btn">×</button>
+            </div>
+            <div class="panel-content">
+                <div class="update-item latest">
+                    <div class="update-version">v3.3.3 - FIXES & MOBILE!</div>
+                    <div class="update-date">24 Sep 2025</div>
+                    <ul>
+                        <li>🐛 Play button bug gefixt</li>
+                        <li>📱 Volledig mobile geoptimaliseerd</li>
+                        <li>📜 Scrollable login interface</li>
+                        <li>🎯 Touch controls verbeterd</li>
+                        <li>⚡ Performance optimalisaties</li>
+                    </ul>
+                </div>
+                <div class="update-item">
+                    <div class="update-version">v3.0.0 - MEGA UPDATE!</div>
+                    <div class="update-date">23 Sep 2025</div>
+                    <ul>
+                        <li>🎵 Complete geluidssysteem toegevoegd</li>
+                        <li>✨ Particle effects & visual upgrades</li>
+                        <li>⭐ Power-ups collectible systeem</li>
+                        <li>🏆 Achievements & badges systeem</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">🏃 Subway Runner</a>
+                <a href="cookie-clicker.html" class="nav-link">🍪 Cookie Clicker</a>
+            </div>
+        </nav>
+
+        <!-- Game Header -->
+        <div class="game-header">
+            <button id="back-to-hub-btn" class="back-to-hub-btn">� Game Hub</button>
+            <h1>🚇 Subway Surfer</h1>
+            <div class="version-badge">v3.3.3</div>
+            <button id="show-updates" class="updates-btn">📋 Updates</button>
+            <button id="settings-btn" class="settings-btn">⚙️ Settings</button>
+        </div>
+
+        <!-- Player Stats Dashboard -->
+        <div id="player-dashboard">
+            <div class="stat-card">
+                <div class="stat-icon">👔</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="active-outfit">Default</span>
+                    <span class="stat-label">Outfit</span>
+                </div>
+            </div>
+            <div class="stat-card ad-card" id="ad-section">
+                <div class="stat-icon">📺</div>
+                <div class="stat-info">
+                    <button id="watch-ad-btn" class="ad-btn">Bekijk Ad</button>
+                    <span class="stat-label">+10 Coins</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Game Mode Selection -->
+        <div id="gamemode-selection">
+            <h3>🎮 Selecteer Game Mode</h3>
+            <div class="gamemode-grid">
+                <div class="gamemode-card" data-mode="infinity">
+                    <div class="mode-icon">♾️</div>
+                    <h4>Infinity Mode</h4>
+                    <p>Endless runner met progressieve difficulty</p>
+                    <div class="mode-stats">
+                        <span>⭐ Best: <span id="infinity-best">0</span></span>
+                    </div>
+                    <button id="infinity-btn" class="mode-btn" onclick="startGame('infinity')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="level">
+                    <div class="mode-icon">🎯</div>
+                    <h4>Level Mode</h4>
+                    <p>Gestructureerde levels met doelen</p>
+                    <div class="mode-stats">
+                        <span>📊 Level: <span id="current-level">1</span></span>
+                        <span>⭐ Best: <span id="level-best">0</span></span>
+                    </div>
+                    <button id="level-btn" class="mode-btn" onclick="startGame('level')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="multiplayer">
+                    <div class="mode-icon">🤖</div>
+                    <h4>VS Bots</h4>
+                    <p>Competitieve multiplayer tegen AI</p>
+                    <div class="mode-stats">
+                        <span>🏆 Wins: <span id="multiplayer-wins">0</span></span>
+                    </div>
+                    <button id="multiplayer-btn" class="mode-btn" onclick="startGame('multiplayer')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="chaos">
+                    <div class="mode-icon">🌪️</div>
+                    <h4>Chaos Mode</h4>
+                    <p>Random effects every 5 seconds!</p>
+                    <div class="mode-stats">
+                        <span>🔥 Best Chaos: <span id="chaos-best">0</span></span>
+                    </div>
+                    <button id="chaos-btn" class="mode-btn" onclick="startGame('chaos')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="speedrun">
+                    <div class="mode-icon">⚡</div>
+                    <h4>Speed Run</h4>
+                    <p>Zo snel mogelijk naar 1000 punten!</p>
+                    <div class="mode-stats">
+                        <span>🏃 Best Time: <span id="speedrun-best">∞</span></span>
+                    </div>
+                    <button id="speedrun-btn" class="mode-btn" onclick="startGame('speedrun')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="survival">
+                    <div class="mode-icon">🛡️</div>
+                    <h4>Survival Mode</h4>
+                    <p>Overleef zo lang mogelijk met 1 leven!</p>
+                    <div class="mode-stats">
+                        <span>⏱️ Best Survival: <span id="survival-best">0s</span></span>
+                    </div>
+                    <button id="survival-btn" class="mode-btn" onclick="startGame('survival')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="coinrush">
+                    <div class="mode-icon">💰</div>
+                    <h4>Coin Rush</h4>
+                    <p>Collect 100 coins as fast as possible!</p>
+                    <div class="mode-stats">
+                        <span>🪙 Best Rush: <span id="coinrush-best">∞</span></span>
+                    </div>
+                    <button id="coinrush-btn" class="mode-btn" onclick="startGame('coinrush')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="nightmare">
+                    <div class="mode-icon">😈</div>
+                    <h4>Nightmare Mode</h4>
+                    <p>Extreme difficulty with double obstacles!</p>
+                    <div class="mode-stats">
+                        <span>👹 Best Nightmare: <span id="nightmare-best">0</span></span>
+                    </div>
+                    <button id="nightmare-btn" class="mode-btn" onclick="startGame('nightmare')">Spelen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme Selector -->
+        <div id="theme-panel" class="theme-panel">
+            <h3>🎨 Selecteer Thema</h3>
+            <div class="theme-grid">
+                <div class="theme-card" data-theme="default">
+                    <div class="theme-preview default-theme"></div>
+                    <h4>🌊 Ocean</h4>
+                    <p>Het klassieke thema</p>
+                    <div class="theme-unlock">✅ Ontgrendeld</div>
+                    <button class="theme-btn selected" data-theme="default">Actief</button>
+                </div>
+
+                <div class="theme-card" data-theme="sunset">
+                    <div class="theme-preview sunset-theme"></div>
+                    <h4>🌅 Sunset</h4>
+                    <p>Warme zonsondergang kleuren</p>
+                    <div class="theme-unlock">🔓 Score 100</div>
+                    <button class="theme-btn" data-theme="sunset">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="night">
+                    <div class="theme-preview night-theme"></div>
+                    <h4>🌙 Night</h4>
+                    <p>Donkere nacht modus</p>
+                    <div class="theme-unlock">🔓 Score 500</div>
+                    <button class="theme-btn" data-theme="night">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="forest">
+                    <div class="theme-preview forest-theme"></div>
+                    <h4>🌲 Forest</h4>
+                    <p>Groene natuur kleuren</p>
+                    <div class="theme-unlock">🔓 Score 1000</div>
+                    <button class="theme-btn" data-theme="forest">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="volcano">
+                    <div class="theme-preview volcano-theme"></div>
+                    <h4>🌋 Volcano</h4>
+                    <p>Hete lava kleuren</p>
+                    <div class="theme-unlock">🔓 Score 2000</div>
+                    <button class="theme-btn" data-theme="volcano">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="ice">
+                    <div class="theme-preview ice-theme"></div>
+                    <h4>❄️ Ice</h4>
+                    <p>Koude winter kleuren</p>
+                    <div class="theme-unlock">🔓 Score 3000</div>
+                    <button class="theme-btn" data-theme="ice">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="rainbow">
+                    <div class="theme-preview rainbow-theme"></div>
+                    <h4>🌈 Rainbow</h4>
+                    <p>All colors of the rainbow</p>
+                    <div class="theme-unlock">🔓 Score 5000</div>
+                    <button class="theme-btn" data-theme="rainbow">Selecteer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Progress Bar -->
+        <div id="level-progress" class="level-progress">
+            <div class="progress-header">
+                <span>⭐ Level <span id="player-level">1</span></span>
+                <span><span id="current-xp">0</span> / <span id="required-xp">100</span> XP</span>
+            </div>
+            <div class="progress-bar">
+                <div id="xp-fill" class="progress-fill"></div>
+            </div>
+            <div class="progress-rewards">
+                <span>🎁 Next: <span id="next-reward">50 Coins</span></span>
+            </div>
+        </div>
+
+        <!-- Shop Interface -->
+        <div id="shop-panel" class="shop-panel">
+            <div class="shop-header">
+                <h2>🛒 Shop</h2>
+                <button id="close-shop" class="close-btn">×</button>
+            </div>
+
+            <div class="shop-tabs">
+                <button class="shop-tab active" data-tab="outfits">👔 Outfits</button>
+                <button class="shop-tab" data-tab="powers">⚡ Powers</button>
+                <button class="shop-tab" data-tab="boosts">🚀 Boosts</button>
+            </div>
+
+            <!-- Outfits Tab -->
+            <div id="outfits-tab" class="shop-tab-content active">
+                <div class="shop-grid">
+                    <div class="outfit-item" data-item="defaultSkin">
+                        <div class="outfit-preview default-preview"></div>
+                        <h3>🏃 Default Runner</h3>
+                        <p>De klassieke subway runner</p>
+                        <div class="rarity common">Common</div>
+                        <div class="price owned">✅ Eigendom</div>
+                        <button class="buy-btn equipped" data-item="defaultSkin">Uitgerust</button>
+                    </div>
+
+                    <div class="outfit-item" data-item="speedSkin">
+                        <div class="outfit-preview speed-preview"></div>
+                        <h3>💨 Speed Demon</h3>
+                        <p>50% faster movement</p>
+                        <div class="rarity epic">Epic</div>
+                        <div class="price">🪙 150</div>
+                        <button class="buy-btn" data-item="speedSkin">Buy</button>
+                    </div>
+
+                    <div class="outfit-item" data-item="ghostSkin">
+                        <div class="outfit-preview ghost-preview"></div>
+                        <h3>👻 Ghost Walker</h3>
+                        <p>Phase through obstacles</p>
+                        <div class="rarity legendary">Legendary</div>
+                        <div class="price">🪙 200</div>
+                        <button class="buy-btn" data-item="ghostSkin">Buy</button>
+                    </div>
+
+                    <div class="outfit-item" data-item="tankSkin">
+                        <div class="outfit-preview tank-preview"></div>
+                        <h3>🛡️ Tank Armor</h3>
+                        <p>2 extra lives per run</p>
+                        <div class="rarity epic">Epic</div>
+                        <div class="price">🪙 300</div>
+                        <button class="buy-btn" data-item="tankSkin">Buy</button>
+                    </div>
+
+                    <div class="outfit-item" data-item="rainbowSkin">
+                        <div class="outfit-preview rainbow-preview"></div>
+                        <h3>🌈 Rainbow Master</h3>
+                        <p>Alle abilities gecombineerd!</p>
+                        <div class="rarity mythic">Mythic</div>
+                        <div class="price">🪙 500</div>
+                        <button class="buy-btn" data-item="rainbowSkin">Buy</button>
+                    </div>
+
+                    <div class="outfit-item" data-item="neonSkin">
+                        <div class="outfit-preview neon-preview"></div>
+                        <h3>⚡ Neon Racer</h3>
+                        <p>Glow effect + 2x score</p>
+                        <div class="rarity legendary">Legendary</div>
+                        <div class="price">🪙 400</div>
+                        <button class="buy-btn" data-item="neonSkin">Buy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Powers Tab -->
+            <div id="powers-tab" class="shop-tab-content">
+                <div class="shop-grid">
+                    <div class="power-item" data-item="doubleJump">
+                        <div class="power-icon">🦘</div>
+                        <h3>Double Jump</h3>
+                        <p>Jump over 2 obstacles</p>
+                        <div class="price">🪙 75</div>
+                        <button class="buy-btn" data-item="doubleJump">Buy</button>
+                    </div>
+
+                    <div class="power-item" data-item="timeSlower">
+                        <div class="power-icon">⏰</div>
+                        <h3>Time Slower</h3>
+                        <p>Slow down time for 5 seconds</p>
+                        <div class="price">🪙 120</div>
+                        <button class="buy-btn" data-item="timeSlower">Buy</button>
+                    </div>
+
+                    <div class="power-item" data-item="coinRain">
+                        <div class="power-icon">💰</div>
+                        <h3>Coin Rain</h3>
+                        <p>Instant 50 coins per use</p>
+                        <div class="price">🪙 90</div>
+                        <button class="buy-btn" data-item="coinRain">Buy</button>
+                    </div>
+
+                    <div class="power-item" data-item="megaShield">
+                        <div class="power-icon">🛡️</div>
+                        <h3>Mega Shield</h3>
+                        <p>30 seconds invulnerable</p>
+                        <div class="price">🪙 200</div>
+                        <button class="buy-btn" data-item="megaShield">Buy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boosts Tab -->
+            <div id="boosts-tab" class="shop-tab-content">
+                <div class="shop-grid">
+                    <div class="boost-item" data-item="speed">
+                        <div class="boost-icon">⚡</div>
+                        <h3>Speed Boost</h3>
+                        <p>20% sneller starten</p>
+                        <div class="price">🪙 10</div>
+                        <button class="buy-btn" data-item="speed">Buy</button>
+                    </div>
+
+                    <div class="boost-item" data-item="shield">
+                        <div class="boost-icon">🛡️</div>
+                        <h3>Extra Shield</h3>
+                        <p>+1 leven per run</p>
+                        <div class="price">🪙 25</div>
+                        <button class="buy-btn" data-item="shield">Buy</button>
+                    </div>
+
+                    <div class="boost-item" data-item="magnet">
+                        <div class="boost-icon">🧲</div>
+                        <h3>Coin Magnet</h3>
+                        <p>2x more coins</p>
+                        <div class="price">🪙 50</div>
+                        <button class="buy-btn" data-item="magnet">Buy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad Modal -->
+        <div id="ad-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3>📺 Free Coins Advertisement</h3>
+                <div class="ad-placeholder">
+                    <p>🎬 Advertentie wordt afgespeeld...</p>
+                    <div class="ad-timer">
+                        <div id="ad-progress" class="progress-bar"></div>
+                        <span id="ad-countdown">5</span> seconds
+                    </div>
+                </div>
+                <button id="ad-claim-btn" class="ad-claim" disabled>Claim 10 Coins</button>
+                <button id="ad-close-btn" class="modal-close">×</button>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h3>⚙️ Game Settings</h3>
+
+                <div class="settings-section">
+                    <h4>🔊 Audio</h4>
+                    <div class="setting-item">
+                        <label>Master Volume:</label>
+                        <input type="range" id="master-volume" min="0" max="100" value="70">
+                        <span id="master-volume-value">70%</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Sound Effects:</label>
+                        <input type="range" id="sfx-volume" min="0" max="100" value="80">
+                        <span id="sfx-volume-value">80%</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Background Music:</label>
+                        <input type="range" id="music-volume" min="0" max="100" value="50">
+                        <span id="music-volume-value">50%</span>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h4>🎮 Gameplay</h4>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="show-fps"> Show FPS Counter
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="particle-effects" checked> Particle Effects
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="screen-shake" checked> Screen Shake
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h4>📊 Statistics</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Games:</span>
+                            <span class="stat-value" id="total-games">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Best Score:</span>
+                            <span class="stat-value" id="best-score">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Coins:</span>
+                            <span class="stat-value" id="total-coins-earned">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Play Time:</span>
+                            <span class="stat-value" id="total-playtime">0m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="settings-close" class="modal-close">×</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-info" style="display:none;">
+        <div id="game-stats">
+            <span id="mode-display"></span>
+            <span id="level-display"></span>
+        </div>
+    </div>
+    <canvas id="game-canvas" width="480" height="640" style="display:none;"></canvas>
+    <script src="game.js"></script>
+    <script>
+        // Back to Hub functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const backToHubBtn = document.getElementById('back-to-hub-btn');
+            if (backToHubBtn) {
+                backToHubBtn.addEventListener('click', function() {
+                    window.location.href = 'index.html';
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
