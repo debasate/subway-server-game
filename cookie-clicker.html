@@ -14,6 +14,9 @@
         <div class="header">
             <a href="index.html" class="nav-btn back-to-hub">🏠 Game Hub</a>
             <h1>🍪 Cookie Clicker</h1>
+            <div class="user-display" id="user-display" style="display: none;">
+                <span id="current-user-name"></span>
+            </div>
         </div>
 
         <!-- Main Game Area -->
@@ -87,6 +90,79 @@
     </div>
 
     <script src="cookie-game.js"></script>
+    <script>
+        // Check if user is logged in and display username
+        function checkUserLogin() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            const userDisplay = document.getElementById('user-display');
+            const userNameSpan = document.getElementById('current-user-name');
+            
+            if (currentUser) {
+                userNameSpan.textContent = `👤 ${currentUser.username}`;
+                userDisplay.style.display = 'block';
+                
+                // Load user-specific game data if available
+                loadUserGameData(currentUser.username);
+            }
+        }
+        
+        // Load user-specific game data
+        function loadUserGameData(username) {
+            const userGameData = JSON.parse(localStorage.getItem(`cookieGame_${username}`) || 'null');
+            if (userGameData) {
+                // Restore game state
+                cookies = userGameData.cookies || 0;
+                cookiesPerSecond = userGameData.cookiesPerSecond || 0;
+                cookiesPerClick = userGameData.cookiesPerClick || 1;
+                
+                // Restore upgrades
+                if (userGameData.upgrades) {
+                    upgrades.forEach((upgrade, index) => {
+                        if (userGameData.upgrades[index]) {
+                            upgrade.owned = userGameData.upgrades[index].owned || 0;
+                            upgrade.cost = userGameData.upgrades[index].cost || upgrade.baseCost;
+                        }
+                    });
+                }
+                
+                // Update display
+                updateDisplay();
+                updateUpgradeVisualStates();
+            }
+        }
+        
+        // Save user-specific game data
+        function saveUserGameData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser) {
+                const gameData = {
+                    cookies: cookies,
+                    cookiesPerSecond: cookiesPerSecond,
+                    cookiesPerClick: cookiesPerClick,
+                    upgrades: upgrades.map(upgrade => ({
+                        owned: upgrade.owned,
+                        cost: upgrade.cost
+                    })),
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem(`cookieGame_${currentUser.username}`, JSON.stringify(gameData));
+            }
+        }
+        
+        // Override the original save function to use user-specific saving
+        const originalSaveGame = saveGame;
+        saveGame = function() {
+            saveUserGameData();
+            // Also save global data for backwards compatibility
+            originalSaveGame();
+        };
+        
+        // Initialize user login check
+        checkUserLogin();
+        
+        // Auto-save every 30 seconds
+        setInterval(saveUserGameData, 30000);
+    </script>
 </body>
 
 </html>

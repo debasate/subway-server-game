@@ -51,6 +51,104 @@
             will-change: scroll-position;
         }
 
+        .announcement-banner {
+            background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb);
+            background-size: 300% 300%;
+            animation: gradientShift 3s ease infinite;
+            padding: 15px 25px;
+            border-radius: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .announcement-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .announcement-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .announcement-text {
+            font-size: 1.1em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .announcement-countdown {
+            font-size: 0.9em;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 15px;
+            border-radius: 15px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .announcement-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .announcement-close:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes slideOut {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        .announcement-banner.hidden {
+            display: none;
+        }
+
         .external-links {
             display: flex;
             justify-content: center;
@@ -519,11 +617,277 @@
                 font-size: 0.9em;
                 padding: 8px 15px;
             }
+
+            .announcement-banner {
+                padding: 12px 15px;
+                margin-bottom: 20px;
+            }
+
+            .announcement-title {
+                font-size: 1.2em;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .announcement-text {
+                font-size: 1em;
+                margin-bottom: 8px;
+            }
+
+            .announcement-countdown {
+                font-size: 0.8em;
+                padding: 4px 12px;
+            }
+
+            .announcement-close {
+                top: 8px;
+                right: 12px;
+                width: 22px;
+                height: 22px;
+                font-size: 1em;
+            }
+        }
+
+        /* Auth System Styles */
+        .auth-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .auth-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .auth-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 8px 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .auth-modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-modal-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.4s ease;
+        }
+
+        .auth-modal h2 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .auth-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .auth-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-submit {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-switch {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .auth-switch-link {
+            color: white;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .auth-switch-link:hover {
+            color: #667eea;
+        }
+
+        .auth-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .auth-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-error {
+            background: rgba(255, 59, 48, 0.2);
+            border: 1px solid rgba(255, 59, 48, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            color: #ff3b30;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                top: 10px;
+                right: 10px;
+            }
+
+            .auth-modal-content {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .auth-input, .auth-submit {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Authentication System -->
+    <div class="auth-container" id="auth-container">
+        <button class="auth-button" id="login-btn" onclick="openAuthModal('login')">Login</button>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div class="auth-modal" id="auth-modal">
+        <div class="auth-modal-content">
+            <button class="auth-close" onclick="closeAuthModal()">×</button>
+            <h2 id="auth-title">Login</h2>
+            <div id="auth-error" class="auth-error" style="display: none;"></div>
+            <form class="auth-form" id="auth-form" onsubmit="handleAuth(event)">
+                <input type="text" id="auth-username" class="auth-input" placeholder="Username" required>
+                <input type="password" id="auth-password" class="auth-input" placeholder="Password" required>
+                <input type="password" id="auth-confirm" class="auth-input" placeholder="Confirm Password" style="display: none;">
+                <button type="submit" class="auth-submit" id="auth-submit-btn">Login</button>
+            </form>
+            <div class="auth-switch">
+                <span id="auth-switch-text">Don't have an account?</span>
+                <span class="auth-switch-link" id="auth-switch-link" onclick="switchAuthMode()">Register</span>
+            </div>
+        </div>
+    </div>
+
     <div class="floating-shapes">
         <div class="shape"></div>
         <div class="shape"></div>
@@ -537,6 +901,22 @@
         <div class="external-links">
             <a href="https://gtstijn.site" target="_blank" class="external-link">🌐 GTStijn.site</a>
             <a href="https://echobots.gg" target="_blank" class="external-link">🤖 EchoBots.gg</a>
+        </div>
+
+        <!-- Announcement Banner -->
+        <div class="announcement-banner" id="announcement-banner">
+            <button class="announcement-close" onclick="closeAnnouncement()" title="Close announcement">×</button>
+            <div class="announcement-content">
+                <div class="announcement-title">
+                    📢 Regular Updates Coming!
+                </div>
+                <div class="announcement-text">
+                    New features and improvements every 2 days! Stay tuned for exciting updates to both games.
+                </div>
+                <div class="announcement-countdown" id="countdown-timer">
+                    Next update in: Loading...
+                </div>
+            </div>
         </div>
 
         <h1 class="title">🎮 Game Hub</h1>
@@ -609,7 +989,7 @@
                 📋 Game Hub Update Log
                 <button class="toggle-updates" onclick="toggleUpdateLog()">Show All Updates</button>
             </h3>
-            
+
             <div id="updates-container">
                 <!-- Latest Update -->
                 <div class="update-item latest">
@@ -733,22 +1113,94 @@
         function toggleUpdateLog() {
             const olderUpdates = document.getElementById('older-updates');
             const toggleBtn = document.querySelector('.toggle-updates');
-            
+
             if (olderUpdates.style.display === 'none') {
                 olderUpdates.style.display = 'block';
                 toggleBtn.textContent = 'Hide Older Updates';
-                
+
                 // Smooth scroll animation
                 setTimeout(() => {
-                    olderUpdates.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'nearest' 
+                    olderUpdates.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
                     });
                 }, 100);
             } else {
                 olderUpdates.style.display = 'none';
                 toggleBtn.textContent = 'Show All Updates';
             }
+        }
+
+        // Announcement Banner Management
+        function closeAnnouncement() {
+            const banner = document.getElementById('announcement-banner');
+            banner.style.animation = 'slideOut 0.5s ease-in-out forwards';
+            
+            setTimeout(() => {
+                banner.classList.add('hidden');
+                // Remember that user closed it for this session
+                sessionStorage.setItem('announcementClosed', 'true');
+            }, 500);
+        }
+
+        function calculateNextUpdate() {
+            // Base date: September 24, 2025 (today)
+            const baseDate = new Date('2025-09-24T12:00:00');
+            const now = new Date();
+            
+            // Calculate days since base date
+            const daysSinceBase = Math.floor((now - baseDate) / (1000 * 60 * 60 * 24));
+            
+            // Next update is every 2 days from base date
+            const nextUpdateDays = Math.ceil((daysSinceBase + 1) / 2) * 2;
+            
+            // Calculate next update date
+            const nextUpdate = new Date(baseDate);
+            nextUpdate.setDate(baseDate.getDate() + nextUpdateDays);
+            
+            return nextUpdate;
+        }
+
+        function updateCountdown() {
+            const countdownElement = document.getElementById('countdown-timer');
+            if (!countdownElement) return;
+
+            const nextUpdate = calculateNextUpdate();
+            const now = new Date();
+            const timeDiff = nextUpdate - now;
+
+            if (timeDiff <= 0) {
+                countdownElement.textContent = 'Update available now! 🎉';
+                return;
+            }
+
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+
+            let countdownText = 'Next update in: ';
+            
+            if (days > 0) {
+                countdownText += `${days}d ${hours}h`;
+            } else if (hours > 0) {
+                countdownText += `${hours}h ${minutes}m`;
+            } else {
+                countdownText += `${minutes}m`;
+            }
+
+            countdownElement.textContent = countdownText;
+        }
+
+        function initAnnouncement() {
+            // Check if user closed announcement this session
+            if (sessionStorage.getItem('announcementClosed') === 'true') {
+                document.getElementById('announcement-banner').classList.add('hidden');
+                return;
+            }
+
+            // Update countdown immediately and then every minute
+            updateCountdown();
+            setInterval(updateCountdown, 60000);
         }
 
         // Animation effects
@@ -774,6 +1226,7 @@
         function initializeGameHub() {
             try {
                 loadStats();
+                initAnnouncement();
 
                 // Create floating shapes periodically
                 setInterval(createRandomShape, 3000);
@@ -842,6 +1295,200 @@
             }
         `;
         document.head.appendChild(style);
+
+        // Authentication System
+        let currentUser = null;
+        let authMode = 'login'; // 'login' or 'register'
+
+        // Initialize auth system on page load
+        function initAuth() {
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showUserInfo();
+            }
+        }
+
+        function openAuthModal(mode = 'login') {
+            authMode = mode;
+            const modal = document.getElementById('auth-modal');
+            const title = document.getElementById('auth-title');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const confirmField = document.getElementById('auth-confirm');
+            const switchText = document.getElementById('auth-switch-text');
+            const switchLink = document.getElementById('auth-switch-link');
+            
+            if (mode === 'login') {
+                title.textContent = 'Login';
+                submitBtn.textContent = 'Login';
+                confirmField.style.display = 'none';
+                switchText.textContent = "Don't have an account?";
+                switchLink.textContent = 'Register';
+            } else {
+                title.textContent = 'Register';
+                submitBtn.textContent = 'Register';
+                confirmField.style.display = 'block';
+                switchText.textContent = 'Already have an account?';
+                switchLink.textContent = 'Login';
+            }
+            
+            // Clear form and errors
+            document.getElementById('auth-form').reset();
+            hideAuthError();
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchAuthMode() {
+            authMode = authMode === 'login' ? 'register' : 'login';
+            openAuthModal(authMode);
+        }
+
+        function showAuthError(message) {
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideAuthError() {
+            const errorDiv = document.getElementById('auth-error');
+            errorDiv.style.display = 'none';
+        }
+
+        function handleAuth(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('auth-username').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const confirmPassword = document.getElementById('auth-confirm').value;
+            
+            // Validation
+            if (!username || !password) {
+                showAuthError('Please fill in all required fields');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showAuthError('Username must be at least 3 characters long');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAuthError('Password must be at least 6 characters long');
+                return;
+            }
+            
+            if (authMode === 'register') {
+                if (password !== confirmPassword) {
+                    showAuthError('Passwords do not match');
+                    return;
+                }
+                
+                // Check if user already exists
+                const users = JSON.parse(localStorage.getItem('gameHubUsers') || '{}');
+                if (users[username]) {
+                    showAuthError('Username already exists');
+                    return;
+                }
+                
+                // Register new user
+                const newUser = {
+                    username: username,
+                    password: btoa(password), // Basic encoding (not secure for production)
+                    registeredAt: new Date().toISOString(),
+                    gamesPlayed: 0,
+                    totalScore: 0
+                };
+                
+                users[username] = newUser;
+                localStorage.setItem('gameHubUsers', JSON.stringify(users));
+                
+                // Auto login after registration
+                currentUser = newUser;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showUserInfo();
+                closeAuthModal();
+                
+                // Show welcome message
+                setTimeout(() => {
+                    alert(`Welcome to Game Hub, ${username}! 🎮\nYour account has been created successfully!`);
+                }, 500);
+                
+            } else {
+                // Login existing user
+                const users = JSON.parse(localStorage.getItem('gameHubUsers') || '{}');
+                const user = users[username];
+                
+                if (!user || user.password !== btoa(password)) {
+                    showAuthError('Invalid username or password');
+                    return;
+                }
+                
+                // Update last login
+                user.lastLogin = new Date().toISOString();
+                users[username] = user;
+                localStorage.setItem('gameHubUsers', JSON.stringify(users));
+                
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showUserInfo();
+                closeAuthModal();
+                
+                // Show welcome back message
+                setTimeout(() => {
+                    alert(`Welcome back, ${username}! 🎮`);
+                }, 500);
+            }
+        }
+
+        function showUserInfo() {
+            const container = document.getElementById('auth-container');
+            container.innerHTML = `
+                <div class="user-info">
+                    <span class="user-name">👋 ${currentUser.username}</span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            `;
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                
+                const container = document.getElementById('auth-container');
+                container.innerHTML = `
+                    <button class="auth-button" id="login-btn" onclick="openAuthModal('login')">Login</button>
+                `;
+                
+                alert('You have been logged out successfully! 👋');
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('auth-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAuthModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('auth-modal').classList.contains('show')) {
+                closeAuthModal();
+            }
+        });
+
+        // Initialize auth system
+        initAuth();
     </script>
 </body>
 

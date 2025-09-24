@@ -3,16 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta         <!-- Game Header -->
-        <div class="game-header">
-            <button id="back-to-hub-btn" class="back-to-hub-btn">🏠 Game Hub</button>
-            <h1>🚇 Subway Surfer</h1>
-            <div class="version-badge">v3.3.3</div>
-            <button id="show-updates" class="updates-btn">📋 Updates</button>
-            <button id="settings-btn" class="settings-btn">⚙️ Settings</button>
-            <button id="gtstijn-btn" class="settings-btn" onclick="window.open('https://gtstijn.site', '_blank')">🌐 GTStijn.site</button>
-            <button id="echobots-btn" class="settings-btn" onclick="window.open('https://echobots.gg', '_blank')">🤖 EchoBots.gg</button>
-        </div>ewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚇 Subway Surfer Game</title>
     <link rel="stylesheet" href="style.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -522,7 +513,107 @@
                     window.location.href = 'index.html';
                 });
             }
+            
+            // Initialize user profile with login system
+            checkUserLogin();
         });
+        
+        // Check if user is logged in and update profile
+        function checkUserLogin() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            const usernameDisplay = document.getElementById('username-display');
+            const userAvatar = document.getElementById('user-avatar');
+            const logoutBtn = document.getElementById('logout-btn');
+            const saveStatus = document.getElementById('save-status');
+            
+            if (currentUser) {
+                usernameDisplay.textContent = currentUser.username;
+                userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+                logoutBtn.style.display = 'block';
+                saveStatus.textContent = 'User Account';
+                
+                // Update logout button text to English
+                logoutBtn.innerHTML = '<span>🚪</span> Logout';
+                
+                // Load user-specific game data
+                loadUserGameData(currentUser.username);
+                
+                // Add logout functionality
+                logoutBtn.onclick = function() {
+                    if (confirm('Are you sure you want to logout?')) {
+                        // Save current progress before logout
+                        saveUserGameData();
+                        
+                        // Clear current user
+                        localStorage.removeItem('currentUser');
+                        
+                        // Redirect to hub
+                        window.location.href = 'index.html';
+                    }
+                };
+            } else {
+                usernameDisplay.textContent = 'Guest Player';
+                userAvatar.textContent = 'G';
+                logoutBtn.style.display = 'none';
+                saveStatus.textContent = 'Local Save';
+            }
+        }
+        
+        // Load user-specific game data
+        function loadUserGameData(username) {
+            const userGameData = JSON.parse(localStorage.getItem(`subwayGame_${username}`) || 'null');
+            if (userGameData && window.gameState) {
+                // Restore high scores
+                if (userGameData.highScores) {
+                    window.gameState.highScores = userGameData.highScores;
+                }
+                
+                // Restore unlocked themes
+                if (userGameData.unlockedThemes) {
+                    window.gameState.unlockedThemes = userGameData.unlockedThemes;
+                }
+                
+                // Restore achievements
+                if (userGameData.achievements) {
+                    window.gameState.achievements = userGameData.achievements;
+                }
+                
+                // Restore stats
+                if (userGameData.totalGamesPlayed) {
+                    window.gameState.totalGamesPlayed = userGameData.totalGamesPlayed;
+                }
+                
+                console.log('User game data loaded for:', username);
+            }
+        }
+        
+        // Save user-specific game data
+        function saveUserGameData() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser && window.gameState) {
+                const gameData = {
+                    highScores: window.gameState.highScores || {},
+                    unlockedThemes: window.gameState.unlockedThemes || ['default'],
+                    achievements: window.gameState.achievements || {},
+                    totalGamesPlayed: window.gameState.totalGamesPlayed || 0,
+                    lastSaved: new Date().toISOString()
+                };
+                
+                localStorage.setItem(`subwayGame_${currentUser.username}`, JSON.stringify(gameData));
+                console.log('User game data saved for:', currentUser.username);
+            }
+        }
+        
+        // Auto-save every minute during gameplay
+        setInterval(() => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (currentUser) {
+                saveUserGameData();
+            }
+        }, 60000);
+        
+        // Save when page is about to unload
+        window.addEventListener('beforeunload', saveUserGameData);
     </script>
 </body>
 

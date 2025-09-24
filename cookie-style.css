@@ -31,6 +31,20 @@ body {
     position: relative;
 }
 
+.user-display {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+}
+
 .header h1 {
     font-size: 2.5em;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
