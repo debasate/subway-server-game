@@ -343,6 +343,91 @@ function updateDisplay() {
     sessionCookiesEl.textContent = formatNumber(gameState.sessionCookies);
     handMadeEl.textContent = formatNumber(gameState.handMadeCookies);
     perClickEl.textContent = formatNumber(gameState.cookiesPerClick);
+
+    // Update shop and upgrades real-time (only visual states, not full rebuild)
+    updateShopVisualStates();
+    updateUpgradeVisualStates();
+}
+
+// Update only the visual states of shop items (faster than full rebuild)
+function updateShopVisualStates() {
+    buildings.forEach(building => {
+        if (!building.unlocked) return;
+
+        const shopItem = document.querySelector(`[data-building-id="${building.id}"]`);
+        if (!shopItem) {
+            // Item doesn't exist, trigger full rebuild
+            updateShop();
+            return;
+        }
+
+        const canBuy = gameState.cookies >= building.cost;
+
+        // Update classes
+        shopItem.classList.remove('affordable', 'too-expensive');
+        shopItem.classList.add(canBuy ? 'affordable' : 'too-expensive');
+
+        // Update status indicator
+        const statusElement = shopItem.querySelector('.buy-indicator, .too-expensive-indicator');
+        if (statusElement) {
+            statusElement.className = canBuy ? 'buy-indicator' : 'too-expensive-indicator';
+            statusElement.textContent = canBuy ? 'KOOP!' : 'Te duur';
+            console.log(`Updated ${building.name}: canBuy=${canBuy}, cookies=${gameState.cookies}, cost=${building.cost}`);
+        }
+
+        // Update or add progress bar
+        let progressContainer = shopItem.querySelector('.progress-bar-container');
+        if (!canBuy) {
+            const progressPercent = Math.min((gameState.cookies / building.cost) * 100, 100);
+
+            if (progressContainer) {
+                // Update existing progress bar
+                const progressFill = progressContainer.querySelector('.progress-bar-fill');
+                if (progressFill) {
+                    progressFill.style.width = progressPercent + '%';
+                }
+            } else {
+                // Add new progress bar
+                const shopInfo = shopItem.querySelector('.shop-info');
+                if (shopInfo) {
+                    const progressHTML = `<div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
+                     </div>`;
+                    shopInfo.insertAdjacentHTML('beforeend', progressHTML);
+                }
+            }
+        } else if (progressContainer) {
+            // Remove progress bar when affordable
+            progressContainer.remove();
+        }
+    });
+}
+
+// Update only the visual states of upgrade items
+function updateUpgradeVisualStates() {
+    upgrades.forEach(upgrade => {
+        if (!upgrade.unlocked || upgrade.purchased) return;
+
+        const upgradeItem = document.querySelector(`[data-upgrade-id="${upgrade.id}"]`);
+        if (!upgradeItem) {
+            // Item doesn't exist, trigger full rebuild
+            updateUpgrades();
+            return;
+        }
+
+        const canBuy = gameState.cookies >= upgrade.cost;
+
+        // Update classes
+        upgradeItem.classList.remove('affordable', 'too-expensive');
+        upgradeItem.classList.add(canBuy ? 'affordable' : 'too-expensive');
+
+        // Update status indicator
+        const statusElement = upgradeItem.querySelector('.buy-indicator, .too-expensive-indicator');
+        if (statusElement) {
+            statusElement.className = canBuy ? 'buy-indicator' : 'too-expensive-indicator';
+            statusElement.textContent = canBuy ? 'KOOP!' : 'Te duur';
+        }
+    });
 }
 
 // Update Shop
@@ -358,6 +443,7 @@ function updateShop() {
         if (building.unlocked) {
             const shopItem = document.createElement('div');
             shopItem.className = 'shop-item';
+            shopItem.dataset.buildingId = building.id; // Add identifier
 
             if (gameState.cookies >= building.cost) {
                 shopItem.classList.add('affordable');
@@ -365,17 +451,42 @@ function updateShop() {
                 shopItem.classList.add('too-expensive');
             }
 
+            const canBuy = gameState.cookies >= building.cost;
+            const progressPercent = Math.min((gameState.cookies / building.cost) * 100, 100);
+            const statusIndicator = canBuy ?
+                '<div class="buy-indicator">KOOP!</div>' :
+                '<div class="too-expensive-indicator">Te duur</div>';
+
+            const progressBar = !canBuy ?
+                `<div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
+                 </div>` : '';
+
             shopItem.innerHTML = `
                 <div class="shop-icon">${building.icon}</div>
                 <div class="shop-info">
                     <div class="shop-name">${building.name}</div>
                     <div class="shop-description">${building.description}</div>
                     <div class="shop-owned">Owned: ${building.owned}</div>
+                    ${progressBar}
                 </div>
-                <div class="shop-price">${formatNumber(building.cost)}</div>
+                <div class="shop-price-section">
+                    <div class="shop-price">${formatNumber(building.cost)}</div>
+                    ${statusIndicator}
+                </div>
             `;
 
-            shopItem.addEventListener('click', () => buyBuilding(building.id));
+            shopItem.addEventListener('click', () => {
+                if (gameState.cookies >= building.cost) {
+                    buyBuilding(building.id);
+                } else {
+                    // Visual feedback for insufficient funds
+                    shopItem.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        shopItem.style.animation = '';
+                    }, 500);
+                }
+            });
             shopContainer.appendChild(shopItem);
         }
     });
@@ -399,6 +510,7 @@ function updateUpgrades() {
         if (upgrade.unlocked && !upgrade.purchased) {
             const upgradeItem = document.createElement('div');
             upgradeItem.className = 'upgrade-item';
+            upgradeItem.dataset.upgradeId = upgrade.id; // Add identifier
 
             if (gameState.cookies >= upgrade.cost) {
                 upgradeItem.classList.add('affordable');
@@ -406,14 +518,37 @@ function updateUpgrades() {
                 upgradeItem.classList.add('too-expensive');
             }
 
+            const canBuyUpgrade = gameState.cookies >= upgrade.cost;
+            const progressPercent = Math.min((gameState.cookies / upgrade.cost) * 100, 100);
+            const statusIndicator = canBuyUpgrade ?
+                '<div class="buy-indicator">KOOP!</div>' :
+                '<div class="too-expensive-indicator">Te duur</div>';
+
+            const progressBar = !canBuyUpgrade ?
+                `<div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
+                 </div>` : '';
+
             upgradeItem.innerHTML = `
                 <div class="upgrade-icon">${upgrade.icon}</div>
                 <div class="upgrade-name">${upgrade.name}</div>
                 <div class="upgrade-description">${upgrade.description}</div>
+                ${progressBar}
                 <div class="upgrade-price">${formatNumber(upgrade.cost)}</div>
+                ${statusIndicator}
             `;
 
-            upgradeItem.addEventListener('click', () => buyUpgrade(upgrade.id));
+            upgradeItem.addEventListener('click', () => {
+                if (gameState.cookies >= upgrade.cost) {
+                    buyUpgrade(upgrade.id);
+                } else {
+                    // Visual feedback for insufficient funds
+                    upgradeItem.style.animation = 'shake 0.5s ease-in-out';
+                    setTimeout(() => {
+                        upgradeItem.style.animation = '';
+                    }, 500);
+                }
+            });
             upgradesContainer.appendChild(upgradeItem);
         }
     });
