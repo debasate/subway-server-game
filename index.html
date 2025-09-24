@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -187,20 +188,61 @@
             animation: floatUp 15s infinite linear;
         }
 
-        .shape:nth-child(1) { left: 10%; width: 80px; height: 80px; animation-delay: 0s; }
-        .shape:nth-child(2) { left: 20%; width: 120px; height: 120px; animation-delay: 2s; }
-        .shape:nth-child(3) { left: 35%; width: 60px; height: 60px; animation-delay: 4s; }
-        .shape:nth-child(4) { left: 70%; width: 100px; height: 100px; animation-delay: 6s; }
-        .shape:nth-child(5) { left: 85%; width: 90px; height: 90px; animation-delay: 8s; }
+        .shape:nth-child(1) {
+            left: 10%;
+            width: 80px;
+            height: 80px;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            left: 20%;
+            width: 120px;
+            height: 120px;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            left: 35%;
+            width: 60px;
+            height: 60px;
+            animation-delay: 4s;
+        }
+
+        .shape:nth-child(4) {
+            left: 70%;
+            width: 100px;
+            height: 100px;
+            animation-delay: 6s;
+        }
+
+        .shape:nth-child(5) {
+            left: 85%;
+            width: 90px;
+            height: 90px;
+            animation-delay: 8s;
+        }
 
         @keyframes glow {
-            from { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
-            to { text-shadow: 0 0 40px rgba(255, 255, 255, 0.6); }
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+
+            to {
+                text-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+            }
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
         }
 
         @keyframes floatUp {
@@ -208,6 +250,7 @@
                 transform: translateY(100vh) rotate(0deg);
                 opacity: 1;
             }
+
             to {
                 transform: translateY(-100px) rotate(360deg);
                 opacity: 0;
@@ -219,30 +262,31 @@
             .title {
                 font-size: 2.5em;
             }
-            
+
             .subtitle {
                 font-size: 1.3em;
             }
-            
+
             .games-grid {
                 grid-template-columns: 1fr;
                 gap: 30px;
             }
-            
+
             .game-card {
                 padding: 30px 20px;
             }
-            
+
             .game-icon {
                 font-size: 4em;
             }
-            
+
             .game-title {
                 font-size: 1.8em;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="floating-shapes">
         <div class="shape"></div>
@@ -255,14 +299,15 @@
     <div class="container">
         <h1 class="title">🎮 Game Hub</h1>
         <p class="subtitle">Choose Your Adventure!</p>
-        
+
         <div class="games-grid">
             <!-- Subway Surfer Game -->
             <div class="game-card" onclick="playSubway()">
                 <div class="game-icon">🚇</div>
                 <h2 class="game-title">Subway Surfer</h2>
                 <p class="game-description">
-                    Run, jump and surf through endless subway tracks! Avoid obstacles, collect coins, and unlock awesome characters.
+                    Run, jump and surf through endless subway tracks! Avoid obstacles, collect coins, and unlock awesome
+                    characters.
                 </p>
                 <ul class="game-features">
                     <li>🏃‍♂️ Endless running action</li>
@@ -279,7 +324,8 @@
                 <div class="game-icon">🍪</div>
                 <h2 class="game-title">Cookie Clicker</h2>
                 <p class="game-description">
-                    Click cookies to build your baking empire! Buy buildings, unlock upgrades, and become the ultimate cookie tycoon.
+                    Click cookies to build your baking empire! Buy buildings, unlock upgrades, and become the ultimate
+                    cookie tycoon.
                 </p>
                 <ul class="game-features">
                     <li>🍪 Click to bake cookies</li>
@@ -322,19 +368,19 @@
             // Load Subway stats
             const subwayStats = JSON.parse(localStorage.getItem('gameStats') || '{}');
             document.getElementById('total-coins').textContent = subwayStats.totalCoinsEarned || 0;
-            
+
             // Load Cookie Clicker stats
             const cookieStats = JSON.parse(localStorage.getItem('cookieClickerSave') || '{}');
             const cookieGameState = cookieStats.gameState || {};
             document.getElementById('total-cookies').textContent = Math.floor(cookieGameState.totalCookies || 0);
-            
+
             // Calculate total games played (estimate)
             const gamesPlayed = (subwayStats.gamesPlayed || 0) + (cookieGameState.sessionCookies > 0 ? 1 : 0);
             document.getElementById('games-played').textContent = gamesPlayed;
-            
+
             // Calculate achievements (estimate)
-            const achievements = (subwayStats.achievements || []).length + 
-                                (cookieStats.achievements || []).filter(a => a.unlocked).length;
+            const achievements = (subwayStats.achievements || []).length +
+                (cookieStats.achievements || []).filter(a => a.unlocked).length;
             document.getElementById('achievements').textContent = achievements;
         }
 
@@ -356,9 +402,9 @@
             shape.style.height = shape.style.width;
             shape.style.animationDelay = '0s';
             shape.style.animationDuration = (Math.random() * 10 + 10) + 's';
-            
+
             document.querySelector('.floating-shapes').appendChild(shape);
-            
+
             setTimeout(() => {
                 if (shape.parentNode) {
                     shape.parentNode.removeChild(shape);
@@ -367,18 +413,18 @@
         }
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             loadStats();
-            
+
             // Create floating shapes periodically
             setInterval(createRandomShape, 3000);
-            
+
             console.log('🎮 Game Hub loaded successfully!');
         });
 
         // Add click effects to game cards
         document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('click', function(e) {
+            card.addEventListener('click', function (e) {
                 // Create ripple effect
                 const ripple = document.createElement('div');
                 ripple.style.cssText = `
@@ -389,15 +435,15 @@
                     animation: ripple 0.6s linear;
                     pointer-events: none;
                 `;
-                
+
                 const rect = this.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
                 ripple.style.width = ripple.style.height = size + 'px';
                 ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
                 ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-                
+
                 this.appendChild(ripple);
-                
+
                 setTimeout(() => {
                     if (ripple.parentNode) {
                         ripple.parentNode.removeChild(ripple);
@@ -419,4 +465,5 @@
         document.head.appendChild(style);
     </script>
 </body>
+
 </html>
