@@ -302,20 +302,20 @@ function buyBuilding(buildingId) {
 // Buy Upgrade
 function buyUpgrade(upgradeId) {
     console.log(`🛒 Attempting to buy upgrade: ${upgradeId}`);
-    
+
     const upgrade = upgrades.find(u => u.id === upgradeId);
-    
+
     if (!upgrade) {
         console.error(`❌ Upgrade not found: ${upgradeId}`);
         return;
     }
-    
+
     console.log(`💰 Current cookies: ${gameState.cookies}, Upgrade cost: ${upgrade.cost}, Already purchased: ${upgrade.purchased}`);
 
     if (gameState.cookies >= upgrade.cost && !upgrade.purchased) {
         gameState.cookies -= upgrade.cost;
         upgrade.purchased = true;
-        
+
         // Apply the upgrade effect
         try {
             upgrade.effect();
@@ -330,7 +330,7 @@ function buyUpgrade(upgradeId) {
         saveGame();
 
         console.log(`⬆️ Successfully bought upgrade: ${upgrade.name}`);
-        
+
         // Show visual feedback
         showUpgradePurchaseEffect(upgrade);
     } else {
@@ -566,10 +566,10 @@ function updateUpgrades() {
             upgradeItem.addEventListener('click', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                
+
                 console.log(`🖱️ Upgrade item clicked: ${upgrade.id}`);
                 console.log(`💰 Current cookies: ${gameState.cookies}, Required: ${upgrade.cost}`);
-                
+
                 if (gameState.cookies >= upgrade.cost && !upgrade.purchased) {
                     console.log(`✅ Purchase conditions met, buying upgrade...`);
                     buyUpgrade(upgrade.id);
