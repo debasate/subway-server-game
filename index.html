@@ -199,6 +199,112 @@
             margin-top: 40px;
         }
 
+        .update-log-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .update-log-title {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            color: #ffd700;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .update-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffd700;
+            transition: all 0.3s ease;
+        }
+
+        .update-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .update-item.latest {
+            border-left-color: #32CD32;
+            background: rgba(50, 205, 50, 0.1);
+        }
+
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .update-version {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .update-date {
+            font-size: 0.9em;
+            color: #ccc;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+
+        .update-content {
+            line-height: 1.6;
+        }
+
+        .update-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .update-content li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .update-content li:before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .update-item.latest .update-content li:before {
+            content: "🆕";
+        }
+
+        .toggle-updates {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-updates:hover {
+            background: linear-gradient(45deg, #5a67d8, #6b46c1);
+            transform: translateY(-2px);
+        }
+
         .stats-title {
             font-size: 1.8em;
             margin-bottom: 20px;
@@ -383,6 +489,36 @@
             .game-title {
                 font-size: 1.8em;
             }
+
+            .update-log-section {
+                padding: 20px 15px;
+                margin-top: 30px;
+            }
+
+            .update-log-title {
+                font-size: 1.5em;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .update-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .update-version {
+                font-size: 1.1em;
+            }
+
+            .update-item {
+                padding: 15px;
+            }
+
+            .toggle-updates {
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
         }
     </style>
 </head>
@@ -466,6 +602,100 @@
                 </div>
             </div>
         </div>
+
+        <!-- Update Log Section -->
+        <div class="update-log-section">
+            <h3 class="update-log-title">
+                📋 Game Hub Update Log
+                <button class="toggle-updates" onclick="toggleUpdateLog()">Show All Updates</button>
+            </h3>
+            
+            <div id="updates-container">
+                <!-- Latest Update -->
+                <div class="update-item latest">
+                    <div class="update-header">
+                        <div class="update-version">v1.4.0 - Game Hub & Chrome Fixes</div>
+                        <div class="update-date">September 24, 2025</div>
+                    </div>
+                    <div class="update-content">
+                        <ul>
+                            <li>Added central Game Hub with game selection interface</li>
+                            <li>Fixed Chrome compatibility issues with scrolling and rendering</li>
+                            <li>Enhanced Cookie Clicker upgrade button functionality</li>
+                            <li>Added external links to GTStijn.site and EchoBots.gg</li>
+                            <li>Improved mobile responsiveness across all pages</li>
+                            <li>Added visual feedback for upgrade purchases</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Hidden Updates (shown when expanded) -->
+                <div id="older-updates" style="display: none;">
+                    <div class="update-item">
+                        <div class="update-header">
+                            <div class="update-version">v1.3.0 - Cookie Clicker Enhancements</div>
+                            <div class="update-date">September 23, 2025</div>
+                        </div>
+                        <div class="update-content">
+                            <ul>
+                                <li>Complete Dutch to English translation</li>
+                                <li>Real-time visual feedback system for shop items</li>
+                                <li>Progress bars showing purchase progress</li>
+                                <li>Enhanced "BUY!" and "Too expensive" indicators</li>
+                                <li>Improved Cookie Clicker gameplay balance</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-header">
+                            <div class="update-version">v1.2.0 - Subway Surfer Polish</div>
+                            <div class="update-date">September 22, 2025</div>
+                        </div>
+                        <div class="update-content">
+                            <ul>
+                                <li>Added comprehensive game mode selection</li>
+                                <li>Implemented theme system with unlockables</li>
+                                <li>Enhanced mobile controls and touch support</li>
+                                <li>Achievement system with rewards</li>
+                                <li>Statistics tracking and leaderboards</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-header">
+                            <div class="update-version">v1.1.0 - Core Games Launch</div>
+                            <div class="update-date">September 21, 2025</div>
+                        </div>
+                        <div class="update-content">
+                            <ul>
+                                <li>Launched Subway Surfer endless runner game</li>
+                                <li>Released Cookie Clicker incremental game</li>
+                                <li>Implemented save/load functionality</li>
+                                <li>Basic UI and styling framework</li>
+                                <li>Git backup system with PowerShell automation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-header">
+                            <div class="update-version">v1.0.0 - Initial Release</div>
+                            <div class="update-date">September 20, 2025</div>
+                        </div>
+                        <div class="update-content">
+                            <ul>
+                                <li>Project initialization and repository setup</li>
+                                <li>Basic HTML structure and CSS framework</li>
+                                <li>Development environment configuration</li>
+                                <li>Version control and backup systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -497,6 +727,28 @@
 
         function playCookie() {
             window.location.href = 'cookie-clicker.html';
+        }
+
+        // Update Log Toggle
+        function toggleUpdateLog() {
+            const olderUpdates = document.getElementById('older-updates');
+            const toggleBtn = document.querySelector('.toggle-updates');
+            
+            if (olderUpdates.style.display === 'none') {
+                olderUpdates.style.display = 'block';
+                toggleBtn.textContent = 'Hide Older Updates';
+                
+                // Smooth scroll animation
+                setTimeout(() => {
+                    olderUpdates.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                }, 100);
+            } else {
+                olderUpdates.style.display = 'none';
+                toggleBtn.textContent = 'Show All Updates';
+            }
         }
 
         // Animation effects
