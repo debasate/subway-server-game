@@ -371,6 +371,11 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .upgrade-item:hover {
@@ -387,8 +392,9 @@ body {
 
 .upgrade-item.affordable:hover {
     background: rgba(144, 238, 144, 0.3) !important;
-    transform: translateY(-4px);
-    box-shadow: 0 0 20px rgba(144, 238, 144, 0.6);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 0 25px rgba(144, 238, 144, 0.8);
+    cursor: pointer;
 }
 
 .upgrade-item.too-expensive {
@@ -639,6 +645,40 @@ body {
 
     50% {
         transform: translateY(-20px) rotate(10deg);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
     }
 }
 

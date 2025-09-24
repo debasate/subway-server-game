@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0">
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>🎮 Game Hub - Choose Your Adventure!</title>
@@ -317,7 +318,10 @@
 
         /* Chrome-specific fixes */
         @supports (-webkit-backdrop-filter: blur(10px)) {
-            .external-links, .game-card, .stats-section {
+
+            .external-links,
+            .game-card,
+            .stats-section {
                 -webkit-backdrop-filter: blur(10px);
             }
         }
@@ -334,12 +338,12 @@
             body {
                 padding: 10px 0;
             }
-            
+
             .container {
                 padding: 20px 10px;
                 min-height: auto;
             }
-            
+
             .external-links {
                 flex-direction: column;
                 gap: 15px;
@@ -518,13 +522,13 @@
         function initializeGameHub() {
             try {
                 loadStats();
-                
+
                 // Create floating shapes periodically
                 setInterval(createRandomShape, 3000);
-                
+
                 // Force Chrome to recognize scrollable area
                 document.body.style.height = 'auto';
-                
+
                 console.log('🎮 Game Hub loaded successfully!');
             } catch (error) {
                 console.error('Error initializing Game Hub:', error);
@@ -537,8 +541,8 @@
         } else {
             initializeGameHub();
         }
-        
-        window.addEventListener('load', function() {
+
+        window.addEventListener('load', function () {
             // Force repaint for Chrome
             document.body.style.display = 'none';
             document.body.offsetHeight; // Trigger reflow

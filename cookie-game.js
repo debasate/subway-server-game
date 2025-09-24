@@ -301,19 +301,44 @@ function buyBuilding(buildingId) {
 
 // Buy Upgrade
 function buyUpgrade(upgradeId) {
+    console.log(`🛒 Attempting to buy upgrade: ${upgradeId}`);
+    
     const upgrade = upgrades.find(u => u.id === upgradeId);
+    
+    if (!upgrade) {
+        console.error(`❌ Upgrade not found: ${upgradeId}`);
+        return;
+    }
+    
+    console.log(`💰 Current cookies: ${gameState.cookies}, Upgrade cost: ${upgrade.cost}, Already purchased: ${upgrade.purchased}`);
 
     if (gameState.cookies >= upgrade.cost && !upgrade.purchased) {
         gameState.cookies -= upgrade.cost;
         upgrade.purchased = true;
-        upgrade.effect();
+        
+        // Apply the upgrade effect
+        try {
+            upgrade.effect();
+            console.log(`✅ Applied effect for upgrade: ${upgrade.name}`);
+        } catch (error) {
+            console.error(`❌ Error applying upgrade effect:`, error);
+        }
 
         updateCPS();
         updateDisplay();
         updateUpgrades();
         saveGame();
 
-        console.log(`⬆️ Bought upgrade: ${upgrade.name}`);
+        console.log(`⬆️ Successfully bought upgrade: ${upgrade.name}`);
+        
+        // Show visual feedback
+        showUpgradePurchaseEffect(upgrade);
+    } else {
+        if (upgrade.purchased) {
+            console.log(`⚠️ Upgrade ${upgrade.name} already purchased`);
+        } else {
+            console.log(`⚠️ Not enough cookies for ${upgrade.name}. Need ${upgrade.cost - gameState.cookies} more`);
+        }
     }
 }
 
@@ -538,10 +563,18 @@ function updateUpgrades() {
                 ${statusIndicator}
             `;
 
-            upgradeItem.addEventListener('click', () => {
-                if (gameState.cookies >= upgrade.cost) {
+            upgradeItem.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                console.log(`🖱️ Upgrade item clicked: ${upgrade.id}`);
+                console.log(`💰 Current cookies: ${gameState.cookies}, Required: ${upgrade.cost}`);
+                
+                if (gameState.cookies >= upgrade.cost && !upgrade.purchased) {
+                    console.log(`✅ Purchase conditions met, buying upgrade...`);
                     buyUpgrade(upgrade.id);
                 } else {
+                    console.log(`❌ Cannot buy upgrade - cookies: ${gameState.cookies}, cost: ${upgrade.cost}, purchased: ${upgrade.purchased}`);
                     // Visual feedback for insufficient funds
                     upgradeItem.style.animation = 'shake 0.5s ease-in-out';
                     setTimeout(() => {
@@ -625,6 +658,44 @@ function showAchievementNotification(achievement) {
             }, 500);
         }
     }, 3000);
+}
+
+// Show upgrade purchase effect
+function showUpgradePurchaseEffect(upgrade) {
+    console.log(`⬆️ Showing purchase effect for: ${upgrade.name}`);
+
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: linear-gradient(135deg, #90EE90, #32CD32);
+        color: #000;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-weight: bold;
+        z-index: 10000;
+        animation: slideIn 0.5s ease-out;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    `;
+
+    notification.innerHTML = `
+        <div style="font-size: 1.2em;">⬆️ Upgrade Purchased!</div>
+        <div style="margin-top: 5px;">${upgrade.icon} ${upgrade.name}</div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Remove after 2 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOut 0.5s ease-in';
+            setTimeout(() => {
+                notification.parentNode.removeChild(notification);
+            }, 500);
+        }
+    }, 2000);
 }
 
 // Play click sound (placeholder)
