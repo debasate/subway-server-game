@@ -117,30 +117,30 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
             const passwordHash = await bcrypt.hash(password, 12);
 
             // Insert new user
-            db.run('INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)', 
-                [username, email, passwordHash], function(err) {
-                if (err) {
-                    console.error('Insert error:', err);
-                    return res.status(500).json({ error: 'Failed to create user' });
-                }
-
-                // Create JWT token
-                const token = jwt.sign(
-                    { userId: this.lastID, username: username },
-                    JWT_SECRET,
-                    { expiresIn: '24h' }
-                );
-
-                res.status(201).json({
-                    message: 'User created successfully',
-                    token: token,
-                    user: {
-                        id: this.lastID,
-                        username: username,
-                        email: email
+            db.run('INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)',
+                [username, email, passwordHash], function (err) {
+                    if (err) {
+                        console.error('Insert error:', err);
+                        return res.status(500).json({ error: 'Failed to create user' });
                     }
+
+                    // Create JWT token
+                    const token = jwt.sign(
+                        { userId: this.lastID, username: username },
+                        JWT_SECRET,
+                        { expiresIn: '24h' }
+                    );
+
+                    res.status(201).json({
+                        message: 'User created successfully',
+                        token: token,
+                        user: {
+                            id: this.lastID,
+                            username: username,
+                            email: email
+                        }
+                    });
                 });
-            });
         });
     } catch (error) {
         console.error('Registration error:', error);
@@ -203,19 +203,19 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
 
 // Get user profile
 app.get('/api/user/profile', authenticateToken, (req, res) => {
-    db.get('SELECT id, username, email, created_at, last_login FROM users WHERE id = ?', 
+    db.get('SELECT id, username, email, created_at, last_login FROM users WHERE id = ?',
         [req.user.userId], (err, user) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.status(500).json({ error: 'Database error' });
-        }
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
 
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
 
-        res.json({ user });
-    });
+            res.json({ user });
+        });
 });
 
 // Save game data
@@ -229,62 +229,62 @@ app.post('/api/game/save', authenticateToken, (req, res) => {
     const dataString = JSON.stringify(gameData);
 
     db.run(`INSERT OR REPLACE INTO game_data (user_id, game_name, data, updated_at) 
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)`, 
-        [req.user.userId, gameName, dataString], function(err) {
-        if (err) {
-            console.error('Save error:', err);
-            return res.status(500).json({ error: 'Failed to save game data' });
-        }
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)`,
+        [req.user.userId, gameName, dataString], function (err) {
+            if (err) {
+                console.error('Save error:', err);
+                return res.status(500).json({ error: 'Failed to save game data' });
+            }
 
-        res.json({ message: 'Game data saved successfully' });
-    });
+            res.json({ message: 'Game data saved successfully' });
+        });
 });
 
 // Load game data
 app.get('/api/game/load/:gameName', authenticateToken, (req, res) => {
     const { gameName } = req.params;
 
-    db.get('SELECT data, updated_at FROM game_data WHERE user_id = ? AND game_name = ?', 
+    db.get('SELECT data, updated_at FROM game_data WHERE user_id = ? AND game_name = ?',
         [req.user.userId, gameName], (err, row) => {
-        if (err) {
-            console.error('Load error:', err);
-            return res.status(500).json({ error: 'Failed to load game data' });
-        }
+            if (err) {
+                console.error('Load error:', err);
+                return res.status(500).json({ error: 'Failed to load game data' });
+            }
 
-        if (!row) {
-            return res.status(404).json({ error: 'No saved data found' });
-        }
+            if (!row) {
+                return res.status(404).json({ error: 'No saved data found' });
+            }
 
-        try {
-            const gameData = JSON.parse(row.data);
-            res.json({ 
-                gameData,
-                lastUpdated: row.updated_at
-            });
-        } catch (parseError) {
-            console.error('Parse error:', parseError);
-            res.status(500).json({ error: 'Corrupted game data' });
-        }
-    });
+            try {
+                const gameData = JSON.parse(row.data);
+                res.json({
+                    gameData,
+                    lastUpdated: row.updated_at
+                });
+            } catch (parseError) {
+                console.error('Parse error:', parseError);
+                res.status(500).json({ error: 'Corrupted game data' });
+            }
+        });
 });
 
 // Get all user's game data
 app.get('/api/user/games', authenticateToken, (req, res) => {
-    db.all('SELECT game_name, updated_at FROM game_data WHERE user_id = ? ORDER BY updated_at DESC', 
+    db.all('SELECT game_name, updated_at FROM game_data WHERE user_id = ? ORDER BY updated_at DESC',
         [req.user.userId], (err, rows) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.status(500).json({ error: 'Database error' });
-        }
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
 
-        res.json({ games: rows });
-    });
+            res.json({ games: rows });
+        });
 });
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'ok', 
+    res.json({
+        status: 'ok',
         timestamp: new Date().toISOString(),
         version: '1.0.0'
     });

@@ -1350,8 +1350,16 @@
             const textElement = document.getElementById('server-text');
 
             try {
+                // Check if API client is loaded
+                if (!window.gameHubAPI) {
+                    statusElement.className = 'server-status offline';
+                    indicatorElement.textContent = '🔴';
+                    textElement.textContent = 'API Client Loading...';
+                    return;
+                }
+
                 const isOnline = await window.gameHubAPI.checkConnection();
-                
+
                 if (isOnline) {
                     statusElement.className = 'server-status online';
                     indicatorElement.textContent = '🟢';
@@ -1368,9 +1376,8 @@
             }
         }
 
-        // Check server status every 30 seconds
-        updateServerStatus();
-        setInterval(updateServerStatus, 30000);
+        // Check server status every 30 seconds (will be started after API client loads)
+        let serverStatusInterval;
 
         // Authentication System
         let currentUser = null;
@@ -1379,7 +1386,7 @@
         // Initialize auth system on page load
         function initAuth() {
             // Check if user is already logged in via API
-            if (window.gameHubAPI.isLoggedIn()) {
+            if (window.gameHubAPI && window.gameHubAPI.isLoggedIn()) {
                 currentUser = window.gameHubAPI.user;
                 showUserInfo();
             } else {
@@ -1447,28 +1454,28 @@
 
         async function handleAuth(event) {
             event.preventDefault();
-            
+
             const username = document.getElementById('auth-username').value.trim();
             const password = document.getElementById('auth-password').value;
             const confirmPassword = document.getElementById('auth-confirm').value;
             const submitBtn = document.getElementById('auth-submit-btn');
-            
+
             // Validation
             if (!username || !password) {
                 showAuthError('Please fill in all required fields');
                 return;
             }
-            
+
             if (username.length < 3) {
                 showAuthError('Username must be at least 3 characters long');
                 return;
             }
-            
+
             if (password.length < 6) {
                 showAuthError('Password must be at least 6 characters long');
                 return;
             }
-            
+
             if (authMode === 'register' && password !== confirmPassword) {
                 showAuthError('Passwords do not match');
                 return;
@@ -1480,18 +1487,25 @@
             hideAuthError();
 
             try {
+                // Check if API client is loaded
+                if (!window.gameHubAPI) {
+                    console.warn('API client not loaded, using local fallback');
+                    await handleLocalAuth(username, password);
+                    return;
+                }
+
                 let result;
-                
+
                 if (authMode === 'register') {
                     result = await window.gameHubAPI.register(username, password);
-                    
+
                     // Show welcome message
                     setTimeout(() => {
                         alert(`Welcome to Game Hub, ${username}! 🎮\nYour account has been created successfully!`);
                     }, 500);
                 } else {
                     result = await window.gameHubAPI.login(username, password);
-                    
+
                     // Show welcome back message
                     setTimeout(() => {
                         alert(`Welcome back, ${username}! 🎮`);
@@ -1502,14 +1516,14 @@
                 currentUser = result.user;
                 showUserInfo();
                 closeAuthModal();
-                
+
                 // Update server status if login was successful
                 updateServerStatus();
-                
+
             } catch (error) {
                 console.error('Authentication error:', error);
                 showAuthError(error.message || 'Authentication failed. Please try again.');
-                
+
                 // If server is down, try local fallback for login only
                 if (authMode === 'login' && error.message.includes('fetch')) {
                     try {
@@ -1528,26 +1542,57 @@
         // Fallback to local authentication when server is down
         async function handleLocalAuth(username, password) {
             const users = JSON.parse(localStorage.getItem('gameHubUsers') || '{}');
-            const user = users[username];
             
-            if (!user || user.password !== btoa(password)) {
-                throw new Error('Invalid username or password');
+            if (authMode === 'register') {
+                // Check if user already exists
+                if (users[username]) {
+                    throw new Error('Username already exists');
+                }
+                
+                // Create new user
+                const newUser = {
+                    id: Date.now(), // Simple ID generation for local mode
+                    username: username,
+                    password: btoa(password),
+                    registeredAt: new Date().toISOString(),
+                    gamesPlayed: 0,
+                    totalScore: 0
+                };
+                
+                users[username] = newUser;
+                localStorage.setItem('gameHubUsers', JSON.stringify(users));
+                
+                currentUser = newUser;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showUserInfo();
+                closeAuthModal();
+                
+                setTimeout(() => {
+                    alert(`Welcome to Game Hub, ${username}! 🎮\n(Local mode - account created offline)`);
+                }, 500);
+            } else {
+                // Login existing user
+                const user = users[username];
+
+                if (!user || user.password !== btoa(password)) {
+                    throw new Error('Invalid username or password');
+                }
+
+                // Update last login
+                user.lastLogin = new Date().toISOString();
+                users[username] = user;
+                localStorage.setItem('gameHubUsers', JSON.stringify(users));
+
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showUserInfo();
+                closeAuthModal();
+
+                setTimeout(() => {
+                    alert(`Welcome back, ${username}! 🎮\n(Offline mode)`);
+                }, 500);
             }
-            
-            // Update last login
-            user.lastLogin = new Date().toISOString();
-            users[username] = user;
-            localStorage.setItem('gameHubUsers', JSON.stringify(users));
-            
-            currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            showUserInfo();
-            closeAuthModal();
-            
-            setTimeout(() => {
-                alert(`Welcome back, ${username}! 🎮\n(Offline mode)`);
-            }, 500);
-        }        function showUserInfo() {
+        } function showUserInfo() {
             const container = document.getElementById('auth-container');
             container.innerHTML = `
                 <div class="user-info">
@@ -1559,16 +1604,21 @@
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                // Use API logout method
-                window.gameHubAPI.logout();
-                
+                // Use API logout method if available
+                if (window.gameHubAPI) {
+                    window.gameHubAPI.logout();
+                } else {
+                    // Fallback logout
+                    localStorage.removeItem('currentUser');
+                }
+
                 currentUser = null;
-                
+
                 const container = document.getElementById('auth-container');
                 container.innerHTML = `
                     <button class="auth-button" id="login-btn" onclick="openAuthModal('login')">Login</button>
                 `;
-                
+
                 alert('You have been logged out successfully! 👋');
             }
         }        // Close modal when clicking outside
@@ -1585,8 +1635,26 @@
             }
         });
 
-        // Initialize auth system
-        initAuth();
+        // Wait for API client to load, then initialize auth
+        document.addEventListener('DOMContentLoaded', function() {
+            // Try to load API client, with fallback if it fails
+            const script = document.createElement('script');
+            script.src = 'api-client.js';
+            script.onload = function() {
+                console.log('API client loaded successfully');
+                initAuth();
+                updateServerStatus();
+                // Start periodic server status checks
+                serverStatusInterval = setInterval(updateServerStatus, 30000);
+            };
+            script.onerror = function() {
+                console.warn('API client failed to load, using local mode only');
+                initAuth();
+                updateServerStatus();
+                // No need for server status checks if API client failed to load
+            };
+            document.head.appendChild(script);
+        });
     </script>
 </body>
 

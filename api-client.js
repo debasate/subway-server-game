@@ -18,22 +18,22 @@ class GameHubAPI {
         const headers = {
             'Content-Type': 'application/json'
         };
-        
+
         if (this.token) {
             headers['Authorization'] = `Bearer ${this.token}`;
         }
-        
+
         return headers;
     }
 
     // Handle API responses
     async handleResponse(response) {
         const data = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(data.error || 'API request failed');
         }
-        
+
         return data;
     }
 
@@ -47,12 +47,12 @@ class GameHubAPI {
             });
 
             const data = await this.handleResponse(response);
-            
+
             // Store token and user data
             this.setToken(data.token);
             this.user = data.user;
             localStorage.setItem('currentUser', JSON.stringify(data.user));
-            
+
             return data;
         } catch (error) {
             console.error('Registration error:', error);
@@ -70,12 +70,12 @@ class GameHubAPI {
             });
 
             const data = await this.handleResponse(response);
-            
+
             // Store token and user data
             this.setToken(data.token);
             this.user = data.user;
             localStorage.setItem('currentUser', JSON.stringify(data.user));
-            
+
             return data;
         } catch (error) {
             console.error('Login error:', error);
