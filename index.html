@@ -31,6 +31,40 @@
             z-index: 2;
         }
 
+        .external-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .external-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .external-link:hover {
+            background: linear-gradient(45deg, #5f3dc4, #845ef7);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.5);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
         .title {
             font-size: 4em;
             font-weight: bold;
@@ -54,27 +88,22 @@
         }
 
         .game-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             padding: 40px 30px;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .game-card:hover {
-            transform: translateY(-15px) scale(1.05);
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-        }
-
-        .game-card:active {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
         .game-icon {
@@ -92,20 +121,13 @@
             font-weight: bold;
             margin-bottom: 15px;
             color: #fff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(45deg, #fff, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .game-description {
             font-size: 1.2em;
             margin-bottom: 30px;
-            opacity: 0.9;
-            line-height: 1.6;
-            color: #f8f9fa;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            opacity: 0.8;
+            line-height: 1.5;
         }
 
         .game-features {
@@ -119,84 +141,29 @@
             opacity: 0.9;
         }
 
-        /* Click to play indicator */
-        .game-card::before {
-            content: "👆 Click to Play";
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            font-weight: bold;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .game-card:hover::before {
-            opacity: 1;
-        }
-
-        /* Additional glow effect for better visibility */
-        .game-card::after {
-            content: "";
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
-            background-size: 300% 300%;
-            border-radius: 27px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            animation: gradientMove 3s ease infinite;
-        }
-
-        .game-card:hover::after {
-            opacity: 0.7;
-        }
-
-        @keyframes gradientMove {
-            0%, 100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-        }
-
         .play-btn {
             background: linear-gradient(45deg, #ff6b6b, #feca57);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: none;
             border-radius: 50px;
-            padding: 18px 45px;
-            font-size: 1.4em;
+            padding: 15px 40px;
+            font-size: 1.3em;
             font-weight: bold;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-top: 10px;
-            position: relative;
-            z-index: 10;
         }
 
         .play-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
             background: linear-gradient(45deg, #ff5252, #ffc107);
-            border-color: rgba(255, 255, 255, 0.5);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         .play-btn:active {
-            transform: translateY(-2px) scale(1.02);
+            transform: translateY(-1px);
         }
 
         .stats-section {
@@ -324,21 +291,19 @@
             }
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            }
-            50% {
-                box-shadow: 0 10px 30px rgba(255, 107, 107, 0.6);
-            }
-        }
-
-        .play-btn {
-            animation: pulse 2s infinite;
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
+            .external-links {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .external-link {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+
             .title {
                 font-size: 2.5em;
             }
@@ -377,6 +342,12 @@
     </div>
 
     <div class="container">
+        <!-- External Links -->
+        <div class="external-links">
+            <a href="https://gtstijn.site" target="_blank" class="external-link">🌐 GTStijn.site</a>
+            <a href="https://echobots.gg" target="_blank" class="external-link">🤖 EchoBots.gg</a>
+        </div>
+
         <h1 class="title">🎮 Game Hub</h1>
         <p class="subtitle">Choose Your Adventure!</p>
 
@@ -466,12 +437,10 @@
 
         // Navigation functions
         function playSubway() {
-            console.log('🚇 Navigating to Subway Surfer...');
             window.location.href = 'subway-game.html';
         }
 
         function playCookie() {
-            console.log('🍪 Navigating to Cookie Clicker...');
             window.location.href = 'cookie-clicker.html';
         }
 
