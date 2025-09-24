@@ -15,12 +15,12 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: white;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 20px 0;
         }
 
         .container {
@@ -29,6 +29,12 @@
             padding: 40px 20px;
             position: relative;
             z-index: 2;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
         }
 
         .external-links {
@@ -293,10 +299,20 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            body {
+                padding: 10px 0;
+            }
+            
+            .container {
+                padding: 20px 10px;
+                min-height: auto;
+            }
+            
             .external-links {
                 flex-direction: column;
                 gap: 15px;
                 padding: 15px;
+                margin-bottom: 20px;
             }
 
             .external-link {
@@ -306,15 +322,18 @@
 
             .title {
                 font-size: 2.5em;
+                margin-bottom: 15px;
             }
 
             .subtitle {
                 font-size: 1.3em;
+                margin-bottom: 40px;
             }
 
             .games-grid {
                 grid-template-columns: 1fr;
                 gap: 30px;
+                margin-bottom: 40px;
             }
 
             .game-card {
