@@ -1566,7 +1566,7 @@ function purchaseItem(itemId) {
     // Check if player has enough coins
     if (coins < item.price) {
         console.log(`❌ Not enough coins! Need ${item.price}, have ${coins}`);
-        alert(`Je hebt niet genoeg coins!\n\nNodig: ${item.price} 🪙\nHebt: ${coins} 🪙\n\nSpeel meer games om coins te verdienen!`);
+        alert(`You don't have enough coins!\n\nNeeded: ${item.price} 🪙\nYou have: ${coins} 🪙\n\nPlay more games to earn coins!`);
         return;
     }
 
@@ -1645,7 +1645,7 @@ function updateButtonState(itemId, button) {
             button.className = 'buy-btn owned';
             button.disabled = false;
         } else {
-            button.textContent = 'Koop';
+            button.textContent = 'Buy';
             button.className = 'buy-btn';
             button.disabled = coins < item.price;
         }
@@ -1655,16 +1655,16 @@ function updateButtonState(itemId, button) {
             button.className = 'buy-btn owned';
             button.disabled = false;
         } else if (item.owned) {
-            button.textContent = 'Koop meer';
+            button.textContent = 'Buy more';
             button.className = 'buy-btn';
             button.disabled = coins < item.price;
         } else {
-            button.textContent = 'Koop';
+            button.textContent = 'Buy';
             button.className = 'buy-btn';
             button.disabled = coins < item.price;
         }
     } else {
-        button.textContent = 'Koop';
+        button.textContent = 'Buy';
         button.className = 'buy-btn';
         button.disabled = coins < item.price;
     }

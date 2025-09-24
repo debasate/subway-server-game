@@ -371,7 +371,7 @@ function updateShopVisualStates() {
         const statusElement = shopItem.querySelector('.buy-indicator, .too-expensive-indicator');
         if (statusElement) {
             statusElement.className = canBuy ? 'buy-indicator' : 'too-expensive-indicator';
-            statusElement.textContent = canBuy ? 'KOOP!' : 'Te duur';
+            statusElement.textContent = canBuy ? 'BUY!' : 'Too expensive';
             console.log(`Updated ${building.name}: canBuy=${canBuy}, cookies=${gameState.cookies}, cost=${building.cost}`);
         }
 
@@ -425,7 +425,7 @@ function updateUpgradeVisualStates() {
         const statusElement = upgradeItem.querySelector('.buy-indicator, .too-expensive-indicator');
         if (statusElement) {
             statusElement.className = canBuy ? 'buy-indicator' : 'too-expensive-indicator';
-            statusElement.textContent = canBuy ? 'KOOP!' : 'Te duur';
+            statusElement.textContent = canBuy ? 'BUY!' : 'Too expensive';
         }
     });
 }
@@ -454,8 +454,8 @@ function updateShop() {
             const canBuy = gameState.cookies >= building.cost;
             const progressPercent = Math.min((gameState.cookies / building.cost) * 100, 100);
             const statusIndicator = canBuy ?
-                '<div class="buy-indicator">KOOP!</div>' :
-                '<div class="too-expensive-indicator">Te duur</div>';
+                '<div class="buy-indicator">BUY!</div>' :
+                '<div class="too-expensive-indicator">Too expensive</div>';
 
             const progressBar = !canBuy ?
                 `<div class="progress-bar-container">
@@ -521,8 +521,8 @@ function updateUpgrades() {
             const canBuyUpgrade = gameState.cookies >= upgrade.cost;
             const progressPercent = Math.min((gameState.cookies / upgrade.cost) * 100, 100);
             const statusIndicator = canBuyUpgrade ?
-                '<div class="buy-indicator">KOOP!</div>' :
-                '<div class="too-expensive-indicator">Te duur</div>';
+                '<div class="buy-indicator">BUY!</div>' :
+                '<div class="too-expensive-indicator">Too expensive</div>';
 
             const progressBar = !canBuyUpgrade ?
                 `<div class="progress-bar-container">
