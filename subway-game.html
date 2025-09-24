@@ -513,11 +513,11 @@
                     window.location.href = 'index.html';
                 });
             }
-            
+
             // Initialize user profile with login system
             checkUserLogin();
         });
-        
+
         // Check if user is logged in and update profile
         function checkUserLogin() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -525,28 +525,28 @@
             const userAvatar = document.getElementById('user-avatar');
             const logoutBtn = document.getElementById('logout-btn');
             const saveStatus = document.getElementById('save-status');
-            
+
             if (currentUser) {
                 usernameDisplay.textContent = currentUser.username;
                 userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
                 logoutBtn.style.display = 'block';
                 saveStatus.textContent = 'User Account';
-                
+
                 // Update logout button text to English
                 logoutBtn.innerHTML = '<span>🚪</span> Logout';
-                
+
                 // Load user-specific game data
                 loadUserGameData(currentUser.username);
-                
+
                 // Add logout functionality
-                logoutBtn.onclick = function() {
+                logoutBtn.onclick = function () {
                     if (confirm('Are you sure you want to logout?')) {
                         // Save current progress before logout
                         saveUserGameData();
-                        
+
                         // Clear current user
                         localStorage.removeItem('currentUser');
-                        
+
                         // Redirect to hub
                         window.location.href = 'index.html';
                     }
@@ -558,7 +558,7 @@
                 saveStatus.textContent = 'Local Save';
             }
         }
-        
+
         // Load user-specific game data
         function loadUserGameData(username) {
             const userGameData = JSON.parse(localStorage.getItem(`subwayGame_${username}`) || 'null');
@@ -567,26 +567,26 @@
                 if (userGameData.highScores) {
                     window.gameState.highScores = userGameData.highScores;
                 }
-                
+
                 // Restore unlocked themes
                 if (userGameData.unlockedThemes) {
                     window.gameState.unlockedThemes = userGameData.unlockedThemes;
                 }
-                
+
                 // Restore achievements
                 if (userGameData.achievements) {
                     window.gameState.achievements = userGameData.achievements;
                 }
-                
+
                 // Restore stats
                 if (userGameData.totalGamesPlayed) {
                     window.gameState.totalGamesPlayed = userGameData.totalGamesPlayed;
                 }
-                
+
                 console.log('User game data loaded for:', username);
             }
         }
-        
+
         // Save user-specific game data
         function saveUserGameData() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -598,12 +598,12 @@
                     totalGamesPlayed: window.gameState.totalGamesPlayed || 0,
                     lastSaved: new Date().toISOString()
                 };
-                
+
                 localStorage.setItem(`subwayGame_${currentUser.username}`, JSON.stringify(gameData));
                 console.log('User game data saved for:', currentUser.username);
             }
         }
-        
+
         // Auto-save every minute during gameplay
         setInterval(() => {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -611,7 +611,7 @@
                 saveUserGameData();
             }
         }, 60000);
-        
+
         // Save when page is about to unload
         window.addEventListener('beforeunload', saveUserGameData);
     </script>

@@ -126,9 +126,11 @@
             0% {
                 background-position: 0% 50%;
             }
+
             50% {
                 background-position: 100% 50%;
             }
+
             100% {
                 background-position: 0% 50%;
             }
@@ -139,6 +141,7 @@
                 transform: translateY(0);
                 opacity: 1;
             }
+
             100% {
                 transform: translateY(-100%);
                 opacity: 0;
@@ -844,6 +847,35 @@
             font-size: 14px;
         }
 
+        /* Server Status Styles */
+        .server-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .server-status.online {
+            background: rgba(52, 199, 89, 0.2);
+            border: 1px solid rgba(52, 199, 89, 0.5);
+        }
+
+        .server-status.offline {
+            background: rgba(255, 59, 48, 0.2);
+            border: 1px solid rgba(255, 59, 48, 0.5);
+        }
+
         @media (max-width: 768px) {
             .auth-container {
                 top: 10px;
@@ -855,9 +887,17 @@
                 margin: 20px;
             }
 
-            .auth-input, .auth-submit {
+            .auth-input,
+            .auth-submit {
                 font-size: 14px;
                 padding: 12px 15px;
+            }
+
+            .server-status {
+                top: 10px;
+                left: 10px;
+                font-size: 10px;
+                padding: 6px 10px;
             }
         }
     </style>
@@ -878,7 +918,8 @@
             <form class="auth-form" id="auth-form" onsubmit="handleAuth(event)">
                 <input type="text" id="auth-username" class="auth-input" placeholder="Username" required>
                 <input type="password" id="auth-password" class="auth-input" placeholder="Password" required>
-                <input type="password" id="auth-confirm" class="auth-input" placeholder="Confirm Password" style="display: none;">
+                <input type="password" id="auth-confirm" class="auth-input" placeholder="Confirm Password"
+                    style="display: none;">
                 <button type="submit" class="auth-submit" id="auth-submit-btn">Login</button>
             </form>
             <div class="auth-switch">
@@ -897,6 +938,12 @@
     </div>
 
     <div class="container">
+        <!-- Server Status Indicator -->
+        <div id="server-status" class="server-status">
+            <span id="server-indicator">🔴</span>
+            <span id="server-text">Checking server...</span>
+        </div>
+
         <!-- External Links -->
         <div class="external-links">
             <a href="https://gtstijn.site" target="_blank" class="external-link">🌐 GTStijn.site</a>
@@ -1135,7 +1182,7 @@
         function closeAnnouncement() {
             const banner = document.getElementById('announcement-banner');
             banner.style.animation = 'slideOut 0.5s ease-in-out forwards';
-            
+
             setTimeout(() => {
                 banner.classList.add('hidden');
                 // Remember that user closed it for this session
@@ -1147,17 +1194,17 @@
             // Base date: September 24, 2025 (today)
             const baseDate = new Date('2025-09-24T12:00:00');
             const now = new Date();
-            
+
             // Calculate days since base date
             const daysSinceBase = Math.floor((now - baseDate) / (1000 * 60 * 60 * 24));
-            
+
             // Next update is every 2 days from base date
             const nextUpdateDays = Math.ceil((daysSinceBase + 1) / 2) * 2;
-            
+
             // Calculate next update date
             const nextUpdate = new Date(baseDate);
             nextUpdate.setDate(baseDate.getDate() + nextUpdateDays);
-            
+
             return nextUpdate;
         }
 
@@ -1179,7 +1226,7 @@
             const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
             let countdownText = 'Next update in: ';
-            
+
             if (days > 0) {
                 countdownText += `${days}d ${hours}h`;
             } else if (hours > 0) {
@@ -1296,17 +1343,52 @@
         `;
         document.head.appendChild(style);
 
+        // Server Status Check
+        async function updateServerStatus() {
+            const statusElement = document.getElementById('server-status');
+            const indicatorElement = document.getElementById('server-indicator');
+            const textElement = document.getElementById('server-text');
+
+            try {
+                const isOnline = await window.gameHubAPI.checkConnection();
+                
+                if (isOnline) {
+                    statusElement.className = 'server-status online';
+                    indicatorElement.textContent = '🟢';
+                    textElement.textContent = 'Server Online';
+                } else {
+                    statusElement.className = 'server-status offline';
+                    indicatorElement.textContent = '🔴';
+                    textElement.textContent = 'Server Offline (Local Mode)';
+                }
+            } catch (error) {
+                statusElement.className = 'server-status offline';
+                indicatorElement.textContent = '🔴';
+                textElement.textContent = 'Server Offline (Local Mode)';
+            }
+        }
+
+        // Check server status every 30 seconds
+        updateServerStatus();
+        setInterval(updateServerStatus, 30000);
+
         // Authentication System
         let currentUser = null;
         let authMode = 'login'; // 'login' or 'register'
 
         // Initialize auth system on page load
         function initAuth() {
-            // Check if user is already logged in
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
+            // Check if user is already logged in via API
+            if (window.gameHubAPI.isLoggedIn()) {
+                currentUser = window.gameHubAPI.user;
                 showUserInfo();
+            } else {
+                // Fallback: check localStorage for backwards compatibility
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    showUserInfo();
+                }
             }
         }
 
@@ -1318,7 +1400,7 @@
             const confirmField = document.getElementById('auth-confirm');
             const switchText = document.getElementById('auth-switch-text');
             const switchLink = document.getElementById('auth-switch-link');
-            
+
             if (mode === 'login') {
                 title.textContent = 'Login';
                 submitBtn.textContent = 'Login';
@@ -1332,11 +1414,11 @@
                 switchText.textContent = 'Already have an account?';
                 switchLink.textContent = 'Login';
             }
-            
+
             // Clear form and errors
             document.getElementById('auth-form').reset();
             hideAuthError();
-            
+
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
@@ -1363,12 +1445,13 @@
             errorDiv.style.display = 'none';
         }
 
-        function handleAuth(event) {
+        async function handleAuth(event) {
             event.preventDefault();
             
             const username = document.getElementById('auth-username').value.trim();
             const password = document.getElementById('auth-password').value;
             const confirmPassword = document.getElementById('auth-confirm').value;
+            const submitBtn = document.getElementById('auth-submit-btn');
             
             // Validation
             if (!username || !password) {
@@ -1386,70 +1469,85 @@
                 return;
             }
             
-            if (authMode === 'register') {
-                if (password !== confirmPassword) {
-                    showAuthError('Passwords do not match');
-                    return;
+            if (authMode === 'register' && password !== confirmPassword) {
+                showAuthError('Passwords do not match');
+                return;
+            }
+
+            // Disable submit button during request
+            submitBtn.disabled = true;
+            submitBtn.textContent = authMode === 'login' ? 'Logging in...' : 'Registering...';
+            hideAuthError();
+
+            try {
+                let result;
+                
+                if (authMode === 'register') {
+                    result = await window.gameHubAPI.register(username, password);
+                    
+                    // Show welcome message
+                    setTimeout(() => {
+                        alert(`Welcome to Game Hub, ${username}! 🎮\nYour account has been created successfully!`);
+                    }, 500);
+                } else {
+                    result = await window.gameHubAPI.login(username, password);
+                    
+                    // Show welcome back message
+                    setTimeout(() => {
+                        alert(`Welcome back, ${username}! 🎮`);
+                    }, 500);
                 }
-                
-                // Check if user already exists
-                const users = JSON.parse(localStorage.getItem('gameHubUsers') || '{}');
-                if (users[username]) {
-                    showAuthError('Username already exists');
-                    return;
-                }
-                
-                // Register new user
-                const newUser = {
-                    username: username,
-                    password: btoa(password), // Basic encoding (not secure for production)
-                    registeredAt: new Date().toISOString(),
-                    gamesPlayed: 0,
-                    totalScore: 0
-                };
-                
-                users[username] = newUser;
-                localStorage.setItem('gameHubUsers', JSON.stringify(users));
-                
-                // Auto login after registration
-                currentUser = newUser;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                // Update UI
+                currentUser = result.user;
                 showUserInfo();
                 closeAuthModal();
                 
-                // Show welcome message
-                setTimeout(() => {
-                    alert(`Welcome to Game Hub, ${username}! 🎮\nYour account has been created successfully!`);
-                }, 500);
+                // Update server status if login was successful
+                updateServerStatus();
                 
-            } else {
-                // Login existing user
-                const users = JSON.parse(localStorage.getItem('gameHubUsers') || '{}');
-                const user = users[username];
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showAuthError(error.message || 'Authentication failed. Please try again.');
                 
-                if (!user || user.password !== btoa(password)) {
-                    showAuthError('Invalid username or password');
-                    return;
+                // If server is down, try local fallback for login only
+                if (authMode === 'login' && error.message.includes('fetch')) {
+                    try {
+                        await handleLocalAuth(username, password);
+                    } catch (localError) {
+                        showAuthError('Server is offline and no local account found');
+                    }
                 }
-                
-                // Update last login
-                user.lastLogin = new Date().toISOString();
-                users[username] = user;
-                localStorage.setItem('gameHubUsers', JSON.stringify(users));
-                
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                showUserInfo();
-                closeAuthModal();
-                
-                // Show welcome back message
-                setTimeout(() => {
-                    alert(`Welcome back, ${username}! 🎮`);
-                }, 500);
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = authMode === 'login' ? 'Login' : 'Register';
             }
         }
 
-        function showUserInfo() {
+        // Fallback to local authentication when server is down
+        async function handleLocalAuth(username, password) {
+            const users = JSON.parse(localStorage.getItem('gameHubUsers') || '{}');
+            const user = users[username];
+            
+            if (!user || user.password !== btoa(password)) {
+                throw new Error('Invalid username or password');
+            }
+            
+            // Update last login
+            user.lastLogin = new Date().toISOString();
+            users[username] = user;
+            localStorage.setItem('gameHubUsers', JSON.stringify(users));
+            
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showUserInfo();
+            closeAuthModal();
+            
+            setTimeout(() => {
+                alert(`Welcome back, ${username}! 🎮\n(Offline mode)`);
+            }, 500);
+        }        function showUserInfo() {
             const container = document.getElementById('auth-container');
             container.innerHTML = `
                 <div class="user-info">
@@ -1461,8 +1559,10 @@
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
+                // Use API logout method
+                window.gameHubAPI.logout();
+                
                 currentUser = null;
-                localStorage.removeItem('currentUser');
                 
                 const container = document.getElementById('auth-container');
                 container.innerHTML = `
@@ -1471,17 +1571,15 @@
                 
                 alert('You have been logged out successfully! 👋');
             }
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('auth-modal').addEventListener('click', function(e) {
+        }        // Close modal when clicking outside
+        document.getElementById('auth-modal').addEventListener('click', function (e) {
             if (e.target === this) {
                 closeAuthModal();
             }
         });
 
         // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && document.getElementById('auth-modal').classList.contains('show')) {
                 closeAuthModal();
             }
