@@ -3,46 +3,46 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-}
+    /* Verwijderd overbodige accolade */
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #8B4513, #D2691E, #CD853F);
-    color: #fff;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #8B4513, #D2691E, #CD853F);
+        color: #fff;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
 
-.game-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-}
+    .game-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-/* Header */
-.header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 15px 25px;
-    border-radius: 15px;
-    position: relative;
-}
+    /* Header */
+    .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px 25px;
+        border-radius: 15px;
+        position: relative;
+    }
 
-.user-display {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.1);
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-}
+    .user-display {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.1);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
 }
 
 .header h1 {
@@ -710,3 +710,4 @@ body {
     100% {
         filter: drop-shadow(0 0 25px gold);
     }
+}
