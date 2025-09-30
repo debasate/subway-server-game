@@ -614,6 +614,59 @@
 
         // Save when page is about to unload
         window.addEventListener('beforeunload', saveUserGameData);
+
+        // Fix: Ensure game screen opens and panels close properly
+        // This script should be placed at the end of the file before </body>
+
+        // Helper to close theme/shop/update panels
+        function closePanels() {
+            document.getElementById('theme-panel').style.display = 'none';
+            document.getElementById('shop-panel').style.display = 'none';
+            document.getElementById('update-log').style.display = 'none';
+        }
+
+        // Add event listeners for close buttons
+        window.addEventListener('DOMContentLoaded', function () {
+            // Close theme panel
+            const themePanel = document.getElementById('theme-panel');
+            if (themePanel) {
+                themePanel.querySelectorAll('.close-btn').forEach(btn => {
+                    btn.onclick = function () {
+                        themePanel.style.display = 'none';
+                    };
+                });
+            }
+            // Close shop panel
+            const shopPanel = document.getElementById('shop-panel');
+            if (shopPanel) {
+                shopPanel.querySelectorAll('.close-btn').forEach(btn => {
+                    btn.onclick = function () {
+                        shopPanel.style.display = 'none';
+                    };
+                });
+            }
+            // Close update log panel
+            const updatePanel = document.getElementById('update-log');
+            if (updatePanel) {
+                updatePanel.querySelectorAll('.close-btn').forEach(btn => {
+                    btn.onclick = function () {
+                        updatePanel.style.display = 'none';
+                    };
+                });
+            }
+        });
+
+        // Ensure startGame always closes panels and shows game
+        function startGame(mode) {
+            closePanels();
+            if (window.startGameOriginal) {
+                window.startGameOriginal(mode);
+            } else if (typeof window.startGame === 'function') {
+                // Backup original
+                window.startGameOriginal = window.startGame;
+                window.startGameOriginal(mode);
+            }
+        }
     </script>
 </body>
 

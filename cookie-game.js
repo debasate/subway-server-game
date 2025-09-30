@@ -163,6 +163,77 @@ let upgrades = [
     }
 ];
 
+// --- Extra Upgrades ---
+upgrades.push(
+    {
+        id: 'cookie_factory',
+        name: 'Cookie Factory',
+        icon: '🏭',
+        description: 'Farms and mines produce 50% more',
+        cost: 50000,
+        unlocked: false,
+        purchased: false,
+        requirement: () => buildings.find(b => b.id === 'farm').owned >= 5 && buildings.find(b => b.id === 'mine').owned >= 2,
+        effect: () => {
+            buildings.find(b => b.id === 'farm').cps *= 1.5;
+            buildings.find(b => b.id === 'mine').cps *= 1.5;
+        }
+    },
+    {
+        id: 'cookie_god',
+        name: 'Cookie God',
+        icon: '🦸‍♂️',
+        description: 'All cookies per click doubled',
+        cost: 250000,
+        unlocked: false,
+        purchased: false,
+        requirement: () => gameState.cookiesPerClick >= 10,
+        effect: () => {
+            gameState.cookiesPerClick *= 2;
+        }
+    },
+    {
+        id: 'space_bakery',
+        name: 'Space Bakery',
+        icon: '🪐',
+        description: 'Spaceships produce 100% more',
+        cost: 1000000,
+        unlocked: false,
+        purchased: false,
+        requirement: () => buildings.find(b => b.id === 'spaceship') && buildings.find(b => b.id === 'spaceship').owned >= 1,
+        effect: () => {
+            buildings.find(b => b.id === 'spaceship').cps *= 2;
+        }
+    },
+    {
+        id: 'cookie_rain',
+        name: 'Cookie Rain',
+        icon: '🌧️',
+        description: 'All buildings produce 25% more',
+        cost: 5000000,
+        unlocked: false,
+        purchased: false,
+        requirement: () => gameState.totalCookies >= 100000,
+        effect: () => {
+            buildings.forEach(building => building.cps *= 1.25);
+        }
+    },
+    {
+        id: 'ultimate_recipe',
+        name: 'Ultimate Recipe',
+        icon: '🥇',
+        description: 'Grandmas and farms produce 100% more',
+        cost: 20000000,
+        unlocked: false,
+        purchased: false,
+        requirement: () => buildings.find(b => b.id === 'grandma').owned >= 10 && buildings.find(b => b.id === 'farm').owned >= 10,
+        effect: () => {
+            buildings.find(b => b.id === 'grandma').cps *= 2;
+            buildings.find(b => b.id === 'farm').cps *= 2;
+        }
+    }
+);
+
 // Achievements Data
 let achievements = [
     {

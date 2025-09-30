@@ -1542,13 +1542,13 @@
         // Fallback to local authentication when server is down
         async function handleLocalAuth(username, password) {
             const users = JSON.parse(localStorage.getItem('gameHubUsers') || '{}');
-            
+
             if (authMode === 'register') {
                 // Check if user already exists
                 if (users[username]) {
                     throw new Error('Username already exists');
                 }
-                
+
                 // Create new user
                 const newUser = {
                     id: Date.now(), // Simple ID generation for local mode
@@ -1558,15 +1558,15 @@
                     gamesPlayed: 0,
                     totalScore: 0
                 };
-                
+
                 users[username] = newUser;
                 localStorage.setItem('gameHubUsers', JSON.stringify(users));
-                
+
                 currentUser = newUser;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 showUserInfo();
                 closeAuthModal();
-                
+
                 setTimeout(() => {
                     alert(`Welcome to Game Hub, ${username}! 🎮\n(Local mode - account created offline)`);
                 }, 500);
@@ -1636,18 +1636,18 @@
         });
 
         // Wait for API client to load, then initialize auth
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Try to load API client, with fallback if it fails
             const script = document.createElement('script');
             script.src = 'api-client.js';
-            script.onload = function() {
+            script.onload = function () {
                 console.log('API client loaded successfully');
                 initAuth();
                 updateServerStatus();
                 // Start periodic server status checks
                 serverStatusInterval = setInterval(updateServerStatus, 30000);
             };
-            script.onerror = function() {
+            script.onerror = function () {
                 console.warn('API client failed to load, using local mode only');
                 initAuth();
                 updateServerStatus();
