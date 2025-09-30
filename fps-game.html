@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔫 FPS Arena</title>
+    <style>
+        body {
+            background: #222;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #game-canvas {
+            display: block;
+            margin: 0 auto;
+            background: #333;
+            border: 2px solid #444;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 1.2em;
+            z-index: 10;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #444;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="back-btn" onclick="window.location.href='index.html'">🏠 Game Hub</button>
+    <div class="hud" id="hud">Loading...</div>
+    <canvas id="game-canvas" width="900" height="600"></canvas>
+    <script>
+        // FPS Arena - Simple JS FPS with 9 NPCs
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const hud = document.getElementById('hud');
+
+        // Player
+        let player = {
+            x: 450,
+            y: 300,
+            angle: 0,
+            health: 100,
+            pistolAmmo: 12,
+            alive: true,
+            kills: 0
+        };
+
+        // NPCs
+        let npcs = [];
+        for (let i = 0; i < 9; i++) {
+            npcs.push({
+                x: Math.random() * 800 + 50,
+                y: Math.random() * 500 + 50,
+                angle: Math.random() * Math.PI * 2,
+                health: 100,
+                alive: true,
+                id: i + 1
+            });
+        }
+
+        // Controls
+        let keys = {};
+        document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+        // Mouse aim
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            player.angle = Math.atan2(my - player.y, mx - player.x);
+        });
+
+        // --- Extra FPS Features ---
+        let weapon = 'pistol';
+        let pistolMaxAmmo = 12;
+        let shotgunMaxAmmo = 6;
+        let shotgunAmmo = shotgunMaxAmmo;
+        let reloadCooldown = 0;
+        let muzzleFlash = 0;
+        let hitMarker = 0;
+
+        // Weapon switch
+        window.addEventListener('keydown', e => {
+            if (e.key === '1') weapon = 'pistol';
+            if (e.key === '2') weapon = 'shotgun';
+            if (e.key.toLowerCase() === 'r') reloadWeapon();
+        });
+
+        function reloadWeapon() {
+            if (weapon === 'pistol' && player.pistolAmmo < pistolMaxAmmo) {
+                reloadCooldown = 30;
+                setTimeout(() => { player.pistolAmmo = pistolMaxAmmo; }, 600);
+            }
+            if (weapon === 'shotgun' && shotgunAmmo < shotgunMaxAmmo) {
+                reloadCooldown = 45;
+                setTimeout(() => { shotgunAmmo = shotgunMaxAmmo; }, 900);
+            }
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            if (!player.alive || reloadCooldown > 0) return;
+            if (weapon === 'pistol') {
+                if (player.pistolAmmo <= 0) return;
+                player.pistolAmmo--;
+                muzzleFlash = 5;
+                shootRay(50, 0.2, 400);
+            } else if (weapon === 'shotgun') {
+                if (shotgunAmmo <= 0) return;
+                shotgunAmmo--;
+                muzzleFlash = 8;
+                // Shotgun: 3 rays
+                for (let i = -1; i <= 1; i++) {
+                    shootRay(35, 0.35 + i * 0.15, 250);
+                }
+            }
+        });
+
+        function shootRay(damage, spread, range) {
+            let hit = false;
+            for (let npc of npcs) {
+                if (!npc.alive) continue;
+                const dx = npc.x - player.x;
+                const dy = npc.y - player.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const angleToNpc = Math.atan2(dy, dx);
+                const angleDiff = Math.abs(player.angle - angleToNpc);
+                if (dist < range && angleDiff < spread) {
+                    npc.health -= damage;
+                    hit = true;
+                    hitMarker = 10;
+                    if (npc.health <= 0) {
+                        npc.alive = false;
+                        player.kills++;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Game loop
+        function gameLoop() {
+            // Move player
+            if (keys['w']) player.y -= 4;
+            if (keys['s']) player.y += 4;
+            if (keys['a']) player.x -= 4;
+            if (keys['d']) player.x += 4;
+
+            // Clamp player
+            player.x = Math.max(20, Math.min(880, player.x));
+            player.y = Math.max(20, Math.min(580, player.y));
+
+            // NPC AI
+            for (let npc of npcs) {
+                if (!npc.alive) continue;
+                // Simple AI: move randomly, shoot at player if close
+                if (Math.random() < 0.02) npc.angle += (Math.random() - 0.5) * 0.5;
+                npc.x += Math.cos(npc.angle) * 2;
+                npc.y += Math.sin(npc.angle) * 2;
+                // Clamp
+                npc.x = Math.max(20, Math.min(880, npc.x));
+                npc.y = Math.max(20, Math.min(580, npc.y));
+                // Shoot at player
+                const dx = player.x - npc.x;
+                const dy = player.y - npc.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 300 && Math.random() < 0.01) {
+                    player.health -= 10;
+                    if (player.health <= 0) player.alive = false;
+                }
+            }
+
+            if (reloadCooldown > 0) reloadCooldown--;
+            if (muzzleFlash > 0) muzzleFlash--;
+            if (hitMarker > 0) hitMarker--;
+
+            // Draw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw player
+            if (player.alive) {
+                ctx.save();
+                ctx.translate(player.x, player.y);
+                ctx.rotate(player.angle);
+                ctx.fillStyle = '#0af';
+                ctx.fillRect(-15, -15, 30, 30);
+                // Weapon
+                if (weapon === 'pistol') {
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(10, -5, 20, 10);
+                } else {
+                    ctx.fillStyle = '#ccc';
+                    ctx.fillRect(10, -8, 28, 16);
+                }
+                // Muzzle flash
+                if (muzzleFlash > 0) {
+                    ctx.fillStyle = 'yellow';
+                    ctx.beginPath();
+                    ctx.arc(weapon === 'pistol' ? 30 : 38, 0, muzzleFlash, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+            // Draw NPCs
+            for (let npc of npcs) {
+                if (!npc.alive) continue;
+                ctx.save();
+                ctx.translate(npc.x, npc.y);
+                ctx.rotate(npc.angle);
+                ctx.fillStyle = '#fa0';
+                ctx.fillRect(-15, -15, 30, 30);
+                ctx.restore();
+            }
+            // Hit marker
+            if (hitMarker > 0) {
+                ctx.save();
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(canvas.width/2-10, canvas.height/2-10);
+                ctx.lineTo(canvas.width/2+10, canvas.height/2+10);
+                ctx.moveTo(canvas.width/2+10, canvas.height/2-10);
+                ctx.lineTo(canvas.width/2-10, canvas.height/2+10);
+                ctx.stroke();
+                ctx.restore();
+            }
+            // HUD
+            hud.innerHTML = `Health: ${player.health} | Weapon: ${weapon.toUpperCase()} | ` +
+                (weapon === 'pistol' ? `Ammo: ${player.pistolAmmo}/${pistolMaxAmmo}` : `Ammo: ${shotgunAmmo}/${shotgunMaxAmmo}`) +
+                ` | Kills: ${player.kills} / 9`;
+            hud.innerHTML += `<br>Press [R] to reload, [1]=Pistol, [2]=Shotgun`;
+            if (!player.alive) hud.innerHTML += '<br><span style="color:red">Game Over!</span>';
+            if (player.kills === 9) hud.innerHTML += '<br><span style="color:lime">Victory!</span>';
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+    </script>
+</body>
+
+</html>
