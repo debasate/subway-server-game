@@ -1007,6 +1007,23 @@
                 </ul>
                 <button class="play-btn">Play Cookie</button>
             </div>
+
+            <!-- FPS Arena Game -->
+            <div class="game-card" onclick="playFPS()">
+                <div class="game-icon">🔫</div>
+                <h2 class="game-title">FPS Arena</h2>
+                <p class="game-description">
+                    Battle 9 NPCs in a fast-paced FPS arena! WASD to move, mouse to aim, 1/2 to switch weapons, R to reload.
+                </p>
+                <ul class="game-features">
+                    <li>🔫 First-person shooter action</li>
+                    <li>🤖 9 intelligent NPC enemies</li>
+                    <li>🔄 Weapon switching & reload</li>
+                    <li>💥 Muzzle flash & hit marker effects</li>
+                    <li>🏆 Scoreboard & victory screen</li>
+                </ul>
+                <button class="play-btn">Play FPS</button>
+            </div>
         </div>
 
         <!-- Player Statistics -->
@@ -1156,6 +1173,10 @@
 
         function playCookie() {
             window.location.href = 'cookie-clicker.html';
+        }
+
+        function playFPS() {
+            window.location.href = 'fps-game.html';
         }
 
         // Update Log Toggle

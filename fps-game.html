@@ -46,6 +46,21 @@
             font-size: 1em;
             cursor: pointer;
         }
+
+        button {
+            background: #444;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #555;
+        }
     </style>
 </head>
 
@@ -253,11 +268,43 @@
                 (weapon === 'pistol' ? `Ammo: ${player.pistolAmmo}/${pistolMaxAmmo}` : `Ammo: ${shotgunAmmo}/${shotgunMaxAmmo}`) +
                 ` | Kills: ${player.kills} / 9`;
             hud.innerHTML += `<br>Press [R] to reload, [1]=Pistol, [2]=Shotgun`;
-            if (!player.alive) hud.innerHTML += '<br><span style="color:red">Game Over!</span>';
+            if (!player.alive) {
+                hud.innerHTML += '<br><span style="color:red">Game Over!</span>';
+                hud.innerHTML += '<br><button onclick="restartGame()">Opnieuw spelen</button>';
+                hud.innerHTML += '<button onclick=\"window.location.href=\'index.html\'\">Game Hub</button>';
+            }
             if (player.kills === 9) hud.innerHTML += '<br><span style="color:lime">Victory!</span>';
             requestAnimationFrame(gameLoop);
         }
         gameLoop();
+
+        function restartGame() {
+            player = {
+                x: 450,
+                y: 300,
+                angle: 0,
+                health: 100,
+                pistolAmmo: 12,
+                alive: true,
+                kills: 0
+            };
+            npcs = [];
+            for (let i = 0; i < 9; i++) {
+                npcs.push({
+                    x: Math.random() * 800 + 50,
+                    y: Math.random() * 500 + 50,
+                    angle: Math.random() * Math.PI * 2,
+                    health: 100,
+                    alive: true,
+                    id: i + 1
+                });
+            }
+            weapon = 'pistol';
+            shotgunAmmo = shotgunMaxAmmo;
+            reloadCooldown = 0;
+            muzzleFlash = 0;
+            hitMarker = 0;
+        }
     </script>
 </body>
 
