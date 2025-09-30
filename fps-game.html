@@ -305,6 +305,14 @@
             muzzleFlash = 0;
             hitMarker = 0;
         }
+
+        // Event delegation voor HUD buttons
+        hud.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                if (e.target.textContent.includes('Opnieuw spelen')) restartGame();
+                if (e.target.textContent.includes('Game Hub')) window.location.href = 'index.html';
+            }
+        });
     </script>
 </body>
 
