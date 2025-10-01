@@ -119,7 +119,7 @@
                     <div class="mode-stats">
                         <span>⭐ Best: <span id="infinity-best">0</span></span>
                     </div>
-                    <button id="infinity-btn" class="mode-btn" onclick="startGame('infinity')">Spelen</button>
+                    <button id="infinity-btn" class="mode-btn" onclick="startGameMode('infinity')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="level">
@@ -130,7 +130,7 @@
                         <span>📊 Level: <span id="current-level">1</span></span>
                         <span>⭐ Best: <span id="level-best">0</span></span>
                     </div>
-                    <button id="level-btn" class="mode-btn" onclick="startGame('level')">Spelen</button>
+                    <button id="level-btn" class="mode-btn" onclick="startGameMode('level')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="multiplayer">
@@ -140,7 +140,7 @@
                     <div class="mode-stats">
                         <span>🏆 Wins: <span id="multiplayer-wins">0</span></span>
                     </div>
-                    <button id="multiplayer-btn" class="mode-btn" onclick="startGame('multiplayer')">Spelen</button>
+                    <button id="multiplayer-btn" class="mode-btn" onclick="startGameMode('multiplayer')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="chaos">
@@ -150,7 +150,7 @@
                     <div class="mode-stats">
                         <span>🔥 Best Chaos: <span id="chaos-best">0</span></span>
                     </div>
-                    <button id="chaos-btn" class="mode-btn" onclick="startGame('chaos')">Spelen</button>
+                    <button id="chaos-btn" class="mode-btn" onclick="startGameMode('chaos')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="speedrun">
@@ -160,7 +160,7 @@
                     <div class="mode-stats">
                         <span>🏃 Best Time: <span id="speedrun-best">∞</span></span>
                     </div>
-                    <button id="speedrun-btn" class="mode-btn" onclick="startGame('speedrun')">Spelen</button>
+                    <button id="speedrun-btn" class="mode-btn" onclick="startGameMode('speedrun')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="survival">
@@ -170,7 +170,7 @@
                     <div class="mode-stats">
                         <span>⏱️ Best Survival: <span id="survival-best">0s</span></span>
                     </div>
-                    <button id="survival-btn" class="mode-btn" onclick="startGame('survival')">Spelen</button>
+                    <button id="survival-btn" class="mode-btn" onclick="startGameMode('survival')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="coinrush">
@@ -180,7 +180,7 @@
                     <div class="mode-stats">
                         <span>🪙 Best Rush: <span id="coinrush-best">∞</span></span>
                     </div>
-                    <button id="coinrush-btn" class="mode-btn" onclick="startGame('coinrush')">Spelen</button>
+                    <button id="coinrush-btn" class="mode-btn" onclick="startGameMode('coinrush')">Spelen</button>
                 </div>
 
                 <div class="gamemode-card" data-mode="nightmare">
@@ -190,7 +190,7 @@
                     <div class="mode-stats">
                         <span>👹 Best Nightmare: <span id="nightmare-best">0</span></span>
                     </div>
-                    <button id="nightmare-btn" class="mode-btn" onclick="startGame('nightmare')">Spelen</button>
+                    <button id="nightmare-btn" class="mode-btn" onclick="startGameMode('nightmare')">Spelen</button>
                 </div>
 
                 <!-- Mirror Mode gamemode -->
@@ -201,7 +201,7 @@
                     <div class="mode-stats">
                         <span>🪞 Best Mirror: <span id="mirror-best">0</span></span>
                     </div>
-                    <button id="mirror-btn" class="mode-btn" onclick="startGame('mirror')">Spelen</button>
+                    <button id="mirror-btn" class="mode-btn" onclick="startGameMode('mirror')">Spelen</button>
                 </div>
             </div>
         </div>
@@ -681,16 +681,32 @@
         });
 
         // Ensure startGame always closes panels and shows game
-        function startGame(mode) {
+        function startGameMode(mode) {
+            console.log(`🎮 Starting game mode: ${mode}`);
             closePanels();
-            if (window.startGameOriginal) {
-                window.startGameOriginal(mode);
-            } else if (typeof window.startGame === 'function') {
-                // Backup original
-                window.startGameOriginal = window.startGame;
-                window.startGameOriginal(mode);
+
+            // Check if game.js startGame function is available
+            if (typeof window.startGame === 'function') {
+                window.startGame(mode);
+            } else {
+                console.error('❌ startGame function not found in game.js');
+                alert('Game engine not loaded. Please refresh the page.');
             }
         }
+
+        // Make sure all buttons use the correct function
+        document.addEventListener('DOMContentLoaded', function () {
+            // Update all game mode buttons to use startGameMode
+            const buttons = document.querySelectorAll('.mode-btn[onclick*="startGame"]');
+            buttons.forEach(btn => {
+                const onclick = btn.getAttribute('onclick');
+                if (onclick) {
+                    const newOnclick = onclick.replace('startGame(', 'startGameMode(');
+                    btn.setAttribute('onclick', newOnclick);
+                    console.log(`🔧 Fixed button: ${onclick} → ${newOnclick}`);
+                }
+            });
+        });
     </script>
 </body>
 
