@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏴‍☠️ Blox Fruits - One Piece Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3b82f6 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .game-title {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ffd700, #ff6b35, #ff1744);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-subtitle {
+            font-size: 1.5em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .character-selection {
+            margin-bottom: 30px;
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .character-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .character-card:hover,
+        .character-card.selected {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ffd700;
+            transform: translateY(-5px);
+        }
+
+        .character-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .character-name {
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .fruit-selection {
+            margin-bottom: 30px;
+        }
+
+        .fruit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .fruit-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .fruit-card:hover,
+        .fruit-card.selected {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ff6b35;
+            transform: translateY(-5px);
+        }
+
+        .fruit-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .fruit-name {
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .game-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .coming-soon {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .coming-soon h3 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .coming-soon p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5em;
+            }
+
+            .character-grid,
+            .fruit-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .game-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .action-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-header">
+        <h1 class="game-title">🏴‍☠️ Blox Fruits</h1>
+        <p class="game-subtitle">One Piece Adventure Awaits!</p>
+        <a href="index.html" class="back-btn">← Back to Game Hub</a>
+    </div>
+
+    <div class="game-container">
+        <div class="character-selection">
+            <h3>⚔️ Choose Your Fighter</h3>
+            <div class="character-grid" id="character-grid">
+                <div class="character-card" data-character="pirate">
+                    <div class="character-icon">🏴‍☠️</div>
+                    <div class="character-name">Pirate</div>
+                </div>
+                <div class="character-card" data-character="marine">
+                    <div class="character-icon">⚓</div>
+                    <div class="character-name">Marine</div>
+                </div>
+                <div class="character-card" data-character="bounty-hunter">
+                    <div class="character-icon">🎯</div>
+                    <div class="character-name">Bounty Hunter</div>
+                </div>
+                <div class="character-card" data-character="revolutionary">
+                    <div class="character-icon">✊</div>
+                    <div class="character-name">Revolutionary</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fruit-selection">
+            <h3>🍎 Choose Your Devil Fruit Power</h3>
+            <div class="fruit-grid" id="fruit-grid">
+                <div class="fruit-card" data-fruit="rubber">
+                    <div class="fruit-icon">🍎</div>
+                    <div class="fruit-name">Gomu Gomu</div>
+                </div>
+                <div class="fruit-card" data-fruit="fire">
+                    <div class="fruit-icon">🔥</div>
+                    <div class="fruit-name">Mera Mera</div>
+                </div>
+                <div class="fruit-card" data-fruit="ice">
+                    <div class="fruit-icon">❄️</div>
+                    <div class="fruit-name">Hie Hie</div>
+                </div>
+                <div class="fruit-card" data-fruit="light">
+                    <div class="fruit-icon">⚡</div>
+                    <div class="fruit-name">Pika Pika</div>
+                </div>
+                <div class="fruit-card" data-fruit="dark">
+                    <div class="fruit-icon">🌑</div>
+                    <div class="fruit-name">Yami Yami</div>
+                </div>
+                <div class="fruit-card" data-fruit="quake">
+                    <div class="fruit-icon">🌊</div>
+                    <div class="fruit-name">Gura Gura</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-actions">
+            <button class="action-btn" onclick="startAdventure()" id="start-btn" disabled>🚀 Start Adventure</button>
+            <button class="action-btn" onclick="showStats()">📊 View Stats</button>
+        </div>
+
+        <div class="stats-panel" id="stats-panel" style="display: none;">
+            <h3>⚔️ Your Stats</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="level-stat">1</div>
+                    <div class="stat-label">Level</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="bounty-stat">0</div>
+                    <div class="stat-label">Bounty</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="wins-stat">0</div>
+                    <div class="stat-label">Battles Won</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="fruits-stat">0</div>
+                    <div class="stat-label">Fruits Eaten</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="coming-soon">
+            <h3>⚠️ Game Coming Soon!</h3>
+            <p>
+                🏴‍☠️ The full Blox Fruits adventure is under development!<br><br>
+                🎮 <strong>Planned Features:</strong><br>
+                • Epic Devil Fruit battles<br>
+                • Haki mastery system<br>
+                • Island exploration<br>
+                • Crew battles & raids<br>
+                • Marine vs Pirate wars<br><br>
+                🚀 <strong>Coming in the next major update!</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let selectedCharacter = null;
+        let selectedFruit = null;
+        let gameStats = {
+            level: 1,
+            bounty: 0,
+            battlesWon: 0,
+            fruitsEaten: 0
+        };
+
+        // Load saved stats
+        function loadStats() {
+            const saved = localStorage.getItem('bloxFruitsStats');
+            if (saved) {
+                gameStats = { ...gameStats, ...JSON.parse(saved) };
+                updateStatsDisplay();
+            }
+        }
+
+        // Save stats
+        function saveStats() {
+            localStorage.setItem('bloxFruitsStats', JSON.stringify(gameStats));
+        }
+
+        // Update stats display
+        function updateStatsDisplay() {
+            document.getElementById('level-stat').textContent = gameStats.level;
+            document.getElementById('bounty-stat').textContent = gameStats.bounty.toLocaleString();
+            document.getElementById('wins-stat').textContent = gameStats.battlesWon;
+            document.getElementById('fruits-stat').textContent = gameStats.fruitsEaten;
+        }
+
+        // Character selection
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedCharacter = card.dataset.character;
+                checkStartButton();
+            });
+        });
+
+        // Fruit selection
+        document.querySelectorAll('.fruit-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.fruit-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedFruit = card.dataset.fruit;
+                checkStartButton();
+            });
+        });
+
+        // Check if start button should be enabled
+        function checkStartButton() {
+            const startBtn = document.getElementById('start-btn');
+            if (selectedCharacter && selectedFruit) {
+                startBtn.disabled = false;
+                startBtn.style.background = 'linear-gradient(45deg, #ff6b6b, #feca57)';
+            } else {
+                startBtn.disabled = true;
+                startBtn.style.background = 'linear-gradient(45deg, #999, #666)';
+            }
+        }
+
+        // Start adventure
+        function startAdventure() {
+            if (!selectedCharacter || !selectedFruit) {
+                alert('Please select both a character and a Devil Fruit!');
+                return;
+            }
+
+            alert(`🏴‍☠️ Adventure starting soon!\n\n⚔️ Character: ${selectedCharacter}\n🍎 Devil Fruit: ${selectedFruit}\n\nThe full game is coming in the next update! Stay tuned for epic One Piece adventures! 🚀`);
+
+            // Simulate some progress
+            gameStats.fruitsEaten++;
+            if (Math.random() > 0.5) {
+                gameStats.battlesWon++;
+                gameStats.bounty += Math.floor(Math.random() * 1000000);
+            }
+            if (gameStats.battlesWon % 5 === 0) {
+                gameStats.level++;
+            }
+
+            saveStats();
+            updateStatsDisplay();
+
+            // Send Discord notification if available
+            if (typeof window.sendGameplayNotification === 'function') {
+                window.sendGameplayNotification('Blox Fruits', gameStats.bounty, gameStats.level);
+            }
+        }
+
+        // Show/hide stats
+        function showStats() {
+            const panel = document.getElementById('stats-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            console.log('🏴‍☠️ Blox Fruits game loaded! Adventure awaits!');
+        });
+    </script>
+</body>
+
+</html>

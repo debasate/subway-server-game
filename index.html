@@ -1025,6 +1025,23 @@
                 </ul>
                 <button class="play-btn" onclick="playFPS()">Play FPS</button>
             </div>
+
+            <!-- Blox Fruits Game -->
+            <div class="game-card">
+                <div class="game-icon">🏴‍☠️</div>
+                <h2 class="game-title">Blox Fruits</h2>
+                <p class="game-description">
+                    Set sail in the One Piece world! Eat Devil Fruits, master Haki, fight pirates and marines in epic adventures across the seas!
+                </p>
+                <ul class="game-features">
+                    <li>🍎 Eat powerful Devil Fruits</li>
+                    <li>⚔️ Master sword combat & Haki</li>
+                    <li>🏴‍☠️ Epic pirate vs marine battles</li>
+                    <li>🌊 Explore vast ocean worlds</li>
+                    <li>🏆 Bounty hunting & crew battles</li>
+                </ul>
+                <button class="play-btn" onclick="playBloxFruits()">Play Blox Fruits</button>
+            </div>
         </div>
 
         <!-- Player Statistics -->
@@ -1208,6 +1225,10 @@
 
         function playFPS() {
             window.location.href = 'fps-game.html';
+        }
+
+        function playBloxFruits() {
+            window.location.href = 'blox-fruits.html';
         }
 
         // Update Log Toggle
@@ -1656,7 +1677,7 @@
                 if (!user) {
                     throw new Error('Invalid username or password');
                 }
-                
+
                 if (user.password !== btoa(password)) {
                     throw new Error('Invalid username or password');
                 }
@@ -2015,10 +2036,11 @@
                 const updateMessage = `🎮 **Game Hub Activity** 🎮
 
 🟢 Server Status: Online
-🎯 Active Games: Subway Surfer, Cookie Clicker
+🎯 Active Games: Subway Surfer, Cookie Clicker, Blox Fruits
 🪙 Wednesday Coin Boost: ${isWednesday() ? 'ACTIVE (2x coins!)' : 'Ready for next Wednesday'}
 👤 User Session: ${currentUser?.username || 'Guest Player'}
 ⏰ Last Updated: ${new Date().toLocaleString('en-US')}
+🌐 Website: https://gtstijn.space
 
 Ready for gaming! 🚀`;
 
