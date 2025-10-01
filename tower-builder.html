@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,8 +43,13 @@
         }
 
         @keyframes float {
-            from { transform: translateX(-100px); }
-            to { transform: translateX(calc(100vw + 100px)); }
+            from {
+                transform: translateX(-100px);
+            }
+
+            to {
+                transform: translateX(calc(100vw + 100px));
+            }
         }
 
         .game-container {
@@ -130,26 +136,51 @@
             animation: stack 3s infinite ease-in-out;
         }
 
-        .building-block:nth-child(1) { animation-delay: 0s; }
-        .building-block:nth-child(2) { animation-delay: 0.5s; }
-        .building-block:nth-child(3) { animation-delay: 1s; }
-        .building-block:nth-child(4) { animation-delay: 1.5s; }
-        .building-block:nth-child(5) { animation-delay: 2s; }
+        .building-block:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .building-block:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .building-block:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .building-block:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        .building-block:nth-child(5) {
+            animation-delay: 2s;
+        }
 
         @keyframes stack {
-            0%, 100% { transform: translateY(0); opacity: 1; }
-            50% { transform: translateY(-20px); opacity: 0.7; }
+
+            0%,
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translateY(-20px);
+                opacity: 0.7;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="clouds" id="clouds"></div>
 
     <div class="game-container">
         <div class="game-title">🏗️ Tower Builder</div>
-        
+
         <div class="game-description">
-            Build the tallest tower possible! Stack blocks perfectly and reach for the sky in this challenging physics game.
+            Build the tallest tower possible! Stack blocks perfectly and reach for the sky in this challenging physics
+            game.
         </div>
 
         <div class="tower-animation">
@@ -193,4 +224,5 @@
         createClouds();
     </script>
 </body>
+
 </html>

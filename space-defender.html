@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,8 +45,15 @@
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         .game-container {
@@ -118,12 +126,13 @@
         }
     </style>
 </head>
+
 <body>
     <div class="stars" id="stars"></div>
 
     <div class="game-container">
         <div class="game-title">🚀 Space Defender</div>
-        
+
         <div class="game-description">
             Defend Earth from alien invaders! Upgrade your spaceship and survive endless waves of enemies.
         </div>
@@ -158,4 +167,5 @@
         createStars();
     </script>
 </body>
+
 </html>
