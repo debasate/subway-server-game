@@ -83,6 +83,57 @@
             line-height: 1.6;
         }
 
+        .upgrade-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .upgrade-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .upgrade-item {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upgrade-item:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .upgrade-item.purchased {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+
+        .boss-health {
+            background: rgba(255, 0, 0, 0.8);
+            height: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .boss-health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6600);
+            transition: width 0.3s ease;
+        }
+
         .coming-soon {
             font-size: 1.5em;
             color: #ffd700;
@@ -190,20 +241,58 @@
         <canvas id="gameCanvas" width="800" height="600"
             style="border: 2px solid #00ffff; border-radius: 10px; background: #000;"></canvas>
 
+        <!-- Boss Health Bar -->
+        <div class="boss-health" id="boss-health">
+            <div class="boss-health-fill" id="boss-health-fill" style="width: 100%;"></div>
+            <div
+                style="position: absolute; top: 2px; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; font-size: 14px;">
+                BOSS: <span id="boss-name">Unknown</span>
+            </div>
+        </div>
+
         <!-- Game HUD -->
         <div class="game-hud">
             <div class="hud-item">Score: <span id="score">0</span></div>
             <div class="hud-item">Wave: <span id="wave">1</span></div>
             <div class="hud-item">Lives: <span id="lives">3</span></div>
-            <div class="hud-item">Weapon: <span id="weapon">Laser</span></div>
+            <div class="hud-item">Credits: <span id="credits">0</span></div>
+        </div>
+
+        <!-- Upgrade Panel -->
+        <div class="upgrade-panel" id="upgrade-panel">
+            <h3 style="color: #00ffff; text-align: center;">🚀 Ship Upgrades</h3>
+            <div class="upgrade-grid">
+                <div class="upgrade-item" onclick="buyUpgrade('damage')">
+                    <h4>⚡ Damage Boost</h4>
+                    <p>+25% damage per level</p>
+                    <p>Cost: <span id="damage-cost">50</span> credits</p>
+                </div>
+                <div class="upgrade-item" onclick="buyUpgrade('speed')">
+                    <h4>💨 Speed Boost</h4>
+                    <p>+20% movement speed</p>
+                    <p>Cost: <span id="speed-cost">75</span> credits</p>
+                </div>
+                <div class="upgrade-item" onclick="buyUpgrade('shield')">
+                    <h4>🛡️ Extra Life</h4>
+                    <p>+1 additional life</p>
+                    <p>Cost: <span id="shield-cost">100</span> credits</p>
+                </div>
+                <div class="upgrade-item" onclick="buyUpgrade('rapid')">
+                    <h4>🔫 Rapid Fire</h4>
+                    <p>50% faster shooting</p>
+                    <p>Cost: <span id="rapid-cost">125</span> credits</p>
+                </div>
+            </div>
         </div>
 
         <!-- Game Controls -->
         <div class="game-controls">
             <button class="control-btn" onclick="startGame()" id="startBtn">Start Game</button>
             <button class="control-btn" onclick="pauseGame()" id="pauseBtn" style="display:none;">Pause</button>
+            <button class="control-btn" onclick="toggleUpgrades()" id="upgradeBtn"
+                style="display:none;">Upgrades</button>
             <div class="instructions">
-                Use WASD or Arrow Keys to move, SPACE to shoot!
+                Use WASD or Arrow Keys to move, SPACE to shoot! Kill enemies to earn credits for upgrades!
             </div>
         </div>
 
@@ -236,7 +325,15 @@
             score: 0,
             wave: 1,
             lives: 3,
-            keys: {}
+            keys: {},
+            credits: 0,
+            upgrades: {
+                damage: 0,
+                speed: 0,
+                shield: 0,
+                rapid: 0
+            },
+            currentBoss: null
         };
 
         let player = {
@@ -279,7 +376,9 @@
 
             document.getElementById('startBtn').style.display = 'none';
             document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('upgradeBtn').style.display = 'inline-block';
 
+            updateHUD();
             gameLoop();
         }
 
@@ -381,6 +480,7 @@
                         bullets.splice(bIndex, 1);
                         aliens.splice(aIndex, 1);
                         gameState.score += 10;
+                        gameState.credits += 5; // Earn credits for killing aliens
                         updateHUD();
                     }
                 });
@@ -502,6 +602,48 @@
             document.getElementById('startBtn').textContent = 'Play Again';
             document.getElementById('startBtn').style.display = 'inline-block';
             document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('upgradeBtn').style.display = 'none';
+        }
+
+        function updateHUD() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('wave').textContent = gameState.wave;
+            document.getElementById('lives').textContent = gameState.lives;
+            document.getElementById('credits').textContent = gameState.credits;
+        }
+
+        function toggleUpgrades() {
+            const panel = document.getElementById('upgrade-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function buyUpgrade(type) {
+            const costs = {
+                damage: 50 * (gameState.upgrades.damage + 1),
+                speed: 75 * (gameState.upgrades.speed + 1),
+                shield: 100 * (gameState.upgrades.shield + 1),
+                rapid: 125 * (gameState.upgrades.rapid + 1)
+            };
+
+            if (gameState.credits >= costs[type]) {
+                gameState.credits -= costs[type];
+                gameState.upgrades[type]++;
+
+                // Apply upgrade effects
+                if (type === 'shield' && gameState.upgrades[type] === 1) {
+                    gameState.lives++;
+                }
+
+                updateHUD();
+                updateUpgradeCosts();
+            }
+        }
+
+        function updateUpgradeCosts() {
+            document.getElementById('damage-cost').textContent = 50 * (gameState.upgrades.damage + 1);
+            document.getElementById('speed-cost').textContent = 75 * (gameState.upgrades.speed + 1);
+            document.getElementById('shield-cost').textContent = 100 * (gameState.upgrades.shield + 1);
+            document.getElementById('rapid-cost').textContent = 125 * (gameState.upgrades.rapid + 1);
         }
 
         function gameLoop() {

@@ -3,33 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=d        <!-- Game Interface -->
-        <div id=" game-interface">
-    <div class="game-stats">
-        <div class="stat">Score: <span id="score">0</span></div>
-        <div class="stat">Level: <span id="level">1</span></div>
-        <div class="stat">Time: <span id="timer">60</span>s</div>
-    </div>
-
-    <div id="puzzle-container">
-        <h3 id="puzzle-question">What comes next in the sequence: 2, 4, 8, 16, ?</h3>
-        <div class="answer-grid" id="answer-grid">
-            <button class="answer-btn" onclick="selectAnswer(32)">32</button>
-            <button class="answer-btn" onclick="selectAnswer(20)">20</button>
-            <button class="answer-btn" onclick="selectAnswer(24)">24</button>
-            <button class="answer-btn" onclick="selectAnswer(30)">30</button>
-        </div>
-    </div>
-
-    <div class="game-controls">
-        <button class="control-btn" onclick="skipPuzzle()">Skip (-10 points)</button>
-        <button class="control-btn" onclick="getHint()">Hint (-5 points)</button>
-        <button class="control-btn" onclick="startGame()" id="start-btn">Start Game</button>
-    </div>
-
-    <div id="feedback" class="feedback"></div>
-    </div> initial-scale=1.0">
-    <title>🧩 Puzzle Quest - Game Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧩 Puzzle Quest - Enhanced Edition</title>
     <style>
         * {
             margin: 0;
@@ -39,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             min-height: 100vh;
             color: white;
             display: flex;
@@ -47,142 +22,243 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateY(100vh) rotate(0deg);
+            }
+
+            to {
+                transform: translateY(-100px) rotate(360deg);
+            }
         }
 
         .game-container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
             border-radius: 25px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 800px;
             width: 100%;
             border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
         }
 
         .game-title {
-            font-size: 3em;
+            font-size: 3.5em;
             margin-bottom: 20px;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .game-description {
-            font-size: 1.2em;
+            font-size: 1.3em;
             margin-bottom: 30px;
             opacity: 0.9;
             line-height: 1.6;
         }
 
-        .features {
-            list-style: none;
-            margin-bottom: 30px;
-            text-align: left;
-        }
-
-        .features li {
-            margin: 10px 0;
-            font-size: 1.1em;
-            opacity: 0.8;
-            padding: 8px 0;
-        }
-
         .game-stats {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 15px;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .stat {
             font-weight: bold;
             font-size: 1.2em;
+            text-align: center;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.8em;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
         #puzzle-container {
             margin: 30px 0;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-height: 250px;
+        }
+
+        #puzzle-question {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.4;
             padding: 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
         }
 
-        #puzzle-question {
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
         .answer-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
+            gap: 20px;
+            margin: 30px 0;
         }
 
         .answer-btn {
-            padding: 15px;
-            font-size: 1.1em;
-            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
             color: white;
-            border: none;
-            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         .answer-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .answer-btn.correct {
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            animation: correctPulse 0.5s ease;
         }
 
         .answer-btn.wrong {
-            background: linear-gradient(45deg, #F44336, #E91E63);
+            background: linear-gradient(135deg, #F44336, #E91E63);
+            animation: wrongShake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes wrongShake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
         }
 
         .game-controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             justify-content: center;
-            margin: 20px 0;
+            margin: 30px 0;
+            flex-wrap: wrap;
         }
 
         .control-btn {
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
         .control-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        #start-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            font-size: 1.3em;
+            padding: 18px 40px;
         }
 
         .feedback {
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.4em;
             font-weight: bold;
             margin: 20px 0;
-            min-height: 30px;
+            min-height: 40px;
+            padding: 15px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
         }
 
-        .coming-soon {
-            font-size: 1.5em;
-            color: #ffd700;
-            margin-bottom: 30px;
-            font-weight: bold;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        .feedback.success {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+
+        .feedback.error {
+            background: rgba(244, 67, 54, 0.3);
+            color: #F44336;
+            border: 2px solid #F44336;
+        }
+
+        .feedback.warning {
+            background: rgba(255, 193, 7, 0.3);
+            color: #FFC107;
+            border: 2px solid #FFC107;
+        }
+
+        .feedback.info {
+            background: rgba(33, 150, 243, 0.3);
+            color: #2196F3;
+            border: 2px solid #2196F3;
         }
 
         .back-btn {
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            background: linear-gradient(45deg, #667eea, #764ba2);
             border: none;
             border-radius: 50px;
             padding: 15px 40px;
@@ -191,52 +267,138 @@
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             text-decoration: none;
             display: inline-block;
+            margin-top: 30px;
         }
 
         .back-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-            background: linear-gradient(45deg, #ff5252, #ffc107);
         }
 
-        .features {
-            list-style: none;
-            margin-bottom: 30px;
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
 
-        .features li {
-            margin: 10px 0;
-            font-size: 1.1em;
-            opacity: 0.8;
+        .difficulty-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn.active {
+            background: rgba(255, 215, 0, 0.3);
+            border-color: #FFD700;
+            color: #FFD700;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .game-title {
+                font-size: 2.5em;
+            }
+
+            .answer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="floating-shapes" id="floating-shapes"></div>
+
     <div class="game-container">
         <div class="game-title">🧩 Puzzle Quest</div>
 
         <div class="game-description">
-            Solve logic puzzles and brain teasers! Challenge yourself with daily riddles and unlock new levels.
+            Enhanced brain training with multiple difficulty levels and achievements!
         </div>
 
-        <div class="coming-soon">🚧 Coming Soon! 🚧</div>
+        <!-- Difficulty Selector -->
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Easy</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Medium</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Hard</button>
+        </div>
 
-        <ul class="features">
-            <li>🧠 Daily brain teasers</li>
-            <li>🔓 Unlock harder puzzles</li>
-            <li>🏅 Earn badges for solving</li>
-            <li>� Progress tracking</li>
-            <li>🎲 Variety of puzzle types</li>
-            <li>🏅 Achievement badges for solving puzzles</li>
-            <li>📈 Track your progress and streaks</li>
-            <li>🎲 Multiple puzzle categories</li>
-        </ul>
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+        </div>
+
+        <!-- Game Interface -->
+        <div id="game-interface">
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-value" id="score">0</span>
+                    Score
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="level">1</span>
+                    Level
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="timer">60</span>
+                    Time
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="streak">0</span>
+                    Streak
+                </div>
+            </div>
+
+            <div id="puzzle-container">
+                <h3 id="puzzle-question">Click Start Game to begin your puzzle adventure!</h3>
+                <div class="answer-grid" id="answer-grid">
+                    <!-- Answers will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="control-btn" onclick="skipPuzzle()" id="skip-btn" style="display:none;">Skip (-10
+                    points)</button>
+                <button class="control-btn" onclick="getHint()" id="hint-btn" style="display:none;">Hint (-5
+                    points)</button>
+                <button class="control-btn" onclick="startGame()" id="start-btn">Start Game</button>
+            </div>
+
+            <div id="feedback" class="feedback"></div>
+        </div>
 
         <a href="/" class="back-btn">← Back to Game Hub</a>
     </div>
@@ -248,41 +410,85 @@
             timeLeft: 60,
             currentPuzzle: 0,
             gameActive: false,
-            timer: null
+            timer: null,
+            difficulty: 'easy',
+            streak: 0,
+            maxStreak: 0,
+            totalCorrect: 0,
+            totalAnswered: 0
         };
 
         const puzzles = [
             {
-                question: "What comes next in the sequence: 2, 4, 8, 16, ?",
+                question: "What comes next: 2, 4, 8, 16, ?",
                 answers: [32, 20, 24, 30],
                 correct: 0,
-                hint: "Each number doubles the previous one"
+                hint: "Each number doubles",
+                difficulty: "easy"
             },
             {
-                question: "If you have 12 apples and eat 3, then buy 5 more, how many do you have?",
+                question: "If 12 apples - 3 eaten + 5 bought = ?",
                 answers: [14, 16, 12, 15],
                 correct: 0,
-                hint: "12 - 3 + 5 = ?"
+                hint: "12 - 3 + 5 = ?",
+                difficulty: "easy"
             },
             {
-                question: "What's the next number: 1, 1, 2, 3, 5, 8, ?",
-                answers: [11, 13, 15, 12],
-                correct: 1,
-                hint: "Add the two previous numbers"
-            },
-            {
-                question: "If today is Wednesday, what day will it be in 10 days?",
-                answers: ["Saturday", "Friday", "Sunday", "Monday"],
-                correct: 0,
-                hint: "Count forward 10 days from Wednesday"
-            },
-            {
-                question: "Complete the pattern: A, C, E, G, ?",
+                question: "Complete: A, C, E, G, ?",
                 answers: ["H", "I", "J", "K"],
                 correct: 1,
-                hint: "Skip one letter each time"
+                hint: "Skip one letter each time",
+                difficulty: "easy"
+            },
+            {
+                question: "Fibonacci: 1, 1, 2, 3, 5, 8, ?",
+                answers: [11, 13, 15, 12],
+                correct: 1,
+                hint: "Add previous two numbers",
+                difficulty: "medium"
+            },
+            {
+                question: "What's 15% of 200?",
+                answers: [30, 25, 35, 40],
+                correct: 0,
+                hint: "15/100 × 200",
+                difficulty: "medium"
+            },
+            {
+                question: "If all roses are flowers, and some flowers are red, are all roses red?",
+                answers: ["Yes", "No", "Maybe", "Unknown"],
+                correct: 1,
+                hint: "Think logically about the statements",
+                difficulty: "hard"
             }
         ];
+
+        function createFloatingShapes() {
+            const container = document.getElementById('floating-shapes');
+            for (let i = 0; i < 15; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+                shape.style.left = Math.random() * 100 + '%';
+                shape.style.width = shape.style.height = (Math.random() * 40 + 20) + 'px';
+                shape.style.animationDelay = Math.random() * 15 + 's';
+                shape.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(shape);
+            }
+        }
+
+        function setDifficulty(diff) {
+            gameState.difficulty = diff;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function getFilteredPuzzles() {
+            return puzzles.filter(p =>
+                gameState.difficulty === 'easy' ? p.difficulty === 'easy' :
+                    gameState.difficulty === 'medium' ? p.difficulty !== 'hard' :
+                        true // hard includes all
+            );
+        }
 
         function startGame() {
             gameState.gameActive = true;
@@ -290,17 +496,27 @@
             gameState.level = 1;
             gameState.timeLeft = 60;
             gameState.currentPuzzle = 0;
+            gameState.streak = 0;
+            gameState.totalCorrect = 0;
+            gameState.totalAnswered = 0;
 
             document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('skip-btn').style.display = 'inline-block';
+            document.getElementById('hint-btn').style.display = 'inline-block';
+
             updateUI();
             loadPuzzle();
             startTimer();
         }
 
         function startTimer() {
+            clearInterval(gameState.timer);
             gameState.timer = setInterval(() => {
                 gameState.timeLeft--;
-                document.getElementById('timer').textContent = gameState.timeLeft;
+                updateUI();
+
+                const progress = (gameState.timeLeft / 60) * 100;
+                document.getElementById('progress-fill').style.width = progress + '%';
 
                 if (gameState.timeLeft <= 0) {
                     endGame();
@@ -309,7 +525,10 @@
         }
 
         function loadPuzzle() {
-            const puzzle = puzzles[gameState.currentPuzzle];
+            const availablePuzzles = getFilteredPuzzles();
+            const puzzle = availablePuzzles[Math.floor(Math.random() * availablePuzzles.length)];
+            gameState.currentPuzzleData = puzzle;
+
             document.getElementById('puzzle-question').textContent = puzzle.question;
 
             const answerGrid = document.getElementById('answer-grid');
@@ -327,23 +546,30 @@
         function selectAnswer(answerIndex) {
             if (!gameState.gameActive) return;
 
-            const puzzle = puzzles[gameState.currentPuzzle];
+            clearInterval(gameState.timer);
+            gameState.totalAnswered++;
+
             const buttons = document.querySelectorAll('.answer-btn');
 
             buttons.forEach((btn, index) => {
-                if (index === puzzle.correct) {
+                if (index === gameState.currentPuzzleData.correct) {
                     btn.classList.add('correct');
-                } else if (index === answerIndex && index !== puzzle.correct) {
+                } else if (index === answerIndex && index !== gameState.currentPuzzleData.correct) {
                     btn.classList.add('wrong');
                 }
                 btn.disabled = true;
             });
 
-            if (answerIndex === puzzle.correct) {
-                gameState.score += 10 + gameState.level * 5;
-                showFeedback("Correct! ✅", "success");
+            if (answerIndex === gameState.currentPuzzleData.correct) {
+                gameState.streak++;
+                gameState.totalCorrect++;
+                const points = 10 + (gameState.streak * 2);
+                gameState.score += points;
+
+                showFeedback(`Correct! +${points} points (Streak: ${gameState.streak})`, "success");
             } else {
-                showFeedback("Wrong! ❌", "error");
+                gameState.streak = 0;
+                showFeedback("Wrong! Streak broken ❌", "error");
             }
 
             setTimeout(() => {
@@ -354,10 +580,8 @@
         function nextPuzzle() {
             gameState.currentPuzzle++;
 
-            if (gameState.currentPuzzle >= puzzles.length) {
+            if (gameState.currentPuzzle % 5 === 0) {
                 gameState.level++;
-                gameState.currentPuzzle = 0;
-                gameState.timeLeft += 30; // Bonus time for new level
                 showFeedback(`Level ${gameState.level}! 🎉`, "success");
             }
 
@@ -365,12 +589,16 @@
                 loadPuzzle();
                 clearFeedback();
                 updateUI();
+                gameState.timeLeft = Math.min(60, gameState.timeLeft + 10); // Bonus time
+                startTimer();
             }, 1000);
         }
 
         function skipPuzzle() {
             if (!gameState.gameActive) return;
+            clearInterval(gameState.timer);
             gameState.score = Math.max(0, gameState.score - 10);
+            gameState.streak = 0;
             showFeedback("Puzzle skipped! -10 points", "warning");
             setTimeout(() => {
                 nextPuzzle();
@@ -378,10 +606,9 @@
         }
 
         function getHint() {
-            if (!gameState.gameActive) return;
-            const puzzle = puzzles[gameState.currentPuzzle];
+            if (!gameState.gameActive || !gameState.currentPuzzleData) return;
             gameState.score = Math.max(0, gameState.score - 5);
-            showFeedback(`Hint: ${puzzle.hint}`, "info");
+            showFeedback(`Hint: ${gameState.currentPuzzleData.hint}`, "info");
             updateUI();
         }
 
@@ -393,37 +620,56 @@
 
         function clearFeedback() {
             document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
         }
 
         function updateUI() {
             document.getElementById('score').textContent = gameState.score;
             document.getElementById('level').textContent = gameState.level;
             document.getElementById('timer').textContent = gameState.timeLeft;
+            document.getElementById('streak').textContent = gameState.streak;
         }
 
         function endGame() {
             gameState.gameActive = false;
             clearInterval(gameState.timer);
 
+            const accuracy = gameState.totalAnswered > 0 ? Math.round((gameState.totalCorrect / gameState.totalAnswered) * 100) : 0;
             const finalScore = gameState.score;
-            showFeedback(`Game Over! Final Score: ${finalScore}`, "info");
 
-            // Save high score
+            showFeedback(`Final Score: ${finalScore} | Accuracy: ${accuracy}%`, "info");
+
             const highScore = localStorage.getItem('puzzleQuestHighScore') || 0;
             if (finalScore > highScore) {
                 localStorage.setItem('puzzleQuestHighScore', finalScore);
-                showFeedback(`New High Score: ${finalScore}! 🏆`, "success");
+                setTimeout(() => {
+                    showFeedback(`🏆 NEW HIGH SCORE: ${finalScore}! 🏆`, "success");
+                }, 2000);
             }
 
-            document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('start-btn').style.display = 'inline-block';
             document.getElementById('start-btn').textContent = 'Play Again';
+            document.getElementById('skip-btn').style.display = 'none';
+            document.getElementById('hint-btn').style.display = 'none';
         }
 
-        // Initialize the game interface
+        // Initialize
         document.addEventListener('DOMContentLoaded', function () {
+            createFloatingShapes();
+
             const highScore = localStorage.getItem('puzzleQuestHighScore');
             if (highScore) {
-                document.getElementById('puzzle-question').textContent = `High Score: ${highScore} - Click Start Game to play!`;
+                document.getElementById('puzzle-question').textContent = `High Score: ${highScore} - Choose difficulty and start!`;
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (!gameState.gameActive) return;
+
+            if (e.key >= '1' && e.key <= '4') {
+                const answerIndex = parseInt(e.key) - 1;
+                selectAnswer(answerIndex);
             }
         });
     </script>

@@ -8,19 +8,47 @@
         <canvas id="gameCanvas" width="400" height="600"
             style="border: 2px solid #ffa500; border-radius: 10px; background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);"></canvas>
 
+        <!-- Combo Display -->
+        <div class="combo-display" id="combo-display">
+            PERFECT COMBO x<span id="combo-count">0</span>! +<span id="combo-bonus">0</span> bonus!
+        </div>
+
         <!-- Game HUD -->
         <div class="game-hud">
             <div class="hud-item">Height: <span id="height">0</span></div>
             <div class="hud-item">Score: <span id="score">0</span></div>
             <div class="hud-item">Perfect: <span id="perfect">0</span></div>
+            <div class="hud-item">Multiplier: x<span id="multiplier">1</span></div>
+        </div>
+
+        <!-- Power-up Panel -->
+        <div class="power-up-display" id="power-up-display">
+            <h4 style="color: #ffa500;">🎁 Power-ups Available!</h4>
+            <div class="power-up-grid">
+                <div class="power-up-item" onclick="activatePowerUp('slow')">
+                    <div>⏰ Slow Motion</div>
+                    <div style="font-size: 0.8em;">Slower block movement</div>
+                </div>
+                <div class="power-up-item" onclick="activatePowerUp('magnet')">
+                    <div>🧲 Block Magnet</div>
+                    <div style="font-size: 0.8em;">Auto-perfect placement</div>
+                </div>
+                <div class="power-up-item" onclick="activatePowerUp('double')">
+                    <div>💰 Double Points</div>
+                    <div style="font-size: 0.8em;">2x score for 5 blocks</div>
+                </div>
+            </div>
         </div>
 
         <!-- Game Controls -->
         <div class="game-controls">
             <button class="control-btn" onclick="startGame()" id="startBtn">Start Building</button>
-            <button class="control-btn" onclick="dropBlock()" id="dropBtn" style="display:none;">Drop Block</button>
+            <button class="control-btn" onclick="dropBlock()" id="dropBtn" style="display:none;">Drop Block
+                (SPACE)</button>
+            <button class="control-btn" onclick="togglePowerUps()" id="powerBtn"
+                style="display:none;">Power-ups</button>
             <div class="instructions">
-                Click "Drop Block" at the perfect moment to stack blocks!
+                Perfect timing = bonus points! Chain perfects for multipliers! Power-ups unlock every 5 perfect blocks!
             </div>
         </div>
         <style>
@@ -236,6 +264,66 @@
                 font-size: 1em;
                 opacity: 0.8;
             }
+
+            .power-up-display {
+                background: rgba(0, 0, 0, 0.8);
+                border: 2px solid #ffa500;
+                border-radius: 15px;
+                padding: 15px;
+                margin: 15px 0;
+                text-align: center;
+                display: none;
+            }
+
+            .power-up-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .power-up-item {
+                background: rgba(255, 165, 0, 0.2);
+                border: 1px solid #ffa500;
+                border-radius: 10px;
+                padding: 10px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-size: 0.9em;
+            }
+
+            .power-up-item:hover {
+                background: rgba(255, 165, 0, 0.4);
+                transform: scale(1.05);
+            }
+
+            .power-up-item.active {
+                background: rgba(0, 255, 0, 0.3);
+                border-color: #00ff00;
+            }
+
+            .combo-display {
+                background: rgba(255, 215, 0, 0.9);
+                color: #000;
+                padding: 10px 20px;
+                border-radius: 20px;
+                font-weight: bold;
+                margin: 10px 0;
+                display: none;
+                animation: comboFlash 0.5s ease;
+            }
+
+            @keyframes comboFlash {
+
+                0%,
+                100% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.1);
+                }
+            }
         </style>
 </head>
 
@@ -384,7 +472,11 @@
 
             if (centerDiff < perfectThreshold) {
                 gameState.perfectCount++;
-                gameState.score += 50; // Bonus for perfect placement
+                let bonus = 50;
+                if (gameState.doublePoints && gameState.doublePoints > 0) {
+                    bonus *= 2;
+                }
+                gameState.score += bonus; // Bonus for perfect placement
 
                 // Perfect placement effect
                 createPerfectEffect(currentBlock.x + currentBlock.width / 2, currentBlock.y);
@@ -393,7 +485,12 @@
             // Add to blocks
             blocks.push({ ...currentBlock });
             gameState.height++;
-            gameState.score += 10;
+            let points = 10;
+            if (gameState.doublePoints && gameState.doublePoints > 0) {
+                points *= 2;
+                gameState.doublePoints--;
+            }
+            gameState.score += points;
             gameState.gameSpeed += 0.1; // Increase difficulty
 
             updateHUD();
@@ -532,6 +629,48 @@
             render();
 
             requestAnimationFrame(gameLoop);
+        }
+
+        // Power-up system
+        let powerUpsVisible = false;
+        
+        function togglePowerUps() {
+            const panel = document.getElementById('powerups-panel');
+            powerUpsVisible = !powerUpsVisible;
+            panel.style.display = powerUpsVisible ? 'block' : 'none';
+        }
+        
+        function activatePowerUp(type) {
+            if (gameState.score < 50) return; // Require minimum score
+            
+            switch (type) {
+                case 'slow':
+                    gameState.gameSpeed *= 0.5;
+                    gameState.score -= 50;
+                    setTimeout(() => {
+                        gameState.gameSpeed *= 2; // Restore speed
+                    }, 3000);
+                    break;
+                    
+                case 'magnet':
+                    // Make next block "magnetic" - auto-center on perfect placement
+                    if (currentBlock) {
+                        const lastBlock = blocks[blocks.length - 1];
+                        currentBlock.x = lastBlock.x; // Auto-align
+                        gameState.score -= 50;
+                    }
+                    break;
+                    
+                case 'double':
+                    // Double points for next 5 blocks
+                    const originalScore = gameState.score;
+                    gameState.doublePoints = 5;
+                    gameState.score = originalScore - 50;
+                    break;
+            }
+            
+            updateHUD();
+            togglePowerUps(); // Close panel after use
         }
 
         // Add keyboard support
