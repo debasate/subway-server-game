@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -189,6 +190,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="game-container">
         <div class="game-header">
@@ -386,7 +388,7 @@
             const centerY = canvas.height / 2;
             const angle = Math.atan2(player.y - centerY, player.x - centerX);
             const normalizedAngle = (angle + Math.PI * 2) % (Math.PI * 2);
-            
+
             player.lapProgress = normalizedAngle / (Math.PI * 2);
 
             // Check for lap completion
@@ -460,7 +462,7 @@
                 ctx.translate(car.x, car.y);
                 ctx.rotate(car.angle);
                 ctx.fillStyle = car.color;
-                ctx.fillRect(-car.width/2, -car.height/2, car.width, car.height);
+                ctx.fillRect(-car.width / 2, -car.height / 2, car.width, car.height);
                 ctx.restore();
             });
 
@@ -469,7 +471,7 @@
             ctx.translate(player.x, player.y);
             ctx.rotate(player.angle);
             ctx.fillStyle = '#00ffff';
-            ctx.fillRect(-player.width/2, -player.height/2, player.width, player.height);
+            ctx.fillRect(-player.width / 2, -player.height / 2, player.width, player.height);
             ctx.restore();
 
             // Update UI
@@ -488,8 +490,8 @@
             // Calculate and display position
             let currentPosition = 1;
             aiCars.forEach(car => {
-                if (car.lapProgress > player.lapProgress || 
-                   (currentLap === car.currentLap && car.lapProgress > player.lapProgress)) {
+                if (car.lapProgress > player.lapProgress ||
+                    (currentLap === car.currentLap && car.lapProgress > player.lapProgress)) {
                     currentPosition++;
                 }
             });
@@ -556,4 +558,5 @@
         });
     </script>
 </body>
+
 </html>

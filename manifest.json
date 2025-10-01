@@ -7,7 +7,10 @@
     "orientation": "any",
     "background_color": "#667eea",
     "theme_color": "#667eea",
-    "categories": ["games", "entertainment"],
+    "categories": [
+        "games",
+        "entertainment"
+    ],
     "lang": "en-US",
     "scope": "/",
     "icons": [

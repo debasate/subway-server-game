@@ -8,7 +8,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>🎮 Game Hub - Choose Your Adventure!</title>
-    
+
     <!-- PWA Configuration -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#667eea">
@@ -1074,6 +1074,64 @@
             display: none;
         }
 
+        /* PWA Install Styles */
+        .pwa-install {
+            position: fixed;
+            top: 20px;
+            left: 320px;
+            z-index: 999;
+        }
+
+        .install-btn {
+            background: rgba(0, 184, 148, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .install-btn:hover {
+            background: rgba(0, 184, 148, 1);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 184, 148, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 184, 148, 0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 768px) {
             .auth-container {
                 top: 10px;
@@ -1150,10 +1208,20 @@
             </button>
         </div>
 
+        <!-- PWA Install Prompt -->
+        <div class="pwa-install" id="pwa-install" style="display: none;">
+            <button class="install-btn" onclick="installPWA()" id="install-btn">
+                <span>📱</span>
+                <span>Install App</span>
+            </button>
+        </div>
+
         <!-- External Links -->
         <div class="external-links">
-            <a href="https://gtstijn.site" target="_blank" class="external-link">🌐 GTStijn.site</a>
-            <a href="https://echobots.gg" target="_blank" class="external-link">🤖 EchoBots.gg</a>
+            <a href="https://debasate.github.io/subway-server-game/" target="_blank" class="external-link">🌐 Live
+                Demo</a>
+            <a href="https://github.com/debasate/subway-server-game" target="_blank" class="external-link">💻 GitHub
+                Repo</a>
             <a href="fps-game.html" class="external-link">🔫 FPS Arena</a>
         </div>
 
@@ -1270,7 +1338,8 @@
                 <div class="game-icon">🏎️</div>
                 <h2 class="game-title">Racing Arena</h2>
                 <p class="game-description">
-                    Race against AI opponents in high-speed action! Master tight turns, use boost strategically, and claim victory in this adrenaline-fueled racing game!
+                    Race against AI opponents in high-speed action! Master tight turns, use boost strategically, and
+                    claim victory in this adrenaline-fueled racing game!
                 </p>
                 <ul class="game-features">
                     <li>🏁 3-lap racing championships</li>
@@ -1540,9 +1609,9 @@
 
             // Calculate total games played (estimate)
             const racingStats = JSON.parse(localStorage.getItem('racingStats') || '{}');
-            const gamesPlayed = (subwayStats.gamesPlayed || 0) + 
-                              (cookieGameState.sessionCookies > 0 ? 1 : 0) +
-                              (racingStats.gamesPlayed || 0);
+            const gamesPlayed = (subwayStats.gamesPlayed || 0) +
+                (cookieGameState.sessionCookies > 0 ? 1 : 0) +
+                (racingStats.gamesPlayed || 0);
             document.getElementById('games-played').textContent = gamesPlayed;
 
             // Calculate achievements (estimate)
@@ -1695,7 +1764,7 @@
                 loadStats();
                 initAnnouncement();
                 initTheme();
-                
+
                 // Check for daily login reward
                 setTimeout(checkDailyReward, 1000);
 
@@ -2096,7 +2165,7 @@
                 navigator.serviceWorker.register('/sw.js')
                     .then((registration) => {
                         console.log('SW registered: ', registration);
-                        
+
                         // Check for updates
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
@@ -2117,30 +2186,88 @@
             });
         }
 
-        // PWA Install prompt
+        // PWA Installation
         let deferredPrompt;
+
         window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
+            // Stash the event so it can be triggered later
             deferredPrompt = e;
-            
-            // Show install button/banner
-            setTimeout(() => {
-                if (confirm('Install Game Hub as an app for the best experience?')) {
-                    showInstallPrompt();
-                }
-            }, 3000);
+            // Show install button
+            document.getElementById('pwa-install').style.display = 'block';
+            console.log('📱 PWA install prompt available');
         });
 
-        function showInstallPrompt() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
-                    deferredPrompt = null;
-                });
+        async function installPWA() {
+            if (!deferredPrompt) {
+                alert('📱 App installation not available. You can bookmark this page or add it to your home screen manually!');
+                return;
             }
+
+            // Show the prompt
+            deferredPrompt.prompt();
+
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+
+            if (outcome === 'accepted') {
+                console.log('📱 User accepted the PWA install prompt');
+                // Hide the install button
+                document.getElementById('pwa-install').style.display = 'none';
+            } else {
+                console.log('📱 User dismissed the PWA install prompt');
+            }
+
+            deferredPrompt = null;
+        }
+
+        // Handle PWA installation
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('🎉 Game Hub PWA was installed successfully!');
+            document.getElementById('pwa-install').style.display = 'none';
+
+            // Show success message
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 10000;
+                background: linear-gradient(135deg, #4CAF50, #45a049);
+                color: white; padding: 15px 20px; border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                font-weight: bold; animation: slideIn 0.3s ease;
+            `;
+            successMsg.innerHTML = '🎉 Game Hub installed! Find it in your apps menu.';
+            document.body.appendChild(successMsg);
+
+            setTimeout(() => {
+                successMsg.remove();
+            }, 4000);
+        });
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('🎮 PWA Service Worker registered successfully:', registration.scope);
+
+                        // Handle updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New update available
+                                    if (confirm('🚀 New Game Hub update available! Refresh to get the latest features?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('PWA Service Worker registration failed:', error);
+                    });
+            });
         }
 
         // Wait for API client to load, then initialize auth
@@ -2351,7 +2478,7 @@
             const today = new Date().toDateString();
             const lastLogin = localStorage.getItem('lastLoginDate');
             const loginStreak = parseInt(localStorage.getItem('loginStreak') || '0');
-            
+
             if (lastLogin !== today) {
                 // Calculate streak
                 let newStreak = 1;
@@ -2359,23 +2486,23 @@
                     const lastDate = new Date(lastLogin);
                     const todayDate = new Date(today);
                     const dayDiff = (todayDate - lastDate) / (1000 * 60 * 60 * 24);
-                    
+
                     if (dayDiff === 1) {
                         newStreak = loginStreak + 1;
                     }
                 }
-                
+
                 // Calculate reward based on streak
                 const baseReward = 100;
                 const streakBonus = Math.min(newStreak * 20, 500);
                 const totalReward = baseReward + streakBonus;
-                
+
                 // Give reward
                 const currentCoins = parseInt(localStorage.getItem('subwayCoins') || '0');
                 localStorage.setItem('subwayCoins', (currentCoins + totalReward).toString());
                 localStorage.setItem('lastLoginDate', today);
                 localStorage.setItem('loginStreak', newStreak.toString());
-                
+
                 // Show reward banner
                 showDailyReward(totalReward, newStreak);
             }
@@ -2384,10 +2511,10 @@
         function showDailyReward(coins, streak) {
             const banner = document.getElementById('daily-reward-banner');
             const rewardInfo = document.getElementById('reward-info');
-            
+
             rewardInfo.textContent = `+${coins} coins • Day ${streak} streak`;
             banner.style.display = 'block';
-            
+
             // Auto-hide after 5 seconds
             setTimeout(() => {
                 closeDailyReward();
@@ -2397,7 +2524,7 @@
         function closeDailyReward() {
             const banner = document.getElementById('daily-reward-banner');
             banner.style.animation = 'slideOut 0.5s ease-in-out forwards';
-            
+
             setTimeout(() => {
                 banner.style.display = 'none';
                 banner.style.animation = '';
@@ -2420,28 +2547,28 @@
                     const stream = await navigator.mediaDevices.getDisplayMedia({
                         video: { mediaSource: 'screen' }
                     });
-                    
+
                     const video = document.createElement('video');
                     video.srcObject = stream;
                     video.play();
-                    
+
                     video.addEventListener('loadedmetadata', () => {
                         const canvas = document.createElement('canvas');
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
-                        
+
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(video, 0, 0);
-                        
+
                         // Stop the stream
                         stream.getTracks().forEach(track => track.stop());
-                        
+
                         // Download the image
                         const link = document.createElement('a');
                         link.download = `game-hub-screenshot-${Date.now()}.png`;
                         link.href = canvas.toDataURL();
                         link.click();
-                        
+
                         alert('📸 Screenshot saved! Check your downloads folder.');
                     });
                 } else {
@@ -2471,13 +2598,13 @@
                 `🎯 Games Played: ${stats.games}\n` +
                 `🏆 Achievements: ${stats.achievements}\n` +
                 `🔥 Login Streak: ${stats.streak}\n\n` +
-                `Play at https://gtstijn.space 🚀`;
+                `Play at https://debasate.github.io/subway-server-game/ 🚀`;
 
             if (navigator.share) {
                 navigator.share({
                     title: 'My Game Hub Stats',
                     text: shareText,
-                    url: 'https://gtstijn.space'
+                    url: 'https://debasate.github.io/subway-server-game/'
                 });
             } else {
                 // Fallback: copy to clipboard
@@ -2525,7 +2652,7 @@
 
             // Footer
             ctx.font = '24px Arial';
-            ctx.fillText('Play at gtstijn.space', 400, 550);
+            ctx.fillText('Play at debasate.github.io/subway-server-game', 400, 550);
 
             // Download the achievement card
             const link = document.createElement('a');
@@ -2649,11 +2776,11 @@
                 const updateMessage = `🎮 **Game Hub Activity** 🎮
 
 🟢 Server Status: Online
-🎯 Active Games: Subway Surfer, Cookie Clicker, Blox Fruits
+🎯 Active Games: Subway Surfer, Cookie Clicker, Blox Fruits, FPS Arena, Racing Arena
 🪙 Wednesday Coin Boost: ${isWednesday() ? 'ACTIVE (2x coins!)' : 'Ready for next Wednesday'}
 👤 User Session: ${currentUser?.username || 'Guest Player'}
 ⏰ Last Updated: ${new Date().toLocaleString('en-US')}
-🌐 Website: https://gtstijn.space
+🌐 Website: https://debasate.github.io/subway-server-game/
 
 Ready for gaming! 🚀`;
 
