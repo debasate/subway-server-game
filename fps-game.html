@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔫 FPS Arena</title>
+    <title>🔫 FPS Arena v2.0 - Combat Evolved</title>
     <style>
         body {
             background: #222;
@@ -67,6 +67,25 @@
 <body>
     <button class="back-btn" onclick="window.location.href='/'">🏠 Game Hub</button>
     <div class="hud" id="hud">Loading...</div>
+    
+    <!-- NEW: Weapon Selection HUD -->
+    <div style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;">
+        <h4 style="margin: 0 0 10px 0; color: #fff;">🔫 Weapons (v2.0)</h4>
+        <button onclick="selectWeapon('pistol')" style="display: block; margin: 5px 0;">🔫 Pistol</button>
+        <button onclick="selectWeapon('rifle')" style="display: block; margin: 5px 0;">🏹 Rifle</button>
+        <button onclick="selectWeapon('shotgun')" style="display: block; margin: 5px 0;">💥 Shotgun</button>
+        <button onclick="selectWeapon('sniper')" style="display: block; margin: 5px 0;">🎯 Sniper</button>
+    </div>
+
+    <!-- NEW: Score & Stats -->
+    <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;">
+        <div style="color: #fff;">
+            <div>🎯 Kills: <span id="kill-count">0</span></div>
+            <div>🏆 Best Streak: <span id="best-streak">0</span></div>
+            <div>⚡ Accuracy: <span id="accuracy">100%</span></div>
+            <div>💰 Cash: $<span id="cash">0</span></div>
+        </div>
+    </div>
     <canvas id="game-canvas" width="900" height="600"></canvas>
     <script>
         // FPS Arena - Simple JS FPS with 9 NPCs

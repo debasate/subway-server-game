@@ -14,6 +14,7 @@
         <div class="header">
             <a href="/" class="nav-btn back-to-hub">🏠 Game Hub</a>
             <h1>🍪 Cookie Clicker</h1>
+            <div class="version-badge">v2.5.0</div>
             <div class="user-display" id="user-display" style="display: none;">
                 <span id="current-user-name"></span>
             </div>
@@ -55,8 +56,55 @@
         <!-- Upgrades Panel -->
         <div class="upgrades-panel">
             <h3>⬆️ Upgrades</h3>
+            <div class="new-features-banner">
+                🚀 NEW v2.5.0: Golden Cookies, Prestige System, Mini-Games!
+            </div>
             <div class="upgrades-container" id="upgrades-container">
                 <!-- Upgrades will be added by JavaScript -->
+            </div>
+        </div>
+
+        <!-- NEW: Golden Cookie -->
+        <div class="golden-cookie" id="golden-cookie" style="display: none;">
+            🌟
+        </div>
+
+        <!-- NEW: Mini-Games Panel -->
+        <div class="minigames-panel">
+            <h3>🎮 Mini-Games</h3>
+            <div class="minigames-grid">
+                <div class="minigame-card" data-game="cookie-storm">
+                    <div class="game-icon">🌪️</div>
+                    <h4>Cookie Storm</h4>
+                    <p>Click falling cookies for bonus!</p>
+                    <button class="play-btn" onclick="startMiniGame('storm')">Play</button>
+                </div>
+                <div class="minigame-card" data-game="cookie-match">
+                    <div class="game-icon">🧩</div>
+                    <h4>Cookie Match</h4>
+                    <p>Match cookie pairs to win!</p>
+                    <button class="play-btn" onclick="startMiniGame('match')">Play</button>
+                </div>
+                <div class="minigame-card" data-game="cookie-runner">
+                    <div class="game-icon">🏃</div>
+                    <h4>Cookie Runner</h4>
+                    <p>Avoid obstacles, collect cookies!</p>
+                    <button class="play-btn" onclick="startMiniGame('runner')">Play</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW: Prestige Panel -->
+        <div class="prestige-panel">
+            <h3>⭐ Prestige System</h3>
+            <div class="prestige-info">
+                <div class="prestige-points">
+                    <span>Prestige Points: <strong id="prestige-points">0</strong></span>
+                    <span>Next Prestige: <strong id="next-prestige">1,000,000 cookies</strong></span>
+                </div>
+                <button class="prestige-btn" id="prestige-btn" onclick="prestige()">
+                    🌟 Prestige (+1 point, +5% CPS forever)
+                </button>
             </div>
         </div>
 

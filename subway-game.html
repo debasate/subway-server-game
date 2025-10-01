@@ -50,6 +50,20 @@
             </div>
             <div class="panel-content">
                 <div class="update-item latest">
+                    <div class="update-version">v4.0.0 - MEGA EXPANSION!</div>
+                    <div class="update-date">1 Oct 2025</div>
+                    <ul>
+                        <li>🎮 3 NEW Game Modes: Time Attack, Boss Rush, Zen Mode</li>
+                        <li>👔 5 NEW Character Skins with special abilities</li>
+                        <li>🏆 Advanced Achievement System (50+ achievements)</li>
+                        <li>💰 Daily Rewards & Weekly Challenges</li>
+                        <li>🎨 2 NEW Themes: Cyberpunk & Retro Wave</li>
+                        <li>⚡ Power-up Combinations & Chain Effects</li>
+                        <li>📊 Detailed Statistics Dashboard</li>
+                        <li>🎵 Dynamic Music System</li>
+                    </ul>
+                </div>
+                <div class="update-item">
                     <div class="update-version">v3.3.3 - FIXES & MOBILE!</div>
                     <div class="update-date">24 Sep 2025</div>
                     <ul>
@@ -85,7 +99,7 @@
         <div class="game-header">
             <button id="back-to-hub-btn" class="back-to-hub-btn">� Game Hub</button>
             <h1>🚇 Subway Surfer</h1>
-            <div class="version-badge">v3.3.3</div>
+            <div class="version-badge">v4.0.0</div>
             <button id="show-updates" class="updates-btn">📋 Updates</button>
             <button id="settings-btn" class="settings-btn">⚙️ Settings</button>
         </div>
@@ -203,6 +217,36 @@
                     </div>
                     <button id="mirror-btn" class="mode-btn" onclick="startGameMode('mirror')">Spelen</button>
                 </div>
+
+                <div class="gamemode-card" data-mode="timeattack" style="background: linear-gradient(45deg, #ff6b6b, #feca57);">
+                    <div class="mode-icon">⏱️</div>
+                    <h4>Time Attack</h4>
+                    <p>Score as much as possible in 60 seconds! NEW!</p>
+                    <div class="mode-stats">
+                        <span>⏱️ Best 60s: <span id="timeattack-best">0</span></span>
+                    </div>
+                    <button id="timeattack-btn" class="mode-btn" onclick="startGameMode('timeattack')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="bossrush" style="background: linear-gradient(45deg, #ee5a6f, #f29263);">
+                    <div class="mode-icon">👹</div>
+                    <h4>Boss Rush</h4>
+                    <p>Fight epic bosses every 500 points! NEW!</p>
+                    <div class="mode-stats">
+                        <span>👹 Bosses Defeated: <span id="bossrush-best">0</span></span>
+                    </div>
+                    <button id="bossrush-btn" class="mode-btn" onclick="startGameMode('bossrush')">Spelen</button>
+                </div>
+
+                <div class="gamemode-card" data-mode="zen" style="background: linear-gradient(45deg, #5f27cd, #341f97);">
+                    <div class="mode-icon">🧘</div>
+                    <h4>Zen Mode</h4>
+                    <p>No obstacles, just collect coins peacefully! NEW!</p>
+                    <div class="mode-stats">
+                        <span>🧘 Best Zen: <span id="zen-best">0</span></span>
+                    </div>
+                    <button id="zen-btn" class="mode-btn" onclick="startGameMode('zen')">Spelen</button>
+                </div>
             </div>
         </div>
 
@@ -264,6 +308,22 @@
                     <p>All colors of the rainbow</p>
                     <div class="theme-unlock">🔓 Score 5000</div>
                     <button class="theme-btn" data-theme="rainbow">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="cyberpunk">
+                    <div class="theme-preview cyberpunk-theme"></div>
+                    <h4>🌃 Cyberpunk</h4>
+                    <p>Futuristic neon city vibes</p>
+                    <div class="theme-unlock">🔓 Score 7500 - NEW!</div>
+                    <button class="theme-btn" data-theme="cyberpunk">Selecteer</button>
+                </div>
+
+                <div class="theme-card" data-theme="retrowave">
+                    <div class="theme-preview retrowave-theme"></div>
+                    <h4>🌆 Retro Wave</h4>
+                    <p>80s synthwave aesthetic</p>
+                    <div class="theme-unlock">🔓 Score 10000 - NEW!</div>
+                    <button class="theme-btn" data-theme="retrowave">Selecteer</button>
                 </div>
             </div>
         </div>
