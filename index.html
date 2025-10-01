@@ -1065,13 +1065,6 @@
                     <!-- Leaderboard rows will be inserted here -->
                 </tbody>
             </table>
-            <div id="leaderboard-status" style="font-size:0.9em;opacity:0.7;">
-                <span id="status-guest" style="display: none;">📱 Scores saved locally only - Login for online
-                    leaderboard!</span>
-                <span id="status-online" style="display: none;">🌍 Scores automatically saved to online
-                    leaderboard</span>
-                <span id="status-offline">🔌 Server offline - Scores saved locally only</span>
-            </div>
         </div>
 
         <!-- Update Log Section -->
@@ -1432,29 +1425,11 @@
             updateLeaderboardStatus();
         }
 
-        // Update leaderboard status based on user login and server status
+        // Update leaderboard status (disabled - status messages removed for cleaner UI)
         function updateLeaderboardStatus() {
-            const guestStatus = document.getElementById('status-guest');
-            const onlineStatus = document.getElementById('status-online');
-            const offlineStatus = document.getElementById('status-offline');
-
-            // Hide all status messages first
-            guestStatus.style.display = 'none';
-            onlineStatus.style.display = 'none';
-            offlineStatus.style.display = 'none';
-
-            // Check if online leaderboard is available
-            if (!isOnlineLeaderboardAvailable) {
-                // Online leaderboard is not available
-                offlineStatus.style.display = 'inline';
-                offlineStatus.innerHTML = '🔌 Online leaderboard unavailable - Scores saved locally only';
-            } else if (currentUser && currentUser.username) {
-                // User is logged in and online leaderboard is available
-                onlineStatus.style.display = 'inline';
-            } else {
-                // Online leaderboard is available but user not logged in
-                guestStatus.style.display = 'inline';
-            }
+            // Status messages have been removed for a cleaner interface
+            // Leaderboard functionality remains intact but without visual status indicators
+            return;
         }
 
         // Check server status every 30 seconds (will be started after API client loads)
