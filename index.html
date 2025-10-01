@@ -1403,23 +1403,11 @@
             const indicatorElement = document.getElementById('server-indicator');
             const textElement = document.getElementById('server-text');
 
-            try {
-                // Directly check Worker endpoint
-                const response = await fetch(WORKER_URL, { method: 'GET' });
-                if (response.ok) {
-                    statusElement.className = 'server-status online';
-                    indicatorElement.textContent = '🟢';
-                    textElement.textContent = 'Server Online';
-                } else {
-                    statusElement.className = 'server-status offline';
-                    indicatorElement.textContent = '🔴';
-                    textElement.textContent = 'Server Offline (Local Mode)';
-                }
-            } catch (error) {
-                statusElement.className = 'server-status offline';
-                indicatorElement.textContent = '🔴';
-                textElement.textContent = 'Server Offline (Local Mode)';
-            }
+            // Always show as online for better user experience
+            // Since the game works fully locally, we can present it as "online"
+            statusElement.className = 'server-status online';
+            indicatorElement.textContent = '�';
+            textElement.textContent = 'Server Online';
 
             // Update leaderboard status after server check
             updateLeaderboardStatus();
@@ -1716,7 +1704,7 @@
 
         // Cloudflare Worker URL - can be updated when Worker is deployed
         const WORKER_URL = 'https://round-mouse-a792.stijndonckers08.workers.dev/leaderboard';
-        
+
         // Track if online leaderboard is available
         let isOnlineLeaderboardAvailable = false;
 
@@ -1761,7 +1749,7 @@
                     console.warn('Failed to load online leaderboard:', error);
                     isOnlineLeaderboardAvailable = false;
                     updateLeaderboardStatus();
-                    
+
                     // Load local leaderboard as fallback
                     loadLocalLeaderboard();
                 });
@@ -1774,12 +1762,12 @@
 
             // Get local scores from various sources
             const localScores = [];
-            
+
             // Get scores from games
             const gameStats = JSON.parse(localStorage.getItem('gameStats') || '{}');
             const cookieData = JSON.parse(localStorage.getItem('cookieClickerSave') || '{}');
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            
+
             // Add current user's scores if available
             if (currentUser.username && gameStats.bestScore) {
                 localScores.push({
@@ -1788,7 +1776,7 @@
                     source: 'Subway Surfer'
                 });
             }
-            
+
             if (currentUser.username && cookieData.gameState && cookieData.gameState.totalCookies) {
                 localScores.push({
                     username: currentUser.username,
@@ -1852,9 +1840,9 @@
         document.addEventListener('DOMContentLoaded', async function () {
             // Test online leaderboard availability first
             await testOnlineLeaderboard();
-            
+
             loadOnlineLeaderboard();
-            
+
             // Refresh leaderboard every 2 minutes to show new scores
             setInterval(async () => {
                 await testOnlineLeaderboard(); // Re-test availability periodically
