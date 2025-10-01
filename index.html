@@ -1065,7 +1065,8 @@
                     <!-- Leaderboard rows will be inserted here -->
                 </tbody>
             </table>
-            <div style="font-size:0.9em;opacity:0.7;">Scores are updated locally. For online leaderboard, connect to server.</div>
+            <div style="font-size:0.9em;opacity:0.7;">Scores are updated locally. For online leaderboard, connect to
+                server.</div>
         </div>
 
         <!-- Update Log Section -->
@@ -1389,17 +1390,9 @@
             const textElement = document.getElementById('server-text');
 
             try {
-                // Check if API client is loaded
-                if (!window.gameHubAPI) {
-                    statusElement.className = 'server-status offline';
-                    indicatorElement.textContent = '🔴';
-                    textElement.textContent = 'API Client Loading...';
-                    return;
-                }
-
-                const isOnline = await window.gameHubAPI.checkConnection();
-
-                if (isOnline) {
+                // Directly check Worker endpoint
+                const response = await fetch(WORKER_URL, { method: 'GET' });
+                if (response.ok) {
                     statusElement.className = 'server-status online';
                     indicatorElement.textContent = '🟢';
                     textElement.textContent = 'Server Online';
@@ -1694,6 +1687,36 @@
             };
             document.head.appendChild(script);
         });
+
+        // Vervang deze URL door jouw Worker URL
+        const WORKER_URL = 'https://round-mouse-a792.stijndonckers08.workers.dev/leaderboard';
+
+        // Online leaderboard ophalen
+        function loadOnlineLeaderboard() {
+            fetch(WORKER_URL)
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('leaderboard-body');
+                    tbody.innerHTML = '';
+                    data.forEach((entry, i) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td style='padding:8px;'>${i + 1}</td><td style='padding:8px;'>${entry.username}</td><td style='padding:8px;'>${entry.totalScore}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        // Score posten
+        function submitScore(username, score, game) {
+            fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, score, game })
+            });
+        }
+
+        // Roep online leaderboard op bij laden
+        document.addEventListener('DOMContentLoaded', loadOnlineLeaderboard);
     </script>
 </body>
 
