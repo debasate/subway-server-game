@@ -1692,12 +1692,16 @@
                 updateServerStatus();
                 // Start periodic server status checks
                 serverStatusInterval = setInterval(updateServerStatus, 30000);
+                // Send Discord notification about session activity
+                setTimeout(sendUpdateNotification, 2000);
             };
             script.onerror = function () {
                 console.warn('API client failed to load, using local mode only');
                 initAuth();
                 updateServerStatus();
                 // No need for server status checks if API client failed to load
+                // Send Discord notification even in local mode
+                setTimeout(sendUpdateNotification, 2000);
             };
             document.head.appendChild(script);
         });
@@ -1915,6 +1919,101 @@
         window.isWednesday = isWednesday;
         window.getWednesdayBoostMultiplier = getWednesdayBoostMultiplier;
         window.applyWednesdayBoost = applyWednesdayBoost;
+
+        // Discord Webhook Notification System
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1422861232217526382/yLzmdq2HaHIh8b7nBsljOqSpR1jNWHQjn4CVXPn-0EoJIUPieCJaKEd8ba8nSS_DDGGi';
+
+        // Send notification to Discord webhook
+        async function sendDiscordNotification(title, description, color = 0x00ff00) {
+            try {
+                const embed = {
+                    title: title,
+                    description: description,
+                    color: color,
+                    timestamp: new Date().toISOString(),
+                    footer: {
+                        text: "Game Hub Update System"
+                    },
+                    thumbnail: {
+                        url: "🎮"
+                    }
+                };
+
+                const payload = {
+                    username: "Game Hub Bot",
+                    avatar_url: "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3ae.png",
+                    embeds: [embed]
+                };
+
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    console.log('✅ Discord notification sent successfully');
+                    return true;
+                } else {
+                    console.error('❌ Failed to send Discord notification');
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Discord notification error:', error);
+                return false;
+            }
+        }
+
+        // Send update notification on page load (only once per session)
+        function sendUpdateNotification() {
+            const lastNotificationDate = localStorage.getItem('lastUpdateNotification');
+            const today = new Date().toDateString();
+            
+            // Only send notification once per day
+            if (lastNotificationDate !== today) {
+                const updateMessage = `🎮 **Game Hub Activity** 🎮
+
+🟢 Server Status: Online
+🎯 Active Games: Subway Surfer, Cookie Clicker
+🪙 Wednesday Coin Boost: ${isWednesday() ? 'ACTIVE (2x coins!)' : 'Ready for next Wednesday'}
+👤 User Session: ${currentUser?.username || 'Guest Player'}
+⏰ Last Updated: ${new Date().toLocaleString()}
+
+Ready for gaming! 🚀`;
+
+                sendDiscordNotification(
+                    "🎮 Game Hub - Player Activity",
+                    updateMessage,
+                    isWednesday() ? 0xffd700 : 0x00ff00 // Gold color on Wednesday, green otherwise
+                );
+                
+                localStorage.setItem('lastUpdateNotification', today);
+            }
+        }
+
+        // Send notification when games are played
+        function sendGameplayNotification(gameName, score, coins) {
+            const notificationMessage = `🎯 **New High Score!** 🎯
+
+🎮 Game: ${gameName}
+📊 Score: ${score}
+🪙 Coins Earned: ${coins}
+👤 Player: ${currentUser?.username || 'Guest'}
+⏰ Time: ${new Date().toLocaleString()}
+🎁 Wednesday Boost: ${isWednesday() ? 'Active!' : 'Not active'}`;
+
+            sendDiscordNotification(
+                `🏆 ${gameName} - New Score!`,
+                notificationMessage,
+                0x0099ff // Blue color for gameplay notifications
+            );
+        }
+
+        // Make Discord functions globally available for games to use
+        window.sendDiscordNotification = sendDiscordNotification;
+        window.sendGameplayNotification = sendGameplayNotification;
     </script>
 </body>
 

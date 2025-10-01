@@ -974,6 +974,11 @@ function saveGameProgress() {
                 if (username !== 'Guest' && Math.floor(score) > 0) {
                     window.submitScore(username, Math.floor(score), gameMode || 'subway');
                     console.log(`🌍 Score ${Math.floor(score)} submitted to online leaderboard for ${username}`);
+                    
+                    // Send Discord notification for high scores (>500 points)
+                    if (Math.floor(score) > 500 && typeof window.sendGameplayNotification === 'function') {
+                        window.sendGameplayNotification('Subway Surfer', Math.floor(score), coinsThisRun);
+                    }
                 }
             }
         } catch (error) {
