@@ -2,6 +2,18 @@ export default {
     async fetch(request, env) {
         const url = new URL(request.url);
 
+        // CORS headers
+        const corsHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        };
+
+        // Handle OPTIONS preflight
+        if (request.method === 'OPTIONS') {
+            return new Response(null, { headers: corsHeaders });
+        }
+
         // Helper: hash password with SHA-256
         async function hashPassword(password) {
             const encoder = new TextEncoder();
@@ -20,7 +32,7 @@ export default {
                 scores.push(value);
             }
             scores.sort((a, b) => b.totalScore - a.totalScore);
-            return new Response(JSON.stringify(scores.slice(0, 20)), { headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify(scores.slice(0, 20)), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
         // Leaderboard POST
@@ -34,7 +46,7 @@ export default {
                 entry = { username, totalScore: score, game };
             }
             await env.KV.put(key, JSON.stringify(entry));
-            return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
         // Register endpoint
@@ -43,7 +55,7 @@ export default {
             const userKey = `user:${username}`;
             const existing = await env.KV.get(userKey, { type: 'json' });
             if (existing) {
-                return new Response(JSON.stringify({ error: 'Username already exists' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+                return new Response(JSON.stringify({ error: 'Username already exists' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
             const hashedPassword = await hashPassword(password);
             const user = {
@@ -54,7 +66,7 @@ export default {
                 totalScore: 0
             };
             await env.KV.put(userKey, JSON.stringify(user));
-            return new Response(JSON.stringify({ user }), { headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ user }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
         // Login endpoint
@@ -64,13 +76,13 @@ export default {
             const user = await env.KV.get(userKey, { type: 'json' });
             const hashedPassword = await hashPassword(password);
             if (!user || user.password !== hashedPassword) {
-                return new Response(JSON.stringify({ error: 'Invalid username or password' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+                return new Response(JSON.stringify({ error: 'Invalid username or password' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
             }
             user.lastLogin = new Date().toISOString();
             await env.KV.put(userKey, JSON.stringify(user));
-            return new Response(JSON.stringify({ user }), { headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ user }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
 
-        return new Response('Not found', { status: 404 });
+        return new Response('Not found', { status: 404, headers: corsHeaders });
     }
 };

@@ -973,7 +973,7 @@
 
         <div class="games-grid">
             <!-- Subway Surfer Game -->
-            <div class="game-card" onclick="playSubway()">
+            <div class="game-card">
                 <div class="game-icon">🚇</div>
                 <h2 class="game-title">Subway Surfer</h2>
                 <p class="game-description">
@@ -991,7 +991,7 @@
             </div>
 
             <!-- Cookie Clicker Game -->
-            <div class="game-card" onclick="playCookie()">
+            <div class="game-card">
                 <div class="game-icon">🍪</div>
                 <h2 class="game-title">Cookie Clicker</h2>
                 <p class="game-description">
@@ -1005,11 +1005,11 @@
                     <li>📈 Idle progression system</li>
                     <li>🏆 Achievement rewards</li>
                 </ul>
-                <button class="play-btn">Play Cookie</button>
+                <button class="play-btn" onclick="playCookie()">Play Cookie</button>
             </div>
 
             <!-- FPS Arena Game -->
-            <div class="game-card" onclick="playFPS()">
+            <div class="game-card">
                 <div class="game-icon">🔫</div>
                 <h2 class="game-title">FPS Arena</h2>
                 <p class="game-description">
@@ -1023,7 +1023,7 @@
                     <li>💥 Muzzle flash & hit marker effects</li>
                     <li>🏆 Scoreboard & victory screen</li>
                 </ul>
-                <button class="play-btn">Play FPS</button>
+                <button class="play-btn" onclick="playFPS()">Play FPS</button>
             </div>
         </div>
 
@@ -1080,20 +1080,36 @@
                 <!-- Latest Update -->
                 <div class="update-item latest">
                     <div class="update-header">
-                        <div class="update-version">v1.5.0 - Leaderboard added</div>
-                        <div class="update-date">September 30, 2025</div>
+                        <div class="update-version">v1.6.0 - Wednesday Coin Boost & UI Fixes</div>
+                        <div class="update-date">October 1, 2025</div>
                     </div>
                     <div class="update-content">
                         <ul>
-                            <li>Leaderboard added for all games (combined)</li>
-                            <li>Buttons fixed for Subway and FPS Arena</li>
-                            <li>General bugfixes and improvements</li>
+                            <li>Wednesday Coin Boost: 2x coins every Wednesday! 🪙</li>
+                            <li>Fixed all game buttons (Subway, Cookie, FPS)</li>
+                            <li>Secure password hashing with SHA-256</li>
+                            <li>CORS support for online features</li>
+                            <li>Enhanced online/offline authentication system</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Hidden Updates (shown when expanded) -->
                 <div id="older-updates" style="display: none;">
+                    <div class="update-item">
+                        <div class="update-header">
+                            <div class="update-version">v1.5.0 - Leaderboard added</div>
+                            <div class="update-date">September 30, 2025</div>
+                        </div>
+                        <div class="update-content">
+                            <ul>
+                                <li>Leaderboard added for all games (combined)</li>
+                                <li>Buttons fixed for Subway and FPS Arena</li>
+                                <li>General bugfixes and improvements</li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <div class="update-item">
                         <div class="update-header">
                             <div class="update-version">v1.3.0 - Cookie Clicker Enhancements</div>
@@ -1717,6 +1733,72 @@
 
         // Roep online leaderboard op bij laden
         document.addEventListener('DOMContentLoaded', loadOnlineLeaderboard);
+
+        // Wednesday Coin Boost System
+        function isWednesday() {
+            return new Date().getDay() === 3; // 0=Sunday, 3=Wednesday
+        }
+
+        function getWednesdayBoostMultiplier() {
+            return isWednesday() ? 2 : 1; // 2x coins on Wednesday
+        }
+
+        function showWednesdayBoostNotification() {
+            if (isWednesday()) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    background: linear-gradient(45deg, #ffd700, #ffed4e);
+                    color: #333;
+                    padding: 15px 20px;
+                    border-radius: 15px;
+                    font-weight: bold;
+                    z-index: 1001;
+                    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+                    animation: slideInRight 0.5s ease;
+                `;
+                notification.innerHTML = '🪙 Wednesday Coin Boost Active! 2x Coins in all games! 🪙';
+                document.body.appendChild(notification);
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.5s ease';
+                    setTimeout(() => notification.remove(), 500);
+                }, 5000);
+            }
+        }
+
+        // Add CSS animations for notification
+        const boostStyle = document.createElement('style');
+        boostStyle.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(boostStyle);
+
+        // Show boost notification on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(showWednesdayBoostNotification, 1000);
+        });
+
+        // Function to apply coin boost (to be used in games)
+        function applyWednesdayBoost(coinAmount) {
+            const boost = getWednesdayBoostMultiplier();
+            return Math.floor(coinAmount * boost);
+        }
+
+        // Make boost functions globally available
+        window.isWednesday = isWednesday;
+        window.getWednesdayBoostMultiplier = getWednesdayBoostMultiplier;
+        window.applyWednesdayBoost = applyWednesdayBoost;
     </script>
 </body>
 
