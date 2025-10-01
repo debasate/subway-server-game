@@ -358,6 +358,36 @@
             gameState.keys[e.code] = false;
         });
 
+        // Initial render to show the canvas
+        function initialRender() {
+            // Clear canvas with space background
+            ctx.fillStyle = '#000011';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add some stars
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                ctx.fillRect(x, y, 1, 1);
+            }
+            
+            // Show "Press Start Game" message
+            ctx.fillStyle = '#00ffff';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Press "Start Game" to Begin!', canvas.width / 2, canvas.height / 2);
+            
+            // Show player ship preview
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(player.x + 20, player.y - 5, 10, 8);
+        }
+        
+        // Call initial render when page loads
+        initialRender();
+
         function startGame() {
             gameState.running = true;
             gameState.paused = false;
@@ -522,9 +552,17 @@
         }
 
         function render() {
-            // Clear canvas
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            // Clear canvas with space background
+            ctx.fillStyle = '#000011';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add background stars
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            for (let i = 0; i < 30; i++) {
+                const x = (Date.now() * 0.01 + i * 25) % canvas.width;
+                const y = (i * 37) % canvas.height;
+                ctx.fillRect(x, y, 1, 1);
+            }
 
             // Draw player
             ctx.fillStyle = player.color;
