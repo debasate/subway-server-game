@@ -438,7 +438,7 @@
         function updatePlayer() {
             // Apply speed upgrade
             const currentSpeed = player.speed + (gameState.upgrades.speed * 1);
-            
+
             if (gameState.keys['KeyA'] || gameState.keys['ArrowLeft']) {
                 player.x = Math.max(0, player.x - currentSpeed);
             }
@@ -461,7 +461,7 @@
             const now = Date.now();
             // Apply rapid fire upgrade - reduce delay by 30ms per level
             const shootDelay = Math.max(50, 200 - (gameState.upgrades.rapid * 30));
-            
+
             if (now - lastShot > shootDelay) {
                 bullets.push({
                     x: player.x + player.width / 2,
@@ -517,12 +517,12 @@
 
                         bullets.splice(bIndex, 1);
                         aliens.splice(aIndex, 1);
-                        
+
                         // Apply damage upgrade - more score and credits
                         const damageMultiplier = 1 + (gameState.upgrades.damage * 0.5);
                         gameState.score += Math.floor(10 * damageMultiplier);
                         gameState.credits += Math.floor(5 * damageMultiplier);
-                        
+
                         updateHUD();
                     }
                 });
@@ -612,7 +612,7 @@
             // Check for wave completion
             if (gameState.running && aliens.length === 0) {
                 gameState.wave++;
-                
+
                 // Show wave complete message
                 ctx.fillStyle = '#00ffff';
                 ctx.font = '32px Arial';
@@ -620,7 +620,7 @@
                 ctx.fillText(`Wave ${gameState.wave - 1} Complete!`, canvas.width / 2, canvas.height / 2 - 20);
                 ctx.font = '20px Arial';
                 ctx.fillText(`Preparing Wave ${gameState.wave}...`, canvas.width / 2, canvas.height / 2 + 20);
-                
+
                 // Delay before next wave
                 setTimeout(() => {
                     if (gameState.running) {
