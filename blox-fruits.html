@@ -210,24 +210,161 @@
             margin-top: 5px;
         }
 
-        .coming-soon {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+        .game-arena {
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
             border-radius: 15px;
-            padding: 40px;
+            padding: 30px;
+            margin-top: 20px;
+            min-height: 400px;
+            position: relative;
+            display: none;
+        }
+
+        .game-arena.active {
+            display: block;
+        }
+
+        .battle-interface {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: 100%;
+        }
+
+        .player-side, .enemy-side {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
             text-align: center;
+        }
+
+        .character-display {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            transition: width 0.3s ease;
+        }
+
+        .health-fill.low {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+        }
+
+        .battle-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
             margin-top: 20px;
         }
 
-        .coming-soon h3 {
-            font-size: 2em;
-            margin-bottom: 15px;
+        .action-btn {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            border: none;
+            border-radius: 15px;
+            padding: 10px 15px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .battle-log {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .log-player {
+            color: #4CAF50;
+        }
+
+        .log-enemy {
+            color: #f44336;
+        }
+
+        .log-system {
             color: #ffd700;
         }
 
-        .coming-soon p {
+        .victory-screen, .defeat-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-radius: 15px;
+        }
+
+        .victory-screen.show, .defeat-screen.show {
+            display: flex;
+        }
+
+        .result-title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .victory-screen .result-title {
+            color: #ffd700;
+        }
+
+        .defeat-screen .result-title {
+            color: #ff4444;
+        }
+
+        .reward-display {
             font-size: 1.2em;
-            opacity: 0.9;
-            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
 
         @media (max-width: 768px) {
@@ -340,18 +477,66 @@
             </div>
         </div>
 
-        <div class="coming-soon">
-            <h3>⚠️ Game Coming Soon!</h3>
-            <p>
-                🏴‍☠️ The full Blox Fruits adventure is under development!<br><br>
-                🎮 <strong>Planned Features:</strong><br>
-                • Epic Devil Fruit battles<br>
-                • Haki mastery system<br>
-                • Island exploration<br>
-                • Crew battles & raids<br>
-                • Marine vs Pirate wars<br><br>
-                🚀 <strong>Coming in the next major update!</strong>
-            </p>
+        <!-- Game Arena -->
+        <div class="game-arena" id="game-arena">
+            <div class="battle-interface">
+                <div class="player-side">
+                    <h4>⚔️ Your Fighter</h4>
+                    <div class="character-display" id="player-display">🏴‍☠️</div>
+                    <div class="health-bar">
+                        <div class="health-fill" id="player-health" style="width: 100%;"></div>
+                    </div>
+                    <div id="player-info">
+                        <div><strong>HP:</strong> <span id="player-hp">100</span>/100</div>
+                        <div><strong>Fruit:</strong> <span id="player-fruit">None</span></div>
+                    </div>
+                </div>
+                
+                <div class="enemy-side">
+                    <h4>💀 Enemy</h4>
+                    <div class="character-display" id="enemy-display">⚓</div>
+                    <div class="health-bar">
+                        <div class="health-fill" id="enemy-health" style="width: 100%;"></div>
+                    </div>
+                    <div id="enemy-info">
+                        <div><strong>HP:</strong> <span id="enemy-hp">80</span>/80</div>
+                        <div><strong>Type:</strong> <span id="enemy-type">Marine</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="battle-actions" id="battle-actions">
+                <button class="action-btn" onclick="normalAttack()">⚔️ Attack</button>
+                <button class="action-btn" onclick="useDevilFruit()">🍎 Devil Fruit</button>
+                <button class="action-btn" onclick="useHaki()">💪 Haki</button>
+                <button class="action-btn" onclick="defend()">🛡️ Defend</button>
+            </div>
+
+            <div class="battle-log" id="battle-log">
+                <div class="log-entry log-system">⚔️ Battle started! Choose your action!</div>
+            </div>
+
+            <!-- Victory Screen -->
+            <div class="victory-screen" id="victory-screen">
+                <div class="result-title">🏆 VICTORY!</div>
+                <div class="reward-display" id="victory-rewards">
+                    🪙 Bounty Increased: +50,000<br>
+                    ⭐ Experience: +25 XP
+                </div>
+                <button class="action-btn" onclick="nextBattle()">🚀 Next Battle</button>
+                <button class="action-btn" onclick="backToHub()">🏠 Back to Hub</button>
+            </div>
+
+            <!-- Defeat Screen -->
+            <div class="defeat-screen" id="defeat-screen">
+                <div class="result-title">💀 DEFEAT!</div>
+                <div class="reward-display">
+                    💔 You were defeated, but gained experience from the battle!<br>
+                    ⭐ Experience: +10 XP
+                </div>
+                <button class="action-btn" onclick="tryAgain()">🔄 Try Again</button>
+                <button class="action-btn" onclick="backToHub()">🏠 Back to Hub</button>
+            </div>
         </div>
     </div>
 
@@ -419,6 +604,36 @@
             }
         }
 
+        // Game state
+        let battleState = {
+            playerHP: 100,
+            playerMaxHP: 100,
+            enemyHP: 80,
+            enemyMaxHP: 80,
+            playerTurn: true,
+            battleActive: false,
+            currentEnemy: null
+        };
+
+        // Devil Fruit powers
+        const devilFruits = {
+            rubber: { name: 'Gomu Gomu', damage: [25, 35], icon: '🍎' },
+            fire: { name: 'Mera Mera', damage: [30, 40], icon: '🔥' },
+            ice: { name: 'Hie Hie', damage: [28, 38], icon: '❄️' },
+            light: { name: 'Pika Pika', damage: [35, 45], icon: '⚡' },
+            dark: { name: 'Yami Yami', damage: [32, 42], icon: '🌑' },
+            quake: { name: 'Gura Gura', damage: [40, 50], icon: '🌊' }
+        };
+
+        // Enemy types
+        const enemies = [
+            { name: 'Marine Soldier', hp: 60, damage: [15, 25], icon: '⚓', type: 'Marine' },
+            { name: 'Pirate Captain', hp: 90, damage: [20, 30], icon: '🏴‍☠️', type: 'Pirate' },
+            { name: 'Bounty Hunter', hp: 75, damage: [18, 28], icon: '🎯', type: 'Bounty Hunter' },
+            { name: 'Revolutionary', hp: 85, damage: [22, 32], icon: '✊', type: 'Revolutionary' },
+            { name: 'Marine Captain', hp: 120, damage: [25, 35], icon: '👮', type: 'Marine Elite' }
+        ];
+
         // Start adventure
         function startAdventure() {
             if (!selectedCharacter || !selectedFruit) {
@@ -426,25 +641,216 @@
                 return;
             }
 
-            alert(`🏴‍☠️ Adventure starting soon!\n\n⚔️ Character: ${selectedCharacter}\n🍎 Devil Fruit: ${selectedFruit}\n\nThe full game is coming in the next update! Stay tuned for epic One Piece adventures! 🚀`);
+            // Initialize battle
+            initializeBattle();
+            
+            // Hide selection and show arena
+            document.querySelector('.character-selection').style.display = 'none';
+            document.querySelector('.fruit-selection').style.display = 'none';
+            document.querySelector('.game-actions').style.display = 'none';
+            document.getElementById('game-arena').classList.add('active');
 
-            // Simulate some progress
-            gameStats.fruitsEaten++;
-            if (Math.random() > 0.5) {
+            // Update player display
+            updatePlayerDisplay();
+            
+            addLogEntry('⚔️ Adventure begins! Prepare for battle!', 'system');
+        }
+
+        function initializeBattle() {
+            // Reset battle state
+            battleState.playerHP = battleState.playerMaxHP;
+            battleState.enemyHP = battleState.enemyMaxHP;
+            battleState.playerTurn = true;
+            battleState.battleActive = true;
+
+            // Select random enemy
+            battleState.currentEnemy = enemies[Math.floor(Math.random() * enemies.length)];
+            battleState.enemyHP = battleState.currentEnemy.hp;
+            battleState.enemyMaxHP = battleState.currentEnemy.hp;
+
+            // Update displays
+            updateHealthBars();
+            updateEnemyDisplay();
+        }
+
+        function updatePlayerDisplay() {
+            const characterIcons = {
+                pirate: '🏴‍☠️',
+                marine: '⚓',
+                'bounty-hunter': '🎯',
+                revolutionary: '✊'
+            };
+
+            document.getElementById('player-display').textContent = characterIcons[selectedCharacter] || '🏴‍☠️';
+            document.getElementById('player-fruit').textContent = devilFruits[selectedFruit].name;
+        }
+
+        function updateEnemyDisplay() {
+            document.getElementById('enemy-display').textContent = battleState.currentEnemy.icon;
+            document.getElementById('enemy-type').textContent = battleState.currentEnemy.type;
+            document.getElementById('enemy-hp').textContent = battleState.enemyHP;
+        }
+
+        function updateHealthBars() {
+            const playerHealthPercent = (battleState.playerHP / battleState.playerMaxHP) * 100;
+            const enemyHealthPercent = (battleState.enemyHP / battleState.enemyMaxHP) * 100;
+
+            const playerHealthBar = document.getElementById('player-health');
+            const enemyHealthBar = document.getElementById('enemy-health');
+
+            playerHealthBar.style.width = playerHealthPercent + '%';
+            enemyHealthBar.style.width = enemyHealthPercent + '%';
+
+            // Change color when low
+            if (playerHealthPercent < 30) {
+                playerHealthBar.classList.add('low');
+            } else {
+                playerHealthBar.classList.remove('low');
+            }
+
+            if (enemyHealthPercent < 30) {
+                enemyHealthBar.classList.add('low');
+            } else {
+                enemyHealthBar.classList.remove('low');
+            }
+
+            document.getElementById('player-hp').textContent = Math.max(0, battleState.playerHP);
+            document.getElementById('enemy-hp').textContent = Math.max(0, battleState.enemyHP);
+        }
+
+        function addLogEntry(message, type = 'system') {
+            const logElement = document.getElementById('battle-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = message;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function normalAttack() {
+            if (!battleState.battleActive || !battleState.playerTurn) return;
+
+            const damage = Math.floor(Math.random() * 11) + 15; // 15-25 damage
+            battleState.enemyHP -= damage;
+            addLogEntry(`⚔️ You attack for ${damage} damage!`, 'player');
+
+            if (checkBattleEnd()) return;
+
+            battleState.playerTurn = false;
+            setTimeout(enemyTurn, 1000);
+            updateHealthBars();
+        }
+
+        function useDevilFruit() {
+            if (!battleState.battleActive || !battleState.playerTurn) return;
+
+            const fruit = devilFruits[selectedFruit];
+            const damage = Math.floor(Math.random() * (fruit.damage[1] - fruit.damage[0] + 1)) + fruit.damage[0];
+            battleState.enemyHP -= damage;
+            addLogEntry(`${fruit.icon} ${fruit.name} power! ${damage} damage dealt!`, 'player');
+
+            if (checkBattleEnd()) return;
+
+            battleState.playerTurn = false;
+            setTimeout(enemyTurn, 1000);
+            updateHealthBars();
+        }
+
+        function useHaki() {
+            if (!battleState.battleActive || !battleState.playerTurn) return;
+
+            const damage = Math.floor(Math.random() * 16) + 20; // 20-35 damage
+            battleState.enemyHP -= damage;
+            addLogEntry(`💪 Haki infused attack! ${damage} damage!`, 'player');
+
+            if (checkBattleEnd()) return;
+
+            battleState.playerTurn = false;
+            setTimeout(enemyTurn, 1000);
+            updateHealthBars();
+        }
+
+        function defend() {
+            if (!battleState.battleActive || !battleState.playerTurn) return;
+
+            const heal = Math.floor(Math.random() * 11) + 5; // 5-15 heal
+            battleState.playerHP = Math.min(battleState.playerMaxHP, battleState.playerHP + heal);
+            addLogEntry(`🛡️ You defend and recover ${heal} HP!`, 'player');
+
+            battleState.playerTurn = false;
+            setTimeout(enemyTurn, 1000);
+            updateHealthBars();
+        }
+
+        function enemyTurn() {
+            if (!battleState.battleActive) return;
+
+            const enemy = battleState.currentEnemy;
+            const damage = Math.floor(Math.random() * (enemy.damage[1] - enemy.damage[0] + 1)) + enemy.damage[0];
+            battleState.playerHP -= damage;
+            addLogEntry(`${enemy.icon} ${enemy.name} attacks for ${damage} damage!`, 'enemy');
+
+            updateHealthBars();
+
+            if (checkBattleEnd()) return;
+
+            battleState.playerTurn = true;
+        }
+
+        function checkBattleEnd() {
+            if (battleState.enemyHP <= 0) {
+                // Victory
+                battleState.battleActive = false;
+                addLogEntry('🏆 Victory! Enemy defeated!', 'system');
+                
+                // Update stats
                 gameStats.battlesWon++;
-                gameStats.bounty += Math.floor(Math.random() * 1000000);
-            }
-            if (gameStats.battlesWon % 5 === 0) {
-                gameStats.level++;
+                gameStats.bounty += Math.floor(Math.random() * 100000) + 50000;
+                gameStats.level += Math.floor(gameStats.battlesWon / 3);
+                saveStats();
+                updateStatsDisplay();
+
+                setTimeout(() => {
+                    document.getElementById('victory-screen').classList.add('show');
+                }, 1000);
+
+                // Send Discord notification
+                if (typeof window.sendGameplayNotification === 'function') {
+                    window.sendGameplayNotification('Blox Fruits', gameStats.bounty, gameStats.level);
+                }
+                return true;
             }
 
-            saveStats();
-            updateStatsDisplay();
-
-            // Send Discord notification if available
-            if (typeof window.sendGameplayNotification === 'function') {
-                window.sendGameplayNotification('Blox Fruits', gameStats.bounty, gameStats.level);
+            if (battleState.playerHP <= 0) {
+                // Defeat
+                battleState.battleActive = false;
+                addLogEntry('💀 Defeat! You were overwhelmed!', 'system');
+                
+                setTimeout(() => {
+                    document.getElementById('defeat-screen').classList.add('show');
+                }, 1000);
+                return true;
             }
+
+            return false;
+        }
+
+        function nextBattle() {
+            document.getElementById('victory-screen').classList.remove('show');
+            document.getElementById('battle-log').innerHTML = '';
+            initializeBattle();
+            addLogEntry('⚔️ New challenger approaches!', 'system');
+        }
+
+        function tryAgain() {
+            document.getElementById('defeat-screen').classList.remove('show');
+            document.getElementById('battle-log').innerHTML = '';
+            initializeBattle();
+            addLogEntry('🔄 Ready for another battle!', 'system');
+        }
+
+        function backToHub() {
+            window.location.href = 'index.html';
         }
 
         // Show/hide stats
