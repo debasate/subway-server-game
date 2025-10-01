@@ -1979,7 +1979,7 @@
 🎯 Active Games: Subway Surfer, Cookie Clicker
 🪙 Wednesday Coin Boost: ${isWednesday() ? 'ACTIVE (2x coins!)' : 'Ready for next Wednesday'}
 👤 User Session: ${currentUser?.username || 'Guest Player'}
-⏰ Last Updated: ${new Date().toLocaleString()}
+⏰ Last Updated: ${new Date().toLocaleString('en-US')}
 
 Ready for gaming! 🚀`;
 
@@ -2001,7 +2001,7 @@ Ready for gaming! 🚀`;
 📊 Score: ${score}
 🪙 Coins Earned: ${coins}
 👤 Player: ${currentUser?.username || 'Guest'}
-⏰ Time: ${new Date().toLocaleString()}
+⏰ Time: ${new Date().toLocaleString('en-US')}
 🎁 Wednesday Boost: ${isWednesday() ? 'Active!' : 'Not active'}`;
 
             sendDiscordNotification(
