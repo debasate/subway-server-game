@@ -76,7 +76,7 @@
         <!-- Navigation -->
         <nav class="main-nav">
             <div class="nav-links">
-                <a href="index.html" class="nav-link active">🏃 Subway Runner</a>
+                <a href="/" class="nav-link active">🏃 Subway Runner</a>
                 <a href="cookie-clicker.html" class="nav-link">🍪 Cookie Clicker</a>
             </div>
         </nav>
@@ -521,7 +521,7 @@
             const backToHubBtn = document.getElementById('back-to-hub-btn');
             if (backToHubBtn) {
                 backToHubBtn.addEventListener('click', function () {
-                    window.location.href = 'index.html';
+                    window.location.href = '/';
                 });
             }
 
@@ -559,7 +559,7 @@
                         localStorage.removeItem('currentUser');
 
                         // Redirect to hub
-                        window.location.href = 'index.html';
+                        window.location.href = '/';
                     }
                 };
             } else {

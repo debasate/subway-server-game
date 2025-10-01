@@ -65,7 +65,7 @@
 </head>
 
 <body>
-    <button class="back-btn" onclick="window.location.href='index.html'">🏠 Game Hub</button>
+    <button class="back-btn" onclick="window.location.href='/'">🏠 Game Hub</button>
     <div class="hud" id="hud">Loading...</div>
     <canvas id="game-canvas" width="900" height="600"></canvas>
     <script>
@@ -271,7 +271,7 @@
             if (!player.alive) {
                 hud.innerHTML += '<br><span style="color:red">Game Over!</span>';
                 hud.innerHTML += '<br><button onclick="restartGame()">Opnieuw spelen</button>';
-                hud.innerHTML += '<button onclick=\"window.location.href=\'index.html\'\">Game Hub</button>';
+                hud.innerHTML += '<button onclick=\"window.location.href=\'/\'\">Game Hub</button>';
             }
             if (player.kills === 9) hud.innerHTML += '<br><span style="color:lime">Victory!</span>';
             requestAnimationFrame(gameLoop);
@@ -310,7 +310,7 @@
         hud.addEventListener('click', function (e) {
             if (e.target.tagName === 'BUTTON') {
                 if (e.target.textContent.includes('Opnieuw spelen')) restartGame();
-                if (e.target.textContent.includes('Game Hub')) window.location.href = 'index.html';
+                if (e.target.textContent.includes('Game Hub')) window.location.href = '/';
             }
         });
     </script>
