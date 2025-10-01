@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏗️ Tower Builder - Game Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .clouds {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            from { transform: translateX(-100px); }
+            to { transform: translateX(calc(100vw + 100px)); }
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .game-title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 165, 0, 0.7);
+            color: #ffa500;
+        }
+
+        .game-description {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .coming-soon {
+            font-size: 1.5em;
+            color: #ffd700;
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 165, 0, 0.5);
+            background: linear-gradient(45deg, #ff8c00, #ff6347);
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .features li {
+            margin: 10px 0;
+            font-size: 1.1em;
+            opacity: 0.8;
+        }
+
+        .tower-animation {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .building-block {
+            width: 15px;
+            height: 15px;
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            margin: 2px;
+            border-radius: 2px;
+            animation: stack 3s infinite ease-in-out;
+        }
+
+        .building-block:nth-child(1) { animation-delay: 0s; }
+        .building-block:nth-child(2) { animation-delay: 0.5s; }
+        .building-block:nth-child(3) { animation-delay: 1s; }
+        .building-block:nth-child(4) { animation-delay: 1.5s; }
+        .building-block:nth-child(5) { animation-delay: 2s; }
+
+        @keyframes stack {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(-20px); opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="clouds" id="clouds"></div>
+
+    <div class="game-container">
+        <div class="game-title">🏗️ Tower Builder</div>
+        
+        <div class="game-description">
+            Build the tallest tower possible! Stack blocks perfectly and reach for the sky in this challenging physics game.
+        </div>
+
+        <div class="tower-animation">
+            <div class="building-block"></div>
+            <div class="building-block"></div>
+            <div class="building-block"></div>
+            <div class="building-block"></div>
+            <div class="building-block"></div>
+        </div>
+
+        <div class="coming-soon">🚧 Coming Soon! 🚧</div>
+
+        <ul class="features">
+            <li>🧱 Perfect block stacking mechanics</li>
+            <li>📏 Precision timing challenges</li>
+            <li>🏆 Height-based scoring system</li>
+            <li>🎨 Beautiful building materials</li>
+            <li>⚡ Physics-based gameplay</li>
+        </ul>
+
+        <a href="/" class="back-btn">← Back to Game Hub</a>
+    </div>
+
+    <script>
+        // Create floating clouds
+        function createClouds() {
+            const cloudsContainer = document.getElementById('clouds');
+            for (let i = 0; i < 5; i++) {
+                const cloud = document.createElement('div');
+                cloud.className = 'cloud';
+                cloud.style.width = Math.random() * 100 + 50 + 'px';
+                cloud.style.height = Math.random() * 50 + 30 + 'px';
+                cloud.style.top = Math.random() * 60 + '%';
+                cloud.style.left = '-100px';
+                cloud.style.animationDelay = Math.random() * 20 + 's';
+                cloud.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                cloudsContainer.appendChild(cloud);
+            }
+        }
+
+        createClouds();
+    </script>
+</body>
+</html>
