@@ -1065,8 +1065,11 @@
                     <!-- Leaderboard rows will be inserted here -->
                 </tbody>
             </table>
-            <div style="font-size:0.9em;opacity:0.7;">Scores are updated locally. For online leaderboard, connect to
-                server.</div>
+            <div id="leaderboard-status" style="font-size:0.9em;opacity:0.7;">
+                <span id="status-guest" style="display: none;">📱 Scores saved locally only - Login for online leaderboard!</span>
+                <span id="status-online" style="display: none;">🌍 Scores automatically saved to online leaderboard</span>
+                <span id="status-offline">🔌 Server offline - Scores saved locally only</span>
+            </div>
         </div>
 
         <!-- Update Log Section -->
@@ -1422,6 +1425,36 @@
                 indicatorElement.textContent = '🔴';
                 textElement.textContent = 'Server Offline (Local Mode)';
             }
+            
+            // Update leaderboard status after server check
+            updateLeaderboardStatus();
+        }
+
+        // Update leaderboard status based on user login and server status
+        function updateLeaderboardStatus() {
+            const guestStatus = document.getElementById('status-guest');
+            const onlineStatus = document.getElementById('status-online');
+            const offlineStatus = document.getElementById('status-offline');
+            
+            // Hide all status messages first
+            guestStatus.style.display = 'none';
+            onlineStatus.style.display = 'none';
+            offlineStatus.style.display = 'none';
+            
+            // Check server status
+            const serverStatus = document.getElementById('server-status');
+            const isServerOnline = serverStatus && serverStatus.classList.contains('online');
+            
+            if (!isServerOnline) {
+                // Server is offline
+                offlineStatus.style.display = 'inline';
+            } else if (currentUser && currentUser.username) {
+                // User is logged in and server is online
+                onlineStatus.style.display = 'inline';
+            } else {
+                // Server is online but user not logged in
+                guestStatus.style.display = 'inline';
+            }
         }
 
         // Check server status every 30 seconds (will be started after API client loads)
@@ -1648,6 +1681,7 @@
                     <button class="logout-btn" onclick="logout()">Logout</button>
                 </div>
             `;
+            updateLeaderboardStatus();
         }
 
         function logout() {
@@ -1667,6 +1701,7 @@
                     <button class="auth-button" id="login-btn" onclick="openAuthModal('login')">Login</button>
                 `;
 
+                updateLeaderboardStatus();
                 alert('You have been logged out successfully! 👋');
             }
         }        // Close modal when clicking outside
@@ -1710,15 +1745,32 @@
         // Online leaderboard ophalen
         function loadOnlineLeaderboard() {
             fetch(WORKER_URL)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error('Server response not ok');
+                    return res.json();
+                })
                 .then(data => {
                     const tbody = document.getElementById('leaderboard-body');
                     tbody.innerHTML = '';
-                    data.forEach((entry, i) => {
+                    
+                    if (data && data.length > 0) {
+                        data.forEach((entry, i) => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `<td style='padding:8px;'>${i + 1}</td><td style='padding:8px;'>${entry.username}</td><td style='padding:8px;'>${entry.totalScore}</td>`;
+                            tbody.appendChild(tr);
+                        });
+                    } else {
+                        // Show message when no online scores available
                         const tr = document.createElement('tr');
-                        tr.innerHTML = `<td style='padding:8px;'>${i + 1}</td><td style='padding:8px;'>${entry.username}</td><td style='padding:8px;'>${entry.totalScore}</td>`;
+                        tr.innerHTML = '<td colspan="3" style="padding:20px;text-align:center;opacity:0.7;">No online scores yet - be the first to play!</td>';
                         tbody.appendChild(tr);
-                    });
+                    }
+                })
+                .catch(error => {
+                    console.warn('Failed to load online leaderboard:', error);
+                    // Show offline message in leaderboard
+                    const tbody = document.getElementById('leaderboard-body');
+                    tbody.innerHTML = '<tr><td colspan="3" style="padding:20px;text-align:center;opacity:0.7;">🔌 Server offline - Local scores only</td></tr>';
                 });
         }
 
@@ -1728,11 +1780,25 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, score, game })
+            }).then(response => {
+                if (response.ok) {
+                    console.log(`✅ Score submitted successfully: ${username} - ${score} points in ${game}`);
+                    // Refresh leaderboard after successful score submission
+                    setTimeout(loadOnlineLeaderboard, 1000); // Delay to allow server processing
+                } else {
+                    console.error('❌ Failed to submit score to leaderboard');
+                }
+            }).catch(error => {
+                console.error('❌ Score submission error:', error);
             });
         }
 
         // Roep online leaderboard op bij laden
-        document.addEventListener('DOMContentLoaded', loadOnlineLeaderboard);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOnlineLeaderboard();
+            // Refresh leaderboard every 2 minutes to show new scores
+            setInterval(loadOnlineLeaderboard, 120000);
+        });
 
         // Wednesday Coin Boost System
         function isWednesday() {

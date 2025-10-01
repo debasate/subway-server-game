@@ -793,6 +793,28 @@ function saveGame() {
     };
 
     localStorage.setItem('cookieClickerSave', JSON.stringify(saveData));
+    
+    // Submit score to online leaderboard if user is logged in
+    try {
+        if (typeof window.submitScore === 'function') {
+            // Get current user info
+            let username = 'Guest';
+            if (window.currentUser && window.currentUser.username) {
+                username = window.currentUser.username;
+            } else if (localStorage.getItem('currentUser')) {
+                const userData = JSON.parse(localStorage.getItem('currentUser'));
+                username = userData.username || 'Guest';
+            }
+            
+            // Only submit if not guest and has meaningful cookies count
+            if (username !== 'Guest' && gameState.totalCookies > 0) {
+                window.submitScore(username, Math.floor(gameState.totalCookies), 'cookie-clicker');
+                console.log(`🌍 Cookie score ${Math.floor(gameState.totalCookies)} submitted to online leaderboard for ${username}`);
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Failed to submit cookie score to online leaderboard:', error);
+    }
 }
 
 // Load Game
