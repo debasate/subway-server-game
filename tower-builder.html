@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏗️ Tower Builder - Game Hub</ti        <!-- Game Canvas -->
-        <canvas id="gameCanvas" width="400" height="600" style="border: 2px solid #ffa500; border-radius: 10px; background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);"></canvas>
-        
+    <title>🏗️ Tower Builder - Game Hub</ti <!-- Game Canvas -->
+        <canvas id="gameCanvas" width="400" height="600"
+            style="border: 2px solid #ffa500; border-radius: 10px; background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);"></canvas>
+
         <!-- Game HUD -->
         <div class="game-hud">
             <div class="hud-item">Height: <span id="height">0</span></div>
@@ -21,217 +22,221 @@
             <div class="instructions">
                 Click "Drop Block" at the perfect moment to stack blocks!
             </div>
-        </div> <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-        }
-
-        .clouds {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .cloud {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            animation: float 20s infinite linear;
-        }
-
-        @keyframes float {
-            from {
-                transform: translateX(-100px);
+        </div>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
 
-            to {
-                transform: translateX(calc(100vw + 100px));
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+                min-height: 100vh;
+                color: white;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                position: relative;
             }
-        }
 
-        .game-container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            z-index: 2;
-        }
-
-        .game-title {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 0 0 30px rgba(255, 165, 0, 0.7);
-            color: #ffa500;
-        }
-
-        .game-description {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-
-        .coming-soon {
-            font-size: 1.5em;
-            color: #ffd700;
-            margin-bottom: 30px;
-            font-weight: bold;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .back-btn {
-            background: linear-gradient(45deg, #ffa500, #ff8c00);
-            border: none;
-            border-radius: 50px;
-            padding: 15px 40px;
-            font-size: 1.3em;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.3);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .back-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(255, 165, 0, 0.5);
-            background: linear-gradient(45deg, #ff8c00, #ff6347);
-        }
-
-        .features {
-            list-style: none;
-            margin-bottom: 30px;
-        }
-
-        .features li {
-            margin: 10px 0;
-            font-size: 1.1em;
-            opacity: 0.8;
-        }
-
-        .tower-animation {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        .building-block {
-            width: 15px;
-            height: 15px;
-            background: linear-gradient(45deg, #ffa500, #ff8c00);
-            margin: 2px;
-            border-radius: 2px;
-            animation: stack 3s infinite ease-in-out;
-        }
-
-        .building-block:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .building-block:nth-child(2) {
-            animation-delay: 0.5s;
-        }
-
-        .building-block:nth-child(3) {
-            animation-delay: 1s;
-        }
-
-        .building-block:nth-child(4) {
-            animation-delay: 1.5s;
-        }
-
-        .building-block:nth-child(5) {
-            animation-delay: 2s;
-        }
-
-        @keyframes stack {
-            0%, 100% {
-                transform: translateY(0);
-                opacity: 1;
+            .clouds {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                overflow: hidden;
             }
-            50% {
-                transform: translateY(-20px);
-                opacity: 0.7;
+
+            .cloud {
+                position: absolute;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50px;
+                animation: float 20s infinite linear;
             }
-        }
 
-        #gameCanvas {
-            margin: 20px 0;
-            box-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
-        }
+            @keyframes float {
+                from {
+                    transform: translateX(-100px);
+                }
 
-        .game-hud {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0,0,0,0.8);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 1px solid #ffa500;
-        }
+                to {
+                    transform: translateX(calc(100vw + 100px));
+                }
+            }
 
-        .hud-item {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: #ffa500;
-        }
+            .game-container {
+                text-align: center;
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(10px);
+                border-radius: 25px;
+                padding: 40px;
+                max-width: 600px;
+                width: 100%;
+                border: 2px solid rgba(255, 255, 255, 0.1);
+                position: relative;
+                z-index: 2;
+            }
 
-        .game-controls {
-            text-align: center;
-            margin: 20px 0;
-        }
+            .game-title {
+                font-size: 3em;
+                margin-bottom: 20px;
+                text-shadow: 0 0 30px rgba(255, 165, 0, 0.7);
+                color: #ffa500;
+            }
 
-        .control-btn {
-            background: linear-gradient(45deg, #ffa500, #ff8c00);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 25px;
-            font-size: 1.1em;
-            color: white;
-            cursor: pointer;
-            margin: 0 10px;
-            transition: all 0.3s ease;
-        }
+            .game-description {
+                font-size: 1.2em;
+                margin-bottom: 30px;
+                opacity: 0.9;
+                line-height: 1.6;
+            }
 
-        .control-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 165, 0, 0.7);
-        }
+            .coming-soon {
+                font-size: 1.5em;
+                color: #ffd700;
+                margin-bottom: 30px;
+                font-weight: bold;
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            }
 
-        .instructions {
-            margin-top: 15px;
-            font-size: 1em;
-            opacity: 0.8;
-        }
-    </style>
+            .back-btn {
+                background: linear-gradient(45deg, #ffa500, #ff8c00);
+                border: none;
+                border-radius: 50px;
+                padding: 15px 40px;
+                font-size: 1.3em;
+                font-weight: bold;
+                color: white;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow: 0 10px 30px rgba(255, 165, 0, 0.3);
+                text-decoration: none;
+                display: inline-block;
+            }
+
+            .back-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 35px rgba(255, 165, 0, 0.5);
+                background: linear-gradient(45deg, #ff8c00, #ff6347);
+            }
+
+            .features {
+                list-style: none;
+                margin-bottom: 30px;
+            }
+
+            .features li {
+                margin: 10px 0;
+                font-size: 1.1em;
+                opacity: 0.8;
+            }
+
+            .tower-animation {
+                display: flex;
+                justify-content: center;
+                margin: 20px 0;
+            }
+
+            .building-block {
+                width: 15px;
+                height: 15px;
+                background: linear-gradient(45deg, #ffa500, #ff8c00);
+                margin: 2px;
+                border-radius: 2px;
+                animation: stack 3s infinite ease-in-out;
+            }
+
+            .building-block:nth-child(1) {
+                animation-delay: 0s;
+            }
+
+            .building-block:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            .building-block:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            .building-block:nth-child(4) {
+                animation-delay: 1.5s;
+            }
+
+            .building-block:nth-child(5) {
+                animation-delay: 2s;
+            }
+
+            @keyframes stack {
+
+                0%,
+                100% {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+
+                50% {
+                    transform: translateY(-20px);
+                    opacity: 0.7;
+                }
+            }
+
+            #gameCanvas {
+                margin: 20px 0;
+                box-shadow: 0 0 30px rgba(255, 165, 0, 0.5);
+            }
+
+            .game-hud {
+                display: flex;
+                justify-content: space-around;
+                background: rgba(0, 0, 0, 0.8);
+                padding: 15px;
+                border-radius: 10px;
+                margin: 20px 0;
+                border: 1px solid #ffa500;
+            }
+
+            .hud-item {
+                font-weight: bold;
+                font-size: 1.2em;
+                color: #ffa500;
+            }
+
+            .game-controls {
+                text-align: center;
+                margin: 20px 0;
+            }
+
+            .control-btn {
+                background: linear-gradient(45deg, #ffa500, #ff8c00);
+                border: none;
+                border-radius: 25px;
+                padding: 12px 25px;
+                font-size: 1.1em;
+                color: white;
+                cursor: pointer;
+                margin: 0 10px;
+                transition: all 0.3s ease;
+            }
+
+            .control-btn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 20px rgba(255, 165, 0, 0.7);
+            }
+
+            .instructions {
+                margin-top: 15px;
+                font-size: 1em;
+                opacity: 0.8;
+            }
+        </style>
 </head>
 
 <body>
@@ -287,7 +292,7 @@
         // Tower Builder Game Logic
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        
+
         let gameState = {
             running: false,
             height: 0,
@@ -312,15 +317,15 @@
             gameState.score = 0;
             gameState.perfectCount = 0;
             gameState.gameSpeed = 2;
-            
+
             blocks = [baseBlock];
             currentBlock = null;
-            
+
             spawnNewBlock();
-            
+
             document.getElementById('startBtn').style.display = 'none';
             document.getElementById('dropBtn').style.display = 'inline-block';
-            
+
             gameLoop();
         }
 
@@ -340,7 +345,7 @@
         function updateCurrentBlock() {
             if (currentBlock && currentBlock.moving) {
                 currentBlock.x += gameState.gameSpeed * currentBlock.direction;
-                
+
                 // Bounce off edges
                 if (currentBlock.x <= 0) {
                     currentBlock.x = 0;
@@ -354,45 +359,45 @@
 
         function dropBlock() {
             if (!currentBlock || !currentBlock.moving) return;
-            
+
             currentBlock.moving = false;
             const lastBlock = blocks[blocks.length - 1];
-            
+
             // Calculate overlap
             const overlap = calculateOverlap(currentBlock, lastBlock);
-            
+
             if (overlap <= 0) {
                 // Game over - no overlap
                 endGame();
                 return;
             }
-            
+
             // Adjust block based on overlap
             if (currentBlock.x < lastBlock.x) {
                 currentBlock.x = lastBlock.x;
             }
             currentBlock.width = overlap;
-            
+
             // Check for perfect placement
             const perfectThreshold = 10;
             const centerDiff = Math.abs((currentBlock.x + currentBlock.width / 2) - (lastBlock.x + lastBlock.width / 2));
-            
+
             if (centerDiff < perfectThreshold) {
                 gameState.perfectCount++;
                 gameState.score += 50; // Bonus for perfect placement
-                
+
                 // Perfect placement effect
                 createPerfectEffect(currentBlock.x + currentBlock.width / 2, currentBlock.y);
             }
-            
+
             // Add to blocks
-            blocks.push({...currentBlock});
+            blocks.push({ ...currentBlock });
             gameState.height++;
             gameState.score += 10;
             gameState.gameSpeed += 0.1; // Increase difficulty
-            
+
             updateHUD();
-            
+
             // Spawn next block
             setTimeout(() => {
                 if (gameState.running) {
@@ -444,7 +449,7 @@
             blocks.forEach((block, index) => {
                 ctx.fillStyle = block.color;
                 ctx.fillRect(block.x, block.y, block.width, block.height);
-                
+
                 // Block outline
                 ctx.strokeStyle = '#333';
                 ctx.lineWidth = 2;
@@ -455,7 +460,7 @@
             if (currentBlock) {
                 ctx.fillStyle = currentBlock.color;
                 ctx.fillRect(currentBlock.x, currentBlock.y, currentBlock.width, currentBlock.height);
-                
+
                 if (currentBlock.moving) {
                     // Add glow effect to moving block
                     ctx.shadowColor = currentBlock.color;
@@ -463,7 +468,7 @@
                     ctx.fillRect(currentBlock.x, currentBlock.y, currentBlock.width, currentBlock.height);
                     ctx.shadowBlur = 0;
                 }
-                
+
                 ctx.strokeStyle = '#333';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(currentBlock.x, currentBlock.y, currentBlock.width, currentBlock.height);
@@ -492,28 +497,28 @@
 
         function endGame() {
             gameState.running = false;
-            
+
             // Game over overlay
             ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             ctx.fillStyle = '#ffa500';
             ctx.font = '36px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('TOWER COMPLETE!', canvas.width / 2, canvas.height / 2 - 60);
-            
+
             ctx.font = '20px Arial';
             ctx.fillText(`Final Height: ${gameState.height}`, canvas.width / 2, canvas.height / 2 - 20);
             ctx.fillText(`Score: ${gameState.score}`, canvas.width / 2, canvas.height / 2 + 10);
             ctx.fillText(`Perfect Blocks: ${gameState.perfectCount}`, canvas.width / 2, canvas.height / 2 + 40);
-            
+
             // Save high score
             const highScore = localStorage.getItem('towerBuilderHighScore') || 0;
             if (gameState.score > highScore) {
                 localStorage.setItem('towerBuilderHighScore', gameState.score);
                 ctx.fillText('NEW HIGH SCORE!', canvas.width / 2, canvas.height / 2 + 70);
             }
-            
+
             document.getElementById('startBtn').textContent = 'Build Again';
             document.getElementById('startBtn').style.display = 'inline-block';
             document.getElementById('dropBtn').style.display = 'none';
@@ -521,11 +526,11 @@
 
         function gameLoop() {
             if (!gameState.running) return;
-            
+
             updateCurrentBlock();
             updateParticles();
             render();
-            
+
             requestAnimationFrame(gameLoop);
         }
 

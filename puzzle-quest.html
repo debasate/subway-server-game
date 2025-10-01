@@ -4,31 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=d        <!-- Game Interface -->
-        <div id="game-interface">
-            <div class="game-stats">
-                <div class="stat">Score: <span id="score">0</span></div>
-                <div class="stat">Level: <span id="level">1</span></div>
-                <div class="stat">Time: <span id="timer">60</span>s</div>
-            </div>
+        <div id=" game-interface">
+    <div class="game-stats">
+        <div class="stat">Score: <span id="score">0</span></div>
+        <div class="stat">Level: <span id="level">1</span></div>
+        <div class="stat">Time: <span id="timer">60</span>s</div>
+    </div>
 
-            <div id="puzzle-container">
-                <h3 id="puzzle-question">What comes next in the sequence: 2, 4, 8, 16, ?</h3>
-                <div class="answer-grid" id="answer-grid">
-                    <button class="answer-btn" onclick="selectAnswer(32)">32</button>
-                    <button class="answer-btn" onclick="selectAnswer(20)">20</button>
-                    <button class="answer-btn" onclick="selectAnswer(24)">24</button>
-                    <button class="answer-btn" onclick="selectAnswer(30)">30</button>
-                </div>
-            </div>
+    <div id="puzzle-container">
+        <h3 id="puzzle-question">What comes next in the sequence: 2, 4, 8, 16, ?</h3>
+        <div class="answer-grid" id="answer-grid">
+            <button class="answer-btn" onclick="selectAnswer(32)">32</button>
+            <button class="answer-btn" onclick="selectAnswer(20)">20</button>
+            <button class="answer-btn" onclick="selectAnswer(24)">24</button>
+            <button class="answer-btn" onclick="selectAnswer(30)">30</button>
+        </div>
+    </div>
 
-            <div class="game-controls">
-                <button class="control-btn" onclick="skipPuzzle()">Skip (-10 points)</button>
-                <button class="control-btn" onclick="getHint()">Hint (-5 points)</button>
-                <button class="control-btn" onclick="startGame()" id="start-btn">Start Game</button>
-            </div>
+    <div class="game-controls">
+        <button class="control-btn" onclick="skipPuzzle()">Skip (-10 points)</button>
+        <button class="control-btn" onclick="getHint()">Hint (-5 points)</button>
+        <button class="control-btn" onclick="startGame()" id="start-btn">Start Game</button>
+    </div>
 
-            <div id="feedback" class="feedback"></div>
-        </div> initial-scale=1.0">
+    <div id="feedback" class="feedback"></div>
+    </div> initial-scale=1.0">
     <title>🧩 Puzzle Quest - Game Hub</title>
     <style>
         * {
@@ -90,7 +90,7 @@
             display: flex;
             justify-content: space-around;
             margin-bottom: 20px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
             padding: 15px;
             border-radius: 15px;
         }
@@ -103,7 +103,7 @@
         #puzzle-container {
             margin: 30px 0;
             padding: 20px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
         }
 
@@ -123,7 +123,7 @@
         .answer-btn {
             padding: 15px;
             font-size: 1.1em;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
             border-radius: 10px;
@@ -132,7 +132,7 @@
         }
 
         .answer-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
         }
 
@@ -153,7 +153,7 @@
 
         .control-btn {
             padding: 10px 20px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
             border-radius: 25px;
@@ -162,7 +162,7 @@
         }
 
         .control-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .feedback {
@@ -290,7 +290,7 @@
             gameState.level = 1;
             gameState.timeLeft = 60;
             gameState.currentPuzzle = 0;
-            
+
             document.getElementById('start-btn').style.display = 'none';
             updateUI();
             loadPuzzle();
@@ -301,7 +301,7 @@
             gameState.timer = setInterval(() => {
                 gameState.timeLeft--;
                 document.getElementById('timer').textContent = gameState.timeLeft;
-                
+
                 if (gameState.timeLeft <= 0) {
                     endGame();
                 }
@@ -311,10 +311,10 @@
         function loadPuzzle() {
             const puzzle = puzzles[gameState.currentPuzzle];
             document.getElementById('puzzle-question').textContent = puzzle.question;
-            
+
             const answerGrid = document.getElementById('answer-grid');
             answerGrid.innerHTML = '';
-            
+
             puzzle.answers.forEach((answer, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'answer-btn';
@@ -326,10 +326,10 @@
 
         function selectAnswer(answerIndex) {
             if (!gameState.gameActive) return;
-            
+
             const puzzle = puzzles[gameState.currentPuzzle];
             const buttons = document.querySelectorAll('.answer-btn');
-            
+
             buttons.forEach((btn, index) => {
                 if (index === puzzle.correct) {
                     btn.classList.add('correct');
@@ -338,14 +338,14 @@
                 }
                 btn.disabled = true;
             });
-            
+
             if (answerIndex === puzzle.correct) {
                 gameState.score += 10 + gameState.level * 5;
                 showFeedback("Correct! ✅", "success");
             } else {
                 showFeedback("Wrong! ❌", "error");
             }
-            
+
             setTimeout(() => {
                 nextPuzzle();
             }, 1500);
@@ -353,14 +353,14 @@
 
         function nextPuzzle() {
             gameState.currentPuzzle++;
-            
+
             if (gameState.currentPuzzle >= puzzles.length) {
                 gameState.level++;
                 gameState.currentPuzzle = 0;
                 gameState.timeLeft += 30; // Bonus time for new level
                 showFeedback(`Level ${gameState.level}! 🎉`, "success");
             }
-            
+
             setTimeout(() => {
                 loadPuzzle();
                 clearFeedback();
@@ -404,23 +404,23 @@
         function endGame() {
             gameState.gameActive = false;
             clearInterval(gameState.timer);
-            
+
             const finalScore = gameState.score;
             showFeedback(`Game Over! Final Score: ${finalScore}`, "info");
-            
+
             // Save high score
             const highScore = localStorage.getItem('puzzleQuestHighScore') || 0;
             if (finalScore > highScore) {
                 localStorage.setItem('puzzleQuestHighScore', finalScore);
                 showFeedback(`New High Score: ${finalScore}! 🏆`, "success");
             }
-            
+
             document.getElementById('start-btn').style.display = 'block';
             document.getElementById('start-btn').textContent = 'Play Again';
         }
 
         // Initialize the game interface
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const highScore = localStorage.getItem('puzzleQuestHighScore');
             if (highScore) {
                 document.getElementById('puzzle-question').textContent = `High Score: ${highScore} - Click Start Game to play!`;
