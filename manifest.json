@@ -1,28 +1,58 @@
 {
-    "name": "Subway Server Game",
-    "short_name": "Subway Game",
-    "description": "Een spannende endless runner game met power-ups, achievements en multiplayer modes!",
+    "name": "Game Hub - Ultimate Gaming Experience",
+    "short_name": "Game Hub",
+    "description": "Play Subway Surfer, Cookie Clicker, FPS Arena, Blox Fruits, and Racing Arena in one amazing gaming hub!",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#1a1a2e",
-    "theme_color": "#4ecdc4",
-    "orientation": "portrait-primary",
-    "categories": [
-        "games",
-        "entertainment"
-    ],
-    "lang": "nl",
+    "orientation": "any",
+    "background_color": "#667eea",
+    "theme_color": "#667eea",
+    "categories": ["games", "entertainment"],
+    "lang": "en-US",
+    "scope": "/",
     "icons": [
         {
-            "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjMWExYTJlIi8+Cjx0ZXh0IHg9IjI1NiIgeT0iMjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYwIiBmaWxsPSIjNGVjZGM0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn5qHPC90ZXh0Pgo8L3N2Zz4K",
+            "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjNjY3ZWVhIi8+Cjx0ZXh0IHg9IjI1NiIgeT0iMjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYwIiBmaWxsPSIjZmZmZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7wn46uPC90ZXh0Pgo8L3N2Zz4K",
             "sizes": "512x512",
             "type": "image/svg+xml",
             "purpose": "any maskable"
         },
         {
-            "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjMWExYTJlIi8+Cjx0ZXh0IHg9Ijk2IiB5PSIxMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI2NCIgZmlsbD0iIzRlY2RjNCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+ahzwvdGV4dD4KPC9zdmc+Cg==",
+            "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjNjY3ZWVhIi8+Cjx0ZXh0IHg9Ijk2IiB5PSIxMTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI2NCIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+OrgPC90ZXh0Pgo8L3N2Zz4K",
             "sizes": "192x192",
             "type": "image/svg+xml"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Subway Surfer",
+            "short_name": "Subway",
+            "description": "Play the endless runner game",
+            "url": "/subway-game.html"
+        },
+        {
+            "name": "Cookie Clicker",
+            "short_name": "Cookies",
+            "description": "Build your cookie empire",
+            "url": "/cookie-clicker.html"
+        },
+        {
+            "name": "FPS Arena",
+            "short_name": "FPS",
+            "description": "Battle in the arena",
+            "url": "/fps-game.html"
+        },
+        {
+            "name": "Blox Fruits",
+            "short_name": "Blox",
+            "description": "One Piece adventure",
+            "url": "/blox-fruits.html"
+        },
+        {
+            "name": "Racing Arena",
+            "short_name": "Racing",
+            "description": "High-speed racing action",
+            "url": "/racing-game.html"
         }
     ]
 }

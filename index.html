@@ -8,6 +8,14 @@
     <meta name="format-detection" content="telephone=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>🎮 Game Hub - Choose Your Adventure!</title>
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Game Hub">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
     <style>
         * {
             margin: 0;
@@ -150,6 +158,31 @@
 
         .announcement-banner.hidden {
             display: none;
+        }
+
+        .daily-reward-banner {
+            background: linear-gradient(135deg, #00b894, #00cec9, #74b9ff);
+            background-size: 300% 300%;
+            animation: gradientShift 3s ease infinite;
+            padding: 15px 25px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .reward-info {
+            font-size: 1em;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
         .external-links {
@@ -877,6 +910,170 @@
             border: 1px solid rgba(255, 59, 48, 0.5);
         }
 
+        /* Theme Toggle Styles */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 180px;
+            z-index: 999;
+        }
+
+        .theme-btn {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .theme-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Light Theme Styles */
+        body.light-theme {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        }
+
+        body.light-theme .container {
+            color: #2d3436;
+        }
+
+        body.light-theme .title {
+            color: #2d3436;
+            text-shadow: 0 0 30px rgba(45, 52, 54, 0.3);
+        }
+
+        body.light-theme .subtitle {
+            color: #636e72;
+        }
+
+        body.light-theme .game-card {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3436;
+        }
+
+        body.light-theme .game-title {
+            color: #2d3436;
+        }
+
+        body.light-theme .stats-section {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3436;
+        }
+
+        body.light-theme .update-log-section {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3436;
+        }
+
+        body.light-theme .update-version {
+            color: #e17055;
+        }
+
+        body.light-theme .stats-title {
+            color: #e17055;
+        }
+
+        body.light-theme .update-log-title {
+            color: #e17055;
+        }
+
+        /* Daily Challenges Styles */
+        .challenge-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .challenge-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .challenge-title {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .challenge-progress {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .challenge-reward {
+            background: linear-gradient(45deg, #e17055, #fdcb6e);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .challenge-item.completed {
+            background: rgba(0, 184, 148, 0.2);
+            border: 2px solid #00b894;
+        }
+
+        .challenge-item.completed .challenge-reward {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+        }
+
+        /* Screenshot Sharing Styles */
+        .sharing-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            color: white;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #5a67d8, #6b46c1);
+        }
+
+        .screenshot-canvas {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .auth-container {
                 top: 10px;
@@ -945,6 +1142,14 @@
             <span id="server-text">Checking server...</span>
         </div>
 
+        <!-- Theme Toggle -->
+        <div class="theme-toggle" id="theme-toggle">
+            <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">
+                <span id="theme-icon">🌙</span>
+                <span id="theme-text">Dark</span>
+            </button>
+        </div>
+
         <!-- External Links -->
         <div class="external-links">
             <a href="https://gtstijn.site" target="_blank" class="external-link">🌐 GTStijn.site</a>
@@ -952,15 +1157,31 @@
             <a href="fps-game.html" class="external-link">🔫 FPS Arena</a>
         </div>
 
+        <!-- Daily Reward Banner -->
+        <div class="daily-reward-banner" id="daily-reward-banner" style="display: none;">
+            <button class="announcement-close" onclick="closeDailyReward()" title="Close">×</button>
+            <div class="announcement-content">
+                <div class="announcement-title">
+                    🎁 Daily Login Reward!
+                </div>
+                <div class="announcement-text">
+                    Welcome back! You've earned your daily reward!
+                </div>
+                <div class="reward-info" id="reward-info">
+                    +100 coins • Day 1 streak
+                </div>
+            </div>
+        </div>
+
         <!-- Announcement Banner -->
         <div class="announcement-banner" id="announcement-banner">
             <button class="announcement-close" onclick="closeAnnouncement()" title="Close announcement">×</button>
             <div class="announcement-content">
                 <div class="announcement-title">
-                    🏴‍☠️ NEW GAME: Blox Fruits!
+                    🏴‍☠️ NEW GAME: Racing Arena Added!
                 </div>
                 <div class="announcement-text">
-                    Set sail in the One Piece world! Choose Devil Fruits, master Haki, and become the ultimate pirate!
+                    Experience high-speed racing action! Compete against AI opponents and earn rewards!
                 </div>
                 <div class="announcement-countdown" id="countdown-timer">
                     Next update in: Loading...
@@ -1043,6 +1264,33 @@
                 </ul>
                 <button class="play-btn" onclick="playBloxFruits()">Play Blox Fruits</button>
             </div>
+
+            <!-- Racing Arena Game -->
+            <div class="game-card">
+                <div class="game-icon">🏎️</div>
+                <h2 class="game-title">Racing Arena</h2>
+                <p class="game-description">
+                    Race against AI opponents in high-speed action! Master tight turns, use boost strategically, and claim victory in this adrenaline-fueled racing game!
+                </p>
+                <ul class="game-features">
+                    <li>🏁 3-lap racing championships</li>
+                    <li>🤖 5 intelligent AI opponents</li>
+                    <li>⚡ Boost system & power management</li>
+                    <li>🏆 Position tracking & lap times</li>
+                    <li>🪙 Earn coins based on performance</li>
+                </ul>
+                <button class="play-btn" onclick="playRacing()">Play Racing</button>
+            </div>
+        </div>
+
+        <!-- Screenshot Sharing -->
+        <div class="stats-section">
+            <h3 class="stats-title">📸 Share Your Achievements</h3>
+            <div class="sharing-controls">
+                <button class="share-btn" onclick="takeScreenshot()">📸 Take Screenshot</button>
+                <button class="share-btn" onclick="shareStats()">📊 Share Stats</button>
+                <button class="share-btn" onclick="generateAchievementCard()">🏆 Achievement Card</button>
+            </div>
         </div>
 
         <!-- Player Statistics -->
@@ -1052,6 +1300,10 @@
                 <div class="stat-item">
                     <div class="stat-value" id="total-coins">0</div>
                     <div class="stat-label">Total Coins Earned</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="total-gems">0</div>
+                    <div class="stat-label">💎 Gems Collected</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" id="total-cookies">0</div>
@@ -1064,6 +1316,45 @@
                 <div class="stat-item">
                     <div class="stat-value" id="achievements">0</div>
                     <div class="stat-label">Achievements Unlocked</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="login-streak">0</div>
+                    <div class="stat-label">🔥 Login Streak</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Challenges -->
+        <div class="stats-section">
+            <h3 class="stats-title">🎯 Daily Challenges</h3>
+            <div id="daily-challenges">
+                <div class="challenge-item">
+                    <div class="challenge-info">
+                        <span class="challenge-title">🏃 Play 3 Subway Games</span>
+                        <span class="challenge-progress" id="subway-challenge">0/3</span>
+                    </div>
+                    <div class="challenge-reward">+50 💎</div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-info">
+                        <span class="challenge-title">🍪 Bake 1000 Cookies</span>
+                        <span class="challenge-progress" id="cookie-challenge">0/1000</span>
+                    </div>
+                    <div class="challenge-reward">+30 💎</div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-info">
+                        <span class="challenge-title">🏁 Win a Race</span>
+                        <span class="challenge-progress" id="race-challenge">0/1</span>
+                    </div>
+                    <div class="challenge-reward">+75 💎</div>
+                </div>
+                <div class="challenge-item">
+                    <div class="challenge-info">
+                        <span class="challenge-title">🎮 Play All Games</span>
+                        <span class="challenge-progress" id="all-games-challenge">0/5</span>
+                    </div>
+                    <div class="challenge-reward">+100 💎</div>
                 </div>
             </div>
         </div>
@@ -1095,6 +1386,26 @@
             <div id="updates-container">
                 <!-- Latest Update -->
                 <div class="update-item latest">
+                    <div class="update-header">
+                        <div class="update-version">v1.8.0 - MEGA FEATURE UPDATE! 🚀</div>
+                        <div class="update-date">October 1, 2025</div>
+                    </div>
+                    <div class="update-content">
+                        <ul>
+                            <li>🎮 NEW GAME: Racing Arena - High-speed racing!</li>
+                            <li>📱 Progressive Web App (PWA) - Install as app!</li>
+                            <li>🎁 Daily Login Rewards - Login for bonuses!</li>
+                            <li>🏆 Advanced Achievement System - Cross-game achievements!</li>
+                            <li>🌙 Dark/Light Theme Toggle - Choose your style!</li>
+                            <li>💎 Premium Currency System - Gems & special rewards!</li>
+                            <li>🎯 Daily Challenges - Complete tasks for rewards!</li>
+                            <li>📸 Screenshot Sharing - Share your best moments!</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Previous Update -->
+                <div class="update-item">
                     <div class="update-header">
                         <div class="update-version">v1.7.0 - Blox Fruits Game & Polish Updates</div>
                         <div class="update-date">October 1, 2025</div>
@@ -1218,19 +1529,30 @@
             const subwayStats = JSON.parse(localStorage.getItem('gameStats') || '{}');
             document.getElementById('total-coins').textContent = subwayStats.totalCoinsEarned || 0;
 
+            // Load gems
+            const totalGems = parseInt(localStorage.getItem('totalGems') || '0');
+            document.getElementById('total-gems').textContent = totalGems;
+
             // Load Cookie Clicker stats
             const cookieStats = JSON.parse(localStorage.getItem('cookieClickerSave') || '{}');
             const cookieGameState = cookieStats.gameState || {};
             document.getElementById('total-cookies').textContent = Math.floor(cookieGameState.totalCookies || 0);
 
             // Calculate total games played (estimate)
-            const gamesPlayed = (subwayStats.gamesPlayed || 0) + (cookieGameState.sessionCookies > 0 ? 1 : 0);
+            const racingStats = JSON.parse(localStorage.getItem('racingStats') || '{}');
+            const gamesPlayed = (subwayStats.gamesPlayed || 0) + 
+                              (cookieGameState.sessionCookies > 0 ? 1 : 0) +
+                              (racingStats.gamesPlayed || 0);
             document.getElementById('games-played').textContent = gamesPlayed;
 
             // Calculate achievements (estimate)
             const achievements = (subwayStats.achievements || []).length +
                 (cookieStats.achievements || []).filter(a => a.unlocked).length;
             document.getElementById('achievements').textContent = achievements;
+
+            // Load login streak
+            const loginStreak = parseInt(localStorage.getItem('loginStreak') || '0');
+            document.getElementById('login-streak').textContent = loginStreak;
         }
 
         // Navigation functions
@@ -1248,6 +1570,10 @@
 
         function playBloxFruits() {
             window.location.href = 'blox-fruits.html';
+        }
+
+        function playRacing() {
+            window.location.href = 'racing-game.html';
         }
 
         // Update Log Toggle
@@ -1368,6 +1694,10 @@
             try {
                 loadStats();
                 initAnnouncement();
+                initTheme();
+                
+                // Check for daily login reward
+                setTimeout(checkDailyReward, 1000);
 
                 // Create floating shapes periodically
                 setInterval(createRandomShape, 3000);
@@ -1760,6 +2090,59 @@
             }
         });
 
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    if (confirm('New version available! Reload to update?')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // PWA Install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button/banner
+            setTimeout(() => {
+                if (confirm('Install Game Hub as an app for the best experience?')) {
+                    showInstallPrompt();
+                }
+            }, 3000);
+        });
+
+        function showInstallPrompt() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
         // Wait for API client to load, then initialize auth
         document.addEventListener('DOMContentLoaded', function () {
             // Try to load API client, with fallback if it fails
@@ -1933,6 +2316,94 @@
             }, 120000);
         });
 
+        // Theme Toggle System
+        let currentTheme = localStorage.getItem('gameHubTheme') || 'dark';
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(currentTheme);
+            localStorage.setItem('gameHubTheme', currentTheme);
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+
+            if (theme === 'light') {
+                body.classList.add('light-theme');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'Light';
+            } else {
+                body.classList.remove('light-theme');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+            }
+        }
+
+        // Initialize theme on page load
+        function initTheme() {
+            applyTheme(currentTheme);
+        }
+
+        // Daily Rewards System
+        function checkDailyReward() {
+            const today = new Date().toDateString();
+            const lastLogin = localStorage.getItem('lastLoginDate');
+            const loginStreak = parseInt(localStorage.getItem('loginStreak') || '0');
+            
+            if (lastLogin !== today) {
+                // Calculate streak
+                let newStreak = 1;
+                if (lastLogin) {
+                    const lastDate = new Date(lastLogin);
+                    const todayDate = new Date(today);
+                    const dayDiff = (todayDate - lastDate) / (1000 * 60 * 60 * 24);
+                    
+                    if (dayDiff === 1) {
+                        newStreak = loginStreak + 1;
+                    }
+                }
+                
+                // Calculate reward based on streak
+                const baseReward = 100;
+                const streakBonus = Math.min(newStreak * 20, 500);
+                const totalReward = baseReward + streakBonus;
+                
+                // Give reward
+                const currentCoins = parseInt(localStorage.getItem('subwayCoins') || '0');
+                localStorage.setItem('subwayCoins', (currentCoins + totalReward).toString());
+                localStorage.setItem('lastLoginDate', today);
+                localStorage.setItem('loginStreak', newStreak.toString());
+                
+                // Show reward banner
+                showDailyReward(totalReward, newStreak);
+            }
+        }
+
+        function showDailyReward(coins, streak) {
+            const banner = document.getElementById('daily-reward-banner');
+            const rewardInfo = document.getElementById('reward-info');
+            
+            rewardInfo.textContent = `+${coins} coins • Day ${streak} streak`;
+            banner.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                closeDailyReward();
+            }, 5000);
+        }
+
+        function closeDailyReward() {
+            const banner = document.getElementById('daily-reward-banner');
+            banner.style.animation = 'slideOut 0.5s ease-in-out forwards';
+            
+            setTimeout(() => {
+                banner.style.display = 'none';
+                banner.style.animation = '';
+            }, 500);
+        }
+
         // Wednesday Coin Boost System
         function isWednesday() {
             return new Date().getDay() === 3; // 0=Sunday, 3=Wednesday
@@ -1940,6 +2411,129 @@
 
         function getWednesdayBoostMultiplier() {
             return isWednesday() ? 2 : 1; // 2x coins on Wednesday
+        }
+
+        // Screenshot and Sharing Functions
+        async function takeScreenshot() {
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                    const stream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { mediaSource: 'screen' }
+                    });
+                    
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+                    
+                    video.addEventListener('loadedmetadata', () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0);
+                        
+                        // Stop the stream
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        // Download the image
+                        const link = document.createElement('a');
+                        link.download = `game-hub-screenshot-${Date.now()}.png`;
+                        link.href = canvas.toDataURL();
+                        link.click();
+                        
+                        alert('📸 Screenshot saved! Check your downloads folder.');
+                    });
+                } else {
+                    // Fallback: Use html2canvas if available or manual screenshot
+                    alert('📸 Screenshot feature not available. Please use your browser\'s screenshot tool!');
+                }
+            } catch (error) {
+                console.error('Screenshot error:', error);
+                alert('📸 Please use your browser\'s built-in screenshot feature or print screen!');
+            }
+        }
+
+        function shareStats() {
+            const stats = {
+                coins: document.getElementById('total-coins').textContent,
+                gems: document.getElementById('total-gems').textContent,
+                cookies: document.getElementById('total-cookies').textContent,
+                games: document.getElementById('games-played').textContent,
+                achievements: document.getElementById('achievements').textContent,
+                streak: document.getElementById('login-streak').textContent
+            };
+
+            const shareText = `🎮 Check out my Game Hub stats!\n\n` +
+                `🪙 Coins: ${stats.coins}\n` +
+                `💎 Gems: ${stats.gems}\n` +
+                `🍪 Cookies: ${stats.cookies}\n` +
+                `🎯 Games Played: ${stats.games}\n` +
+                `🏆 Achievements: ${stats.achievements}\n` +
+                `🔥 Login Streak: ${stats.streak}\n\n` +
+                `Play at https://gtstijn.space 🚀`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Game Hub Stats',
+                    text: shareText,
+                    url: 'https://gtstijn.space'
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('📊 Stats copied to clipboard! Paste anywhere to share.');
+                }).catch(() => {
+                    // Fallback: show in alert
+                    alert(`📊 Your stats:\n\n${shareText}`);
+                });
+            }
+        }
+
+        function generateAchievementCard() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            const ctx = canvas.getContext('2d');
+
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 800, 600);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 800, 600);
+
+            // Title
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🎮 Game Hub Achievement', 400, 80);
+
+            // Stats
+            const stats = [
+                `🪙 Coins: ${document.getElementById('total-coins').textContent}`,
+                `💎 Gems: ${document.getElementById('total-gems').textContent}`,
+                `🎯 Games Played: ${document.getElementById('games-played').textContent}`,
+                `🏆 Achievements: ${document.getElementById('achievements').textContent}`,
+                `🔥 Login Streak: ${document.getElementById('login-streak').textContent} days`
+            ];
+
+            ctx.font = '32px Arial';
+            stats.forEach((stat, index) => {
+                ctx.fillText(stat, 400, 200 + (index * 60));
+            });
+
+            // Footer
+            ctx.font = '24px Arial';
+            ctx.fillText('Play at gtstijn.space', 400, 550);
+
+            // Download the achievement card
+            const link = document.createElement('a');
+            link.download = `game-hub-achievement-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+
+            alert('🏆 Achievement card generated! Check your downloads folder.');
         }
 
         function showWednesdayBoostNotification() {

@@ -231,7 +231,8 @@
             height: 100%;
         }
 
-        .player-side, .enemy-side {
+        .player-side,
+        .enemy-side {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             padding: 20px;
@@ -319,7 +320,8 @@
             color: #ffd700;
         }
 
-        .victory-screen, .defeat-screen {
+        .victory-screen,
+        .defeat-screen {
             position: absolute;
             top: 0;
             left: 0;
@@ -333,7 +335,8 @@
             border-radius: 15px;
         }
 
-        .victory-screen.show, .defeat-screen.show {
+        .victory-screen.show,
+        .defeat-screen.show {
             display: flex;
         }
 
@@ -357,14 +360,34 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
         }
 
         @media (max-width: 768px) {
@@ -491,7 +514,7 @@
                         <div><strong>Fruit:</strong> <span id="player-fruit">None</span></div>
                     </div>
                 </div>
-                
+
                 <div class="enemy-side">
                     <h4>💀 Enemy</h4>
                     <div class="character-display" id="enemy-display">⚓</div>
@@ -643,7 +666,7 @@
 
             // Initialize battle
             initializeBattle();
-            
+
             // Hide selection and show arena
             document.querySelector('.character-selection').style.display = 'none';
             document.querySelector('.fruit-selection').style.display = 'none';
@@ -652,7 +675,7 @@
 
             // Update player display
             updatePlayerDisplay();
-            
+
             addLogEntry('⚔️ Adventure begins! Prepare for battle!', 'system');
         }
 
@@ -802,7 +825,7 @@
                 // Victory
                 battleState.battleActive = false;
                 addLogEntry('🏆 Victory! Enemy defeated!', 'system');
-                
+
                 // Update stats
                 gameStats.battlesWon++;
                 gameStats.bounty += Math.floor(Math.random() * 100000) + 50000;
@@ -825,7 +848,7 @@
                 // Defeat
                 battleState.battleActive = false;
                 addLogEntry('💀 Defeat! You were overwhelmed!', 'system');
-                
+
                 setTimeout(() => {
                     document.getElementById('defeat-screen').classList.add('show');
                 }, 1000);

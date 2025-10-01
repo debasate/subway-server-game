@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ Racing Arena - Game Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-header {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .game-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 1.1em;
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-canvas {
+            background: #2c5f2d;
+            border: 3px solid #444;
+            display: block;
+            margin: 20px auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-ui {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .controls-info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-over-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-over-screen h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .final-stats {
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        .restart-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .speed-indicator {
+            position: absolute;
+            bottom: 80px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #00ff00;
+        }
+
+        .minimap {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #444;
+            border-radius: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .game-header {
+                padding: 10px 15px;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .game-stats {
+                font-size: 0.9em;
+                gap: 10px;
+            }
+
+            .controls-info {
+                font-size: 0.8em;
+                padding: 8px 15px;
+            }
+
+            .minimap {
+                width: 100px;
+                height: 100px;
+            }
+
+            .speed-indicator {
+                font-size: 1.2em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-title">🏎️ Racing Arena</div>
+            <div class="game-stats">
+                <span>🏁 Lap: <span id="current-lap">1</span>/3</span>
+                <span>⏱️ Time: <span id="race-time">0:00</span></span>
+                <span>🏆 Position: <span id="position">1</span>/6</span>
+            </div>
+            <button class="back-btn" onclick="goHome()">← Back to Hub</button>
+        </div>
+
+        <canvas id="racing-canvas" class="game-canvas" width="800" height="600"></canvas>
+
+        <div class="game-ui">
+            <div><strong>🏎️ Your Car</strong></div>
+            <div>Speed: <span id="speed">0</span> km/h</div>
+            <div>Boost: <span id="boost">100</span>%</div>
+        </div>
+
+        <div class="controls-info">
+            🎮 WASD to move • SPACE for boost • R to restart
+        </div>
+
+        <div class="speed-indicator" id="speed-indicator">
+            0 KM/H
+        </div>
+
+        <div class="minimap" id="minimap"></div>
+
+        <div class="game-over-screen" id="game-over-screen">
+            <h2 id="result-title">🏁 Race Finished!</h2>
+            <div class="final-stats">
+                <div>🏆 Final Position: <span id="final-position">1</span>/6</div>
+                <div>⏱️ Best Lap: <span id="best-lap">0:00</span></div>
+                <div>🏁 Total Time: <span id="total-time">0:00</span></div>
+                <div>🪙 Coins Earned: <span id="coins-earned">0</span></div>
+            </div>
+            <button class="restart-btn" onclick="restartRace()">🔄 Race Again</button>
+            <button class="restart-btn" onclick="goHome()">🏠 Back to Hub</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('racing-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game state
+        let gameRunning = false;
+        let gameStartTime = 0;
+        let currentLap = 1;
+        let raceFinished = false;
+
+        // Player car
+        const player = {
+            x: 100,
+            y: 300,
+            width: 30,
+            height: 20,
+            angle: 0,
+            speed: 0,
+            maxSpeed: 8,
+            acceleration: 0.2,
+            friction: 0.15,
+            boost: 100,
+            lapProgress: 0
+        };
+
+        // AI cars
+        const aiCars = [];
+        const carColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'];
+
+        // Track checkpoints for lap detection
+        const checkpoints = [
+            { x: 100, y: 300 }, // Start/finish
+            { x: 600, y: 100 }, // Top right
+            { x: 700, y: 500 }, // Bottom right
+            { x: 200, y: 550 }  // Bottom left
+        ];
+
+        // Input handling
+        const keys = {};
+        document.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.key.toLowerCase() === 'r' && raceFinished) {
+                restartRace();
+            }
+        });
+        document.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
+
+        // Initialize AI cars
+        function initAICars() {
+            aiCars.length = 0;
+            for (let i = 0; i < 5; i++) {
+                aiCars.push({
+                    x: 80 + i * 35,
+                    y: 320 + i * 25,
+                    width: 30,
+                    height: 20,
+                    angle: 0,
+                    speed: Math.random() * 3 + 4,
+                    color: carColors[i],
+                    lapProgress: 0,
+                    currentCheckpoint: 0
+                });
+            }
+        }
+
+        // Start race
+        function startRace() {
+            gameRunning = true;
+            gameStartTime = Date.now();
+            currentLap = 1;
+            raceFinished = false;
+            player.lapProgress = 0;
+            player.x = 100;
+            player.y = 300;
+            player.speed = 0;
+            player.boost = 100;
+            initAICars();
+            document.getElementById('game-over-screen').style.display = 'none';
+            gameLoop();
+        }
+
+        // Update player car
+        function updatePlayer() {
+            // Handle input
+            if (keys['w'] || keys['arrowup']) {
+                player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
+            }
+            if (keys['s'] || keys['arrowdown']) {
+                player.speed = Math.max(player.speed - player.acceleration, -player.maxSpeed * 0.5);
+            }
+            if (keys['a'] || keys['arrowleft']) {
+                player.angle -= 0.05 * (player.speed / player.maxSpeed);
+            }
+            if (keys['d'] || keys['arrowright']) {
+                player.angle += 0.05 * (player.speed / player.maxSpeed);
+            }
+
+            // Boost
+            if (keys[' '] && player.boost > 0) {
+                player.speed = Math.min(player.speed + player.acceleration * 2, player.maxSpeed * 1.5);
+                player.boost = Math.max(0, player.boost - 1);
+            } else if (player.boost < 100) {
+                player.boost = Math.min(100, player.boost + 0.2);
+            }
+
+            // Apply friction
+            player.speed *= (1 - player.friction);
+
+            // Update position
+            player.x += Math.cos(player.angle) * player.speed;
+            player.y += Math.sin(player.angle) * player.speed;
+
+            // Keep on track (simple boundary)
+            if (player.x < 50) player.x = 50;
+            if (player.x > canvas.width - 50) player.x = canvas.width - 50;
+            if (player.y < 50) player.y = 50;
+            if (player.y > canvas.height - 50) player.y = canvas.height - 50;
+
+            // Update lap progress (simplified)
+            updateLapProgress();
+        }
+
+        // Update AI cars
+        function updateAI() {
+            aiCars.forEach(car => {
+                // Simple AI: follow track roughly
+                const targetX = 400 + Math.cos(Date.now() * 0.001 + car.color.charCodeAt(0)) * 250;
+                const targetY = 300 + Math.sin(Date.now() * 0.001 + car.color.charCodeAt(0)) * 200;
+
+                const dx = targetX - car.x;
+                const dy = targetY - car.y;
+                const targetAngle = Math.atan2(dy, dx);
+
+                car.angle += (targetAngle - car.angle) * 0.1;
+                car.x += Math.cos(car.angle) * car.speed;
+                car.y += Math.sin(car.angle) * car.speed;
+
+                // Keep on screen
+                if (car.x < 50) car.x = 50;
+                if (car.x > canvas.width - 50) car.x = canvas.width - 50;
+                if (car.y < 50) car.y = 50;
+                if (car.y > canvas.height - 50) car.y = canvas.height - 50;
+
+                car.lapProgress += 0.01;
+            });
+        }
+
+        // Update lap progress
+        function updateLapProgress() {
+            // Simplified lap detection based on position
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const angle = Math.atan2(player.y - centerY, player.x - centerX);
+            const normalizedAngle = (angle + Math.PI * 2) % (Math.PI * 2);
+            
+            player.lapProgress = normalizedAngle / (Math.PI * 2);
+
+            // Check for lap completion
+            if (player.lapProgress > 0.95 && player.x < 150 && Math.abs(player.y - 300) < 50) {
+                if (currentLap < 3) {
+                    currentLap++;
+                    document.getElementById('current-lap').textContent = currentLap;
+                } else if (!raceFinished) {
+                    finishRace();
+                }
+            }
+        }
+
+        // Finish race
+        function finishRace() {
+            raceFinished = true;
+            gameRunning = false;
+
+            const totalTime = Date.now() - gameStartTime;
+            const minutes = Math.floor(totalTime / 60000);
+            const seconds = Math.floor((totalTime % 60000) / 1000);
+
+            // Calculate position based on lap progress
+            let position = 1;
+            aiCars.forEach(car => {
+                if (car.lapProgress > player.lapProgress) position++;
+            });
+
+            // Calculate rewards
+            const coinsEarned = Math.max(10, 100 - (position - 1) * 15);
+
+            // Update UI
+            document.getElementById('final-position').textContent = position;
+            document.getElementById('total-time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('best-lap').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('coins-earned').textContent = coinsEarned;
+
+            // Save progress
+            const stats = JSON.parse(localStorage.getItem('racingStats') || '{}');
+            stats.gamesPlayed = (stats.gamesPlayed || 0) + 1;
+            stats.totalCoins = (stats.totalCoins || 0) + coinsEarned;
+            stats.bestPosition = Math.min(stats.bestPosition || 6, position);
+            localStorage.setItem('racingStats', JSON.stringify(stats));
+
+            document.getElementById('game-over-screen').style.display = 'block';
+        }
+
+        // Draw everything
+        function draw() {
+            // Clear canvas
+            ctx.fillStyle = '#2c5f2d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw track outline
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.roundRect(50, 50, canvas.width - 100, canvas.height - 100, 20);
+            ctx.stroke();
+
+            // Draw start/finish line
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(90, 290, 20, 20);
+            ctx.fillStyle = '#000000';
+            ctx.font = '12px Arial';
+            ctx.fillText('START', 95, 285);
+
+            // Draw AI cars
+            aiCars.forEach(car => {
+                ctx.save();
+                ctx.translate(car.x, car.y);
+                ctx.rotate(car.angle);
+                ctx.fillStyle = car.color;
+                ctx.fillRect(-car.width/2, -car.height/2, car.width, car.height);
+                ctx.restore();
+            });
+
+            // Draw player car
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.angle);
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(-player.width/2, -player.height/2, player.width, player.height);
+            ctx.restore();
+
+            // Update UI
+            document.getElementById('speed').textContent = Math.floor(Math.abs(player.speed) * 10);
+            document.getElementById('boost').textContent = Math.floor(player.boost);
+            document.getElementById('speed-indicator').textContent = `${Math.floor(Math.abs(player.speed) * 10)} KM/H`;
+
+            // Update timer
+            if (gameRunning) {
+                const elapsed = Date.now() - gameStartTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                document.getElementById('race-time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            // Calculate and display position
+            let currentPosition = 1;
+            aiCars.forEach(car => {
+                if (car.lapProgress > player.lapProgress || 
+                   (currentLap === car.currentLap && car.lapProgress > player.lapProgress)) {
+                    currentPosition++;
+                }
+            });
+            document.getElementById('position').textContent = currentPosition;
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            updatePlayer();
+            updateAI();
+            draw();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Restart race
+        function restartRace() {
+            startRace();
+        }
+
+        // Go back to hub
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+
+        // Mobile touch controls
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+
+            // Simulate key presses based on touch movement
+            if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                if (deltaY < -20) keys['w'] = true;
+                else if (deltaY > 20) keys['s'] = true;
+            } else {
+                if (deltaX < -20) keys['a'] = true;
+                else if (deltaX > 20) keys['d'] = true;
+            }
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys['w'] = keys['s'] = keys['a'] = keys['d'] = false;
+        });
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🏎️ Racing Arena loaded!');
+            startRace();
+        });
+    </script>
+</body>
+</html>
