@@ -3,7 +3,32 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=d        <!-- Game Interface -->
+        <div id="game-interface">
+            <div class="game-stats">
+                <div class="stat">Score: <span id="score">0</span></div>
+                <div class="stat">Level: <span id="level">1</span></div>
+                <div class="stat">Time: <span id="timer">60</span>s</div>
+            </div>
+
+            <div id="puzzle-container">
+                <h3 id="puzzle-question">What comes next in the sequence: 2, 4, 8, 16, ?</h3>
+                <div class="answer-grid" id="answer-grid">
+                    <button class="answer-btn" onclick="selectAnswer(32)">32</button>
+                    <button class="answer-btn" onclick="selectAnswer(20)">20</button>
+                    <button class="answer-btn" onclick="selectAnswer(24)">24</button>
+                    <button class="answer-btn" onclick="selectAnswer(30)">30</button>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="control-btn" onclick="skipPuzzle()">Skip (-10 points)</button>
+                <button class="control-btn" onclick="getHint()">Hint (-5 points)</button>
+                <button class="control-btn" onclick="startGame()" id="start-btn">Start Game</button>
+            </div>
+
+            <div id="feedback" class="feedback"></div>
+        </div> initial-scale=1.0">
     <title>🧩 Puzzle Quest - Game Hub</title>
     <style>
         * {
@@ -59,6 +84,93 @@
             font-size: 1.1em;
             opacity: 0.8;
             padding: 8px 0;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .stat {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        #puzzle-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        #puzzle-question {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .answer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            font-size: 1.1em;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        }
+
+        .answer-btn.wrong {
+            background: linear-gradient(45deg, #F44336, #E91E63);
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 30px;
         }
 
         .coming-soon {
@@ -128,6 +240,193 @@
 
         <a href="/" class="back-btn">← Back to Game Hub</a>
     </div>
+
+    <script>
+        let gameState = {
+            score: 0,
+            level: 1,
+            timeLeft: 60,
+            currentPuzzle: 0,
+            gameActive: false,
+            timer: null
+        };
+
+        const puzzles = [
+            {
+                question: "What comes next in the sequence: 2, 4, 8, 16, ?",
+                answers: [32, 20, 24, 30],
+                correct: 0,
+                hint: "Each number doubles the previous one"
+            },
+            {
+                question: "If you have 12 apples and eat 3, then buy 5 more, how many do you have?",
+                answers: [14, 16, 12, 15],
+                correct: 0,
+                hint: "12 - 3 + 5 = ?"
+            },
+            {
+                question: "What's the next number: 1, 1, 2, 3, 5, 8, ?",
+                answers: [11, 13, 15, 12],
+                correct: 1,
+                hint: "Add the two previous numbers"
+            },
+            {
+                question: "If today is Wednesday, what day will it be in 10 days?",
+                answers: ["Saturday", "Friday", "Sunday", "Monday"],
+                correct: 0,
+                hint: "Count forward 10 days from Wednesday"
+            },
+            {
+                question: "Complete the pattern: A, C, E, G, ?",
+                answers: ["H", "I", "J", "K"],
+                correct: 1,
+                hint: "Skip one letter each time"
+            }
+        ];
+
+        function startGame() {
+            gameState.gameActive = true;
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.timeLeft = 60;
+            gameState.currentPuzzle = 0;
+            
+            document.getElementById('start-btn').style.display = 'none';
+            updateUI();
+            loadPuzzle();
+            startTimer();
+        }
+
+        function startTimer() {
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('timer').textContent = gameState.timeLeft;
+                
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function loadPuzzle() {
+            const puzzle = puzzles[gameState.currentPuzzle];
+            document.getElementById('puzzle-question').textContent = puzzle.question;
+            
+            const answerGrid = document.getElementById('answer-grid');
+            answerGrid.innerHTML = '';
+            
+            puzzle.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.onclick = () => selectAnswer(index);
+                answerGrid.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(answerIndex) {
+            if (!gameState.gameActive) return;
+            
+            const puzzle = puzzles[gameState.currentPuzzle];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach((btn, index) => {
+                if (index === puzzle.correct) {
+                    btn.classList.add('correct');
+                } else if (index === answerIndex && index !== puzzle.correct) {
+                    btn.classList.add('wrong');
+                }
+                btn.disabled = true;
+            });
+            
+            if (answerIndex === puzzle.correct) {
+                gameState.score += 10 + gameState.level * 5;
+                showFeedback("Correct! ✅", "success");
+            } else {
+                showFeedback("Wrong! ❌", "error");
+            }
+            
+            setTimeout(() => {
+                nextPuzzle();
+            }, 1500);
+        }
+
+        function nextPuzzle() {
+            gameState.currentPuzzle++;
+            
+            if (gameState.currentPuzzle >= puzzles.length) {
+                gameState.level++;
+                gameState.currentPuzzle = 0;
+                gameState.timeLeft += 30; // Bonus time for new level
+                showFeedback(`Level ${gameState.level}! 🎉`, "success");
+            }
+            
+            setTimeout(() => {
+                loadPuzzle();
+                clearFeedback();
+                updateUI();
+            }, 1000);
+        }
+
+        function skipPuzzle() {
+            if (!gameState.gameActive) return;
+            gameState.score = Math.max(0, gameState.score - 10);
+            showFeedback("Puzzle skipped! -10 points", "warning");
+            setTimeout(() => {
+                nextPuzzle();
+            }, 1000);
+        }
+
+        function getHint() {
+            if (!gameState.gameActive) return;
+            const puzzle = puzzles[gameState.currentPuzzle];
+            gameState.score = Math.max(0, gameState.score - 5);
+            showFeedback(`Hint: ${puzzle.hint}`, "info");
+            updateUI();
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+        }
+
+        function clearFeedback() {
+            document.getElementById('feedback').textContent = '';
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('timer').textContent = gameState.timeLeft;
+        }
+
+        function endGame() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timer);
+            
+            const finalScore = gameState.score;
+            showFeedback(`Game Over! Final Score: ${finalScore}`, "info");
+            
+            // Save high score
+            const highScore = localStorage.getItem('puzzleQuestHighScore') || 0;
+            if (finalScore > highScore) {
+                localStorage.setItem('puzzleQuestHighScore', finalScore);
+                showFeedback(`New High Score: ${finalScore}! 🏆`, "success");
+            }
+            
+            document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('start-btn').textContent = 'Play Again';
+        }
+
+        // Initialize the game interface
+        document.addEventListener('DOMContentLoaded', function() {
+            const highScore = localStorage.getItem('puzzleQuestHighScore');
+            if (highScore) {
+                document.getElementById('puzzle-question').textContent = `High Score: ${highScore} - Click Start Game to play!`;
+            }
+        });
+    </script>
 </body>
 
 </html>
