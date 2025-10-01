@@ -67,9 +67,10 @@
 <body>
     <button class="back-btn" onclick="window.location.href='/'">🏠 Game Hub</button>
     <div class="hud" id="hud">Loading...</div>
-    
+
     <!-- NEW: Weapon Selection HUD -->
-    <div style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;">
+    <div
+        style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;">
         <h4 style="margin: 0 0 10px 0; color: #fff;">🔫 Weapons (v2.0)</h4>
         <button onclick="selectWeapon('pistol')" style="display: block; margin: 5px 0;">🔫 Pistol</button>
         <button onclick="selectWeapon('rifle')" style="display: block; margin: 5px 0;">🏹 Rifle</button>
@@ -78,7 +79,8 @@
     </div>
 
     <!-- NEW: Score & Stats -->
-    <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;">
+    <div
+        style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px;">
         <div style="color: #fff;">
             <div>🎯 Kills: <span id="kill-count">0</span></div>
             <div>🏆 Best Streak: <span id="best-streak">0</span></div>
