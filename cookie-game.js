@@ -810,7 +810,7 @@ function saveGame() {
             if (username !== 'Guest' && gameState.totalCookies > 0) {
                 window.submitScore(username, Math.floor(gameState.totalCookies), 'cookie-clicker');
                 console.log(`🌍 Cookie score ${Math.floor(gameState.totalCookies)} submitted to online leaderboard for ${username}`);
-                
+
                 // Send Discord notification for milestone cookies (>1000 total)
                 if (gameState.totalCookies > 1000 && typeof window.sendGameplayNotification === 'function') {
                     window.sendGameplayNotification('Cookie Clicker', Math.floor(gameState.totalCookies), Math.floor(gameState.cookies));

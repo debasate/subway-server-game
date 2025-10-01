@@ -1970,7 +1970,7 @@
         function sendUpdateNotification() {
             const lastNotificationDate = localStorage.getItem('lastUpdateNotification');
             const today = new Date().toDateString();
-            
+
             // Only send notification once per day
             if (lastNotificationDate !== today) {
                 const updateMessage = `🎮 **Game Hub Activity** 🎮
@@ -1988,7 +1988,7 @@ Ready for gaming! 🚀`;
                     updateMessage,
                     isWednesday() ? 0xffd700 : 0x00ff00 // Gold color on Wednesday, green otherwise
                 );
-                
+
                 localStorage.setItem('lastUpdateNotification', today);
             }
         }
