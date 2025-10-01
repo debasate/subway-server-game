@@ -915,6 +915,23 @@ function updateParticles() {
  */
 function saveGameProgress() {
     try {
+        // Calculate coins this run (base calculation)
+        if (coinsThisRun === 0) {
+            coinsThisRun = Math.floor(score / 100); // 1 coin per 100 score points
+        }
+        
+        // Apply Wednesday Coin Boost if available
+        if (window.applyWednesdayBoost && coinsThisRun > 0) {
+            const originalCoins = coinsThisRun;
+            coinsThisRun = window.applyWednesdayBoost(coinsThisRun);
+            if (originalCoins !== coinsThisRun) {
+                console.log(`🪙 Wednesday Boost applied: ${originalCoins} → ${coinsThisRun} coins!`);
+            }
+        }
+        
+        // Add coins this run to total
+        coins += coinsThisRun;
+        
         // Debug info
         console.log(`💾 Saving progress: Score=${Math.floor(score)}, Coins=${coins}, CoinsThisRun=${coinsThisRun}`);
 
@@ -1413,10 +1430,17 @@ function setupUIButtons() {
     if (adClaimBtn) {
         adClaimBtn.onclick = () => {
             console.log('💰 Claiming ad reward...');
-            coins += 10;
+            let coinReward = 10;
+            
+            // Apply Wednesday Coin Boost if available
+            if (window.applyWednesdayBoost) {
+                coinReward = window.applyWednesdayBoost(coinReward);
+            }
+            
+            coins += coinReward;
             saveGameProgress();
             updateCoinDisplay();
-            alert('🎉 Je hebt 10 coins gekregen!');
+            alert(`🎉 Je hebt ${coinReward} coins gekregen!${window.isWednesday && window.isWednesday() ? ' (Wednesday Boost!)' : ''}`);
             if (adModal) adModal.style.display = 'none';
         };
         console.log('✅ Ad claim button connected');

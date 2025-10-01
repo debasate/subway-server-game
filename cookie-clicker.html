@@ -29,6 +29,9 @@
                     <div class="cookies-per-second">
                         per second: <span id="cps">0</span>
                     </div>
+                    <div id="wednesday-boost" class="wednesday-boost" style="display: none;">
+                        🪙 Wednesday Boost Active! 2x Cookies! 🪙
+                    </div>
                 </div>
 
                 <!-- Big Cookie -->
@@ -91,6 +94,38 @@
 
     <script src="cookie-game.js"></script>
     <script>
+        // Wednesday Boost functions (fallback if not loaded from main page)
+        if (!window.isWednesday) {
+            window.isWednesday = function() {
+                return new Date().getDay() === 3; // 0=Sunday, 3=Wednesday
+            };
+            window.getWednesdayBoostMultiplier = function() {
+                return window.isWednesday() ? 2 : 1;
+            };
+            window.applyWednesdayBoost = function(amount) {
+                return Math.floor(amount * window.getWednesdayBoostMultiplier());
+            };
+        }
+
+        // Show Wednesday boost indicator
+        function updateWednesdayBoost() {
+            const boostElement = document.getElementById('wednesday-boost');
+            if (window.isWednesday()) {
+                boostElement.style.display = 'block';
+                boostElement.style.background = 'linear-gradient(45deg, #ffd700, #ffed4e)';
+                boostElement.style.color = '#333';
+                boostElement.style.padding = '8px 15px';
+                boostElement.style.borderRadius = '15px';
+                boostElement.style.marginTop = '10px';
+                boostElement.style.fontWeight = 'bold';
+                boostElement.style.textAlign = 'center';
+                boostElement.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3)';
+                boostElement.style.animation = 'glow 2s ease-in-out infinite alternate';
+            } else {
+                boostElement.style.display = 'none';
+            }
+        }
+
         // Check if user is logged in and display username
         function checkUserLogin() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -159,6 +194,9 @@
 
         // Initialize user login check
         checkUserLogin();
+
+        // Initialize Wednesday boost display
+        updateWednesdayBoost();
 
         // Auto-save every 30 seconds
         setInterval(saveUserGameData, 30000);

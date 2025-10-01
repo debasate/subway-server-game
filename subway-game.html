@@ -570,6 +570,19 @@
             }
         }
 
+        // Wednesday Boost functions (fallback if not loaded from main page)
+        if (!window.isWednesday) {
+            window.isWednesday = function() {
+                return new Date().getDay() === 3; // 0=Sunday, 3=Wednesday
+            };
+            window.getWednesdayBoostMultiplier = function() {
+                return window.isWednesday() ? 2 : 1;
+            };
+            window.applyWednesdayBoost = function(amount) {
+                return Math.floor(amount * window.getWednesdayBoostMultiplier());
+            };
+        }
+
         // Load user-specific game data
         function loadUserGameData(username) {
             const userGameData = JSON.parse(localStorage.getItem(`subwayGame_${username}`) || 'null');
