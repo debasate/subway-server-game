@@ -1218,7 +1218,7 @@
 
         <!-- External Links -->
         <div class="external-links">
-            <a href="https://debasate.github.io/subway-server-game/" target="_blank" class="external-link">🌐 Live
+            <a href="https://gtstijn.space/" target="_blank" class="external-link">🌐 Live
                 Demo</a>
             <a href="https://github.com/debasate/subway-server-game" target="_blank" class="external-link">💻 GitHub
                 Repo</a>
@@ -2598,13 +2598,13 @@
                 `🎯 Games Played: ${stats.games}\n` +
                 `🏆 Achievements: ${stats.achievements}\n` +
                 `🔥 Login Streak: ${stats.streak}\n\n` +
-                `Play at https://debasate.github.io/subway-server-game/ 🚀`;
+                `Play at https://gtstijn.space/ 🚀`;
 
             if (navigator.share) {
                 navigator.share({
                     title: 'My Game Hub Stats',
                     text: shareText,
-                    url: 'https://debasate.github.io/subway-server-game/'
+                    url: 'https://gtstijn.space/'
                 });
             } else {
                 // Fallback: copy to clipboard
@@ -2652,7 +2652,7 @@
 
             // Footer
             ctx.font = '24px Arial';
-            ctx.fillText('Play at debasate.github.io/subway-server-game', 400, 550);
+            ctx.fillText('Play at gtstijn.space', 400, 550);
 
             // Download the achievement card
             const link = document.createElement('a');
@@ -2780,7 +2780,7 @@
 🪙 Wednesday Coin Boost: ${isWednesday() ? 'ACTIVE (2x coins!)' : 'Ready for next Wednesday'}
 👤 User Session: ${currentUser?.username || 'Guest Player'}
 ⏰ Last Updated: ${new Date().toLocaleString('en-US')}
-🌐 Website: https://debasate.github.io/subway-server-game/
+🌐 Website: https://gtstijn.space/
 
 Ready for gaming! 🚀`;
 

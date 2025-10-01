@@ -14,7 +14,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'game-hub-secret-key-change-in-prod
 // Security middleware
 app.use(helmet());
 app.use(cors({
-    origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'https://debasate.github.io'],
+    origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'https://gtstijn.space'],
     credentials: true
 }));
 
