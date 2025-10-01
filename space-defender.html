@@ -394,6 +394,7 @@
             gameState.score = 0;
             gameState.wave = 1;
             gameState.lives = 3;
+            // Don't reset credits and upgrades - let players keep progression
 
             player.x = 375;
             player.y = 550;
@@ -409,6 +410,7 @@
             document.getElementById('upgradeBtn').style.display = 'inline-block';
 
             updateHUD();
+            updateUpgradeCosts();
             gameLoop();
         }
 
@@ -434,17 +436,20 @@
         }
 
         function updatePlayer() {
+            // Apply speed upgrade
+            const currentSpeed = player.speed + (gameState.upgrades.speed * 1);
+            
             if (gameState.keys['KeyA'] || gameState.keys['ArrowLeft']) {
-                player.x = Math.max(0, player.x - player.speed);
+                player.x = Math.max(0, player.x - currentSpeed);
             }
             if (gameState.keys['KeyD'] || gameState.keys['ArrowRight']) {
-                player.x = Math.min(canvas.width - player.width, player.x + player.speed);
+                player.x = Math.min(canvas.width - player.width, player.x + currentSpeed);
             }
             if (gameState.keys['KeyW'] || gameState.keys['ArrowUp']) {
-                player.y = Math.max(0, player.y - player.speed);
+                player.y = Math.max(0, player.y - currentSpeed);
             }
             if (gameState.keys['KeyS'] || gameState.keys['ArrowDown']) {
-                player.y = Math.min(canvas.height - player.height, player.y + player.speed);
+                player.y = Math.min(canvas.height - player.height, player.y + currentSpeed);
             }
             if (gameState.keys['Space']) {
                 shootBullet();
@@ -454,7 +459,10 @@
         let lastShot = 0;
         function shootBullet() {
             const now = Date.now();
-            if (now - lastShot > 200) { // Rate limit
+            // Apply rapid fire upgrade - reduce delay by 30ms per level
+            const shootDelay = Math.max(50, 200 - (gameState.upgrades.rapid * 30));
+            
+            if (now - lastShot > shootDelay) {
                 bullets.push({
                     x: player.x + player.width / 2,
                     y: player.y,
@@ -509,8 +517,12 @@
 
                         bullets.splice(bIndex, 1);
                         aliens.splice(aIndex, 1);
-                        gameState.score += 10;
-                        gameState.credits += 5; // Earn credits for killing aliens
+                        
+                        // Apply damage upgrade - more score and credits
+                        const damageMultiplier = 1 + (gameState.upgrades.damage * 0.5);
+                        gameState.score += Math.floor(10 * damageMultiplier);
+                        gameState.credits += Math.floor(5 * damageMultiplier);
+                        
                         updateHUD();
                     }
                 });
@@ -597,22 +609,31 @@
             });
             ctx.globalAlpha = 1;
 
-            // Game over/wave complete check
-            if (aliens.length === 0) {
+            // Check for wave completion
+            if (gameState.running && aliens.length === 0) {
                 gameState.wave++;
-                spawnWave();
-                updateHUD();
+                
+                // Show wave complete message
+                ctx.fillStyle = '#00ffff';
+                ctx.font = '32px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Wave ${gameState.wave - 1} Complete!`, canvas.width / 2, canvas.height / 2 - 20);
+                ctx.font = '20px Arial';
+                ctx.fillText(`Preparing Wave ${gameState.wave}...`, canvas.width / 2, canvas.height / 2 + 20);
+                
+                // Delay before next wave
+                setTimeout(() => {
+                    if (gameState.running) {
+                        spawnWave();
+                        updateHUD();
+                    }
+                }, 2000);
             }
 
+            // Check for game over
             if (gameState.lives <= 0) {
                 endGame();
             }
-        }
-
-        function updateHUD() {
-            document.getElementById('score').textContent = gameState.score;
-            document.getElementById('wave').textContent = gameState.wave;
-            document.getElementById('lives').textContent = gameState.lives;
         }
 
         function endGame() {
