@@ -1066,8 +1066,10 @@
                 </tbody>
             </table>
             <div id="leaderboard-status" style="font-size:0.9em;opacity:0.7;">
-                <span id="status-guest" style="display: none;">📱 Scores saved locally only - Login for online leaderboard!</span>
-                <span id="status-online" style="display: none;">🌍 Scores automatically saved to online leaderboard</span>
+                <span id="status-guest" style="display: none;">📱 Scores saved locally only - Login for online
+                    leaderboard!</span>
+                <span id="status-online" style="display: none;">🌍 Scores automatically saved to online
+                    leaderboard</span>
                 <span id="status-offline">🔌 Server offline - Scores saved locally only</span>
             </div>
         </div>
@@ -1425,7 +1427,7 @@
                 indicatorElement.textContent = '🔴';
                 textElement.textContent = 'Server Offline (Local Mode)';
             }
-            
+
             // Update leaderboard status after server check
             updateLeaderboardStatus();
         }
@@ -1435,24 +1437,22 @@
             const guestStatus = document.getElementById('status-guest');
             const onlineStatus = document.getElementById('status-online');
             const offlineStatus = document.getElementById('status-offline');
-            
+
             // Hide all status messages first
             guestStatus.style.display = 'none';
             onlineStatus.style.display = 'none';
             offlineStatus.style.display = 'none';
-            
-            // Check server status
-            const serverStatus = document.getElementById('server-status');
-            const isServerOnline = serverStatus && serverStatus.classList.contains('online');
-            
-            if (!isServerOnline) {
-                // Server is offline
+
+            // Check if online leaderboard is available
+            if (!isOnlineLeaderboardAvailable) {
+                // Online leaderboard is not available
                 offlineStatus.style.display = 'inline';
+                offlineStatus.innerHTML = '🔌 Online leaderboard unavailable - Scores saved locally only';
             } else if (currentUser && currentUser.username) {
-                // User is logged in and server is online
+                // User is logged in and online leaderboard is available
                 onlineStatus.style.display = 'inline';
             } else {
-                // Server is online but user not logged in
+                // Online leaderboard is available but user not logged in
                 guestStatus.style.display = 'inline';
             }
         }
@@ -1739,8 +1739,24 @@
             document.head.appendChild(script);
         });
 
-        // Vervang deze URL door jouw Worker URL
+        // Cloudflare Worker URL - can be updated when Worker is deployed
         const WORKER_URL = 'https://round-mouse-a792.stijndonckers08.workers.dev/leaderboard';
+        
+        // Track if online leaderboard is available
+        let isOnlineLeaderboardAvailable = false;
+
+        // Test if online leaderboard is available
+        async function testOnlineLeaderboard() {
+            try {
+                const testResponse = await fetch(WORKER_URL, { method: 'GET' });
+                isOnlineLeaderboardAvailable = testResponse.ok;
+                return isOnlineLeaderboardAvailable;
+            } catch (error) {
+                console.warn('Online leaderboard not available:', error.message);
+                isOnlineLeaderboardAvailable = false;
+                return false;
+            }
+        }
 
         // Online leaderboard ophalen
         function loadOnlineLeaderboard() {
@@ -1752,7 +1768,7 @@
                 .then(data => {
                     const tbody = document.getElementById('leaderboard-body');
                     tbody.innerHTML = '';
-                    
+
                     if (data && data.length > 0) {
                         data.forEach((entry, i) => {
                             const tr = document.createElement('tr');
@@ -1768,36 +1784,107 @@
                 })
                 .catch(error => {
                     console.warn('Failed to load online leaderboard:', error);
-                    // Show offline message in leaderboard
-                    const tbody = document.getElementById('leaderboard-body');
-                    tbody.innerHTML = '<tr><td colspan="3" style="padding:20px;text-align:center;opacity:0.7;">🔌 Server offline - Local scores only</td></tr>';
+                    isOnlineLeaderboardAvailable = false;
+                    updateLeaderboardStatus();
+                    
+                    // Load local leaderboard as fallback
+                    loadLocalLeaderboard();
                 });
         }
 
+        // Load local leaderboard from localStorage
+        function loadLocalLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+
+            // Get local scores from various sources
+            const localScores = [];
+            
+            // Get scores from games
+            const gameStats = JSON.parse(localStorage.getItem('gameStats') || '{}');
+            const cookieData = JSON.parse(localStorage.getItem('cookieClickerSave') || '{}');
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            
+            // Add current user's scores if available
+            if (currentUser.username && gameStats.bestScore) {
+                localScores.push({
+                    username: currentUser.username,
+                    totalScore: gameStats.bestScore,
+                    source: 'Subway Surfer'
+                });
+            }
+            
+            if (currentUser.username && cookieData.gameState && cookieData.gameState.totalCookies) {
+                localScores.push({
+                    username: currentUser.username,
+                    totalScore: Math.floor(cookieData.gameState.totalCookies),
+                    source: 'Cookie Clicker'
+                });
+            }
+
+            // Sort by score
+            localScores.sort((a, b) => b.totalScore - a.totalScore);
+
+            if (localScores.length > 0) {
+                localScores.slice(0, 10).forEach((entry, i) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td style='padding:8px;'>${i + 1}</td><td style='padding:8px;'>${entry.username} <small>(${entry.source})</small></td><td style='padding:8px;'>${entry.totalScore}</td>`;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="3" style="padding:20px;text-align:center;opacity:0.7;">🎮 No local scores yet - start playing to see your scores here!</td>';
+                tbody.appendChild(tr);
+            }
+        }
+
         // Score posten
-        function submitScore(username, score, game) {
-            fetch(WORKER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, score, game })
-            }).then(response => {
+        async function submitScore(username, score, game) {
+            // First test if online leaderboard is available
+            if (!isOnlineLeaderboardAvailable) {
+                const available = await testOnlineLeaderboard();
+                if (!available) {
+                    console.warn('⚠️ Online leaderboard not available, skipping score submission');
+                    return false;
+                }
+            }
+
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, score, game })
+                });
+
                 if (response.ok) {
                     console.log(`✅ Score submitted successfully: ${username} - ${score} points in ${game}`);
                     // Refresh leaderboard after successful score submission
                     setTimeout(loadOnlineLeaderboard, 1000); // Delay to allow server processing
+                    return true;
                 } else {
                     console.error('❌ Failed to submit score to leaderboard');
+                    isOnlineLeaderboardAvailable = false; // Mark as unavailable
+                    return false;
                 }
-            }).catch(error => {
+            } catch (error) {
                 console.error('❌ Score submission error:', error);
-            });
+                isOnlineLeaderboardAvailable = false; // Mark as unavailable
+                return false;
+            }
         }
 
         // Roep online leaderboard op bij laden
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Test online leaderboard availability first
+            await testOnlineLeaderboard();
+            
             loadOnlineLeaderboard();
+            
             // Refresh leaderboard every 2 minutes to show new scores
-            setInterval(loadOnlineLeaderboard, 120000);
+            setInterval(async () => {
+                await testOnlineLeaderboard(); // Re-test availability periodically
+                loadOnlineLeaderboard();
+            }, 120000);
         });
 
         // Wednesday Coin Boost System

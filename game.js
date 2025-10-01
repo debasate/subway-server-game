@@ -957,7 +957,7 @@ function saveGameProgress() {
 
         console.log('💾 Game progress saved:', stats);
         console.log(`🏆 Best score updated: ${currentBestScore} → ${newBestScore}`);
-        
+
         // Submit score to online leaderboard if user is logged in
         try {
             if (typeof window.submitScore === 'function') {
@@ -969,7 +969,7 @@ function saveGameProgress() {
                     const userData = JSON.parse(localStorage.getItem('currentUser'));
                     username = userData.username || 'Guest';
                 }
-                
+
                 // Only submit if not guest and score is meaningful
                 if (username !== 'Guest' && Math.floor(score) > 0) {
                     window.submitScore(username, Math.floor(score), gameMode || 'subway');
@@ -979,7 +979,7 @@ function saveGameProgress() {
         } catch (error) {
             console.warn('⚠️ Failed to submit score to online leaderboard:', error);
         }
-        
+
         return true;
     } catch (error) {
         console.error('❌ Failed to save progress:', error);

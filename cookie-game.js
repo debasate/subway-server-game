@@ -793,7 +793,7 @@ function saveGame() {
     };
 
     localStorage.setItem('cookieClickerSave', JSON.stringify(saveData));
-    
+
     // Submit score to online leaderboard if user is logged in
     try {
         if (typeof window.submitScore === 'function') {
@@ -805,7 +805,7 @@ function saveGame() {
                 const userData = JSON.parse(localStorage.getItem('currentUser'));
                 username = userData.username || 'Guest';
             }
-            
+
             // Only submit if not guest and has meaningful cookies count
             if (username !== 'Guest' && gameState.totalCookies > 0) {
                 window.submitScore(username, Math.floor(gameState.totalCookies), 'cookie-clicker');
