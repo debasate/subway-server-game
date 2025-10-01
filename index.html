@@ -1531,11 +1531,29 @@
             hideAuthError();
 
             try {
-                // Check if API client is loaded
+                // Check if API client is loaded - if not, use local auth
                 if (!window.gameHubAPI) {
                     console.warn('API client not loaded, using local fallback');
-                    await handleLocalAuth(username, password);
-                    return;
+                    try {
+                        await handleLocalAuth(username, password);
+                        return;
+                    } catch (localError) {
+                        // If login fails and no local account exists, offer to create one
+                        if (authMode === 'login' && localError.message.includes('Invalid username or password')) {
+                            const createLocal = confirm(`Would you like to create a local account with username "${username}"?\n\nThis will allow you to play and save your progress locally.`);
+                            if (createLocal) {
+                                const originalMode = authMode;
+                                authMode = 'register';
+                                try {
+                                    await handleLocalAuth(username, password);
+                                } finally {
+                                    authMode = originalMode;
+                                }
+                                return;
+                            }
+                        }
+                        throw localError;
+                    }
                 }
 
                 let result;
@@ -1568,12 +1586,29 @@
                 console.error('Authentication error:', error);
                 showAuthError(error.message || 'Authentication failed. Please try again.');
 
-                // If server is down, try local fallback for login only
-                if (authMode === 'login' && error.message.includes('fetch')) {
+                // If server is down, try local fallback
+                if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
                     try {
                         await handleLocalAuth(username, password);
                     } catch (localError) {
-                        showAuthError('Server is offline and no local account found');
+                        // If no local account exists, offer to create one
+                        if (authMode === 'login' && localError.message.includes('Invalid username or password')) {
+                            const createLocal = confirm(`No server connection available.\n\nWould you like to create a local account with username "${username}"?\n\nThis will allow you to play offline and your progress will be saved locally.`);
+                            if (createLocal) {
+                                // Temporarily switch to register mode to create local account
+                                const originalMode = authMode;
+                                authMode = 'register';
+                                try {
+                                    await handleLocalAuth(username, password);
+                                } finally {
+                                    authMode = originalMode;
+                                }
+                            } else {
+                                showAuthError('Login cancelled. You can create a local account by clicking "Register" instead.');
+                            }
+                        } else {
+                            showAuthError(localError.message || 'Authentication failed');
+                        }
                     }
                 }
             } finally {
@@ -1618,7 +1653,11 @@
                 // Login existing user
                 const user = users[username];
 
-                if (!user || user.password !== btoa(password)) {
+                if (!user) {
+                    throw new Error('Invalid username or password');
+                }
+                
+                if (user.password !== btoa(password)) {
                     throw new Error('Invalid username or password');
                 }
 
