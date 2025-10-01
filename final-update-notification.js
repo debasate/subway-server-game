@@ -54,7 +54,7 @@ const req = https.request(options, (res) => {
     if (res.statusCode === 204) {
         console.log('🎉 FINAL UPDATE notification sent to Discord successfully!');
         console.log('✅ v1.8.0 MEGA UPDATE deployment complete!');
-    console.log('🌐 Live at: https://gtstijn.space/');
+        console.log('🌐 Live at: https://gtstijn.space/');
     } else {
         console.log(`❌ Failed: Status ${res.statusCode}`);
     }
