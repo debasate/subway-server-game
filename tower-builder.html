@@ -633,16 +633,16 @@
 
         // Power-up system
         let powerUpsVisible = false;
-        
+
         function togglePowerUps() {
             const panel = document.getElementById('powerups-panel');
             powerUpsVisible = !powerUpsVisible;
             panel.style.display = powerUpsVisible ? 'block' : 'none';
         }
-        
+
         function activatePowerUp(type) {
             if (gameState.score < 50) return; // Require minimum score
-            
+
             switch (type) {
                 case 'slow':
                     gameState.gameSpeed *= 0.5;
@@ -651,7 +651,7 @@
                         gameState.gameSpeed *= 2; // Restore speed
                     }, 3000);
                     break;
-                    
+
                 case 'magnet':
                     // Make next block "magnetic" - auto-center on perfect placement
                     if (currentBlock) {
@@ -660,7 +660,7 @@
                         gameState.score -= 50;
                     }
                     break;
-                    
+
                 case 'double':
                     // Double points for next 5 blocks
                     const originalScore = gameState.score;
@@ -668,7 +668,7 @@
                     gameState.score = originalScore - 50;
                     break;
             }
-            
+
             updateHUD();
             togglePowerUps(); // Close panel after use
         }
