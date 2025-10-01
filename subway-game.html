@@ -572,13 +572,13 @@
 
         // Wednesday Boost functions (fallback if not loaded from main page)
         if (!window.isWednesday) {
-            window.isWednesday = function() {
+            window.isWednesday = function () {
                 return new Date().getDay() === 3; // 0=Sunday, 3=Wednesday
             };
-            window.getWednesdayBoostMultiplier = function() {
+            window.getWednesdayBoostMultiplier = function () {
                 return window.isWednesday() ? 2 : 1;
             };
-            window.applyWednesdayBoost = function(amount) {
+            window.applyWednesdayBoost = function (amount) {
                 return Math.floor(amount * window.getWednesdayBoostMultiplier());
             };
         }

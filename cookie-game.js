@@ -304,12 +304,12 @@ const perClickEl = document.getElementById('per-click');
 // Cookie Click Handler
 function clickCookie(event) {
     let clickPower = Math.floor(gameState.cookiesPerClick);
-    
+
     // Apply Wednesday Coin Boost if available
     if (window.applyWednesdayBoost) {
         clickPower = window.applyWednesdayBoost(clickPower);
     }
-    
+
     gameState.cookies += clickPower;
     gameState.totalCookies += clickPower;
     gameState.sessionCookies += clickPower;
@@ -848,12 +848,12 @@ function gameLoop() {
     // Add cookies from CPS
     if (gameState.cookiesPerSecond > 0) {
         let cpsGain = gameState.cookiesPerSecond / 30; // 30 FPS
-        
+
         // Apply Wednesday Coin Boost if available
         if (window.applyWednesdayBoost) {
             cpsGain = window.applyWednesdayBoost(cpsGain);
         }
-        
+
         gameState.cookies += cpsGain;
         gameState.totalCookies += cpsGain;
         gameState.sessionCookies += cpsGain;

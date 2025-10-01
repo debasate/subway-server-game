@@ -919,7 +919,7 @@ function saveGameProgress() {
         if (coinsThisRun === 0) {
             coinsThisRun = Math.floor(score / 100); // 1 coin per 100 score points
         }
-        
+
         // Apply Wednesday Coin Boost if available
         if (window.applyWednesdayBoost && coinsThisRun > 0) {
             const originalCoins = coinsThisRun;
@@ -928,10 +928,10 @@ function saveGameProgress() {
                 console.log(`🪙 Wednesday Boost applied: ${originalCoins} → ${coinsThisRun} coins!`);
             }
         }
-        
+
         // Add coins this run to total
         coins += coinsThisRun;
-        
+
         // Debug info
         console.log(`💾 Saving progress: Score=${Math.floor(score)}, Coins=${coins}, CoinsThisRun=${coinsThisRun}`);
 
@@ -1431,12 +1431,12 @@ function setupUIButtons() {
         adClaimBtn.onclick = () => {
             console.log('💰 Claiming ad reward...');
             let coinReward = 10;
-            
+
             // Apply Wednesday Coin Boost if available
             if (window.applyWednesdayBoost) {
                 coinReward = window.applyWednesdayBoost(coinReward);
             }
-            
+
             coins += coinReward;
             saveGameProgress();
             updateCoinDisplay();
