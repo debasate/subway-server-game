@@ -1403,6 +1403,23 @@
                 </ul>
                 <button class="play-btn" onclick="playTowerBuilder()">Play Tower Builder</button>
             </div>
+
+            <!-- Fortnite 3D Game -->
+            <div class="game-card">
+                <div class="game-icon">🎮</div>
+                <h2 class="game-title">Fortnite 3D</h2>
+                <p class="game-description">
+                    Battle in a 3D arena inspired by Fortnite! Build, shoot, and survive against other players.
+                </p>
+                <ul class="game-features">
+                    <li>🗺️ 3D map exploration</li>
+                    <li>🔫 Shooting mechanics</li>
+                    <li>🏗️ Building system</li>
+                    <li>🏆 Victory Royale mode</li>
+                    <li>🎨 Custom skins</li>
+                </ul>
+                <button class="play-btn" onclick="playFortnite3D()">Play Fortnite 3D</button>
+            </div>
         </div>
 
         <!-- Screenshot Sharing -->
@@ -1708,6 +1725,10 @@
 
         function playTowerBuilder() {
             window.location.href = '/tower-builder';
+        }
+
+        function playFortnite3D() {
+            window.location.href = '/fortnite-3d';
         }
 
         // Update Log Toggle
