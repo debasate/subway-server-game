@@ -93,6 +93,8 @@
                 <a href="/" class="nav-link active">🏃 Subway Runner</a>
                 <a href="/cookie-clicker" class="nav-link">🍪 Cookie Clicker</a>
             </div>
+            <!-- Fortnite 3D Button -->
+            <a href="/fortnite-3d.html" class="nav-btn">🎮 Fortnite 3D</a>
         </nav>
 
         <!-- Game Header -->
@@ -492,285 +494,283 @@
                     <p>🎬 Advertentie wordt afgespeeld...</p>
                     <div class="ad-timer">
                         <div id="ad-progress" class="progress-bar"></div>
-                        <span id="ad-countdown">5</span> seconds
                     </div>
+                    <button id="ad-claim-btn" class="ad-claim" disabled>Claim 10 Coins</button>
+                    <button id="ad-close-btn" class="modal-close">×</button>
                 </div>
-                <button id="ad-claim-btn" class="ad-claim" disabled>Claim 10 Coins</button>
-                <button id="ad-close-btn" class="modal-close">×</button>
+            </div>
+
+            <!-- Settings Modal -->
+            <div id="settings-modal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <h3>⚙️ Game Settings</h3>
+
+                    <div class="settings-section">
+                        <h4>🔊 Audio</h4>
+                        <div class="setting-item">
+                            <label>Master Volume:</label>
+                            <input type="range" id="master-volume" min="0" max="100" value="70">
+                            <span id="master-volume-value">70%</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>Sound Effects:</label>
+                            <input type="range" id="sfx-volume" min="0" max="100" value="80">
+                            <span id="sfx-volume-value">80%</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>Background Music:</label>
+                            <input type="range" id="music-volume" min="0" max="100" value="50">
+                            <span id="music-volume-value">50%</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>🎮 Gameplay</h4>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="show-fps"> Show FPS Counter
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="particle-effects" checked> Particle Effects
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="screen-shake" checked> Screen Shake
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h4>📊 Statistics</h4>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Games:</span>
+                                <span class="stat-value" id="total-games">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Best Score:</span>
+                                <span class="stat-value" id="best-score">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total Coins:</span>
+                                <span class="stat-value" id="total-coins-earned">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Play Time:</span>
+                                <span class="stat-value" id="total-playtime">0m</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="settings-close" class="modal-close">×</button>
+                </div>
             </div>
         </div>
 
-        <!-- Settings Modal -->
-        <div id="settings-modal" class="modal" style="display:none;">
-            <div class="modal-content">
-                <h3>⚙️ Game Settings</h3>
-
-                <div class="settings-section">
-                    <h4>🔊 Audio</h4>
-                    <div class="setting-item">
-                        <label>Master Volume:</label>
-                        <input type="range" id="master-volume" min="0" max="100" value="70">
-                        <span id="master-volume-value">70%</span>
-                    </div>
-                    <div class="setting-item">
-                        <label>Sound Effects:</label>
-                        <input type="range" id="sfx-volume" min="0" max="100" value="80">
-                        <span id="sfx-volume-value">80%</span>
-                    </div>
-                    <div class="setting-item">
-                        <label>Background Music:</label>
-                        <input type="range" id="music-volume" min="0" max="100" value="50">
-                        <span id="music-volume-value">50%</span>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h4>🎮 Gameplay</h4>
-                    <div class="setting-item">
-                        <label>
-                            <input type="checkbox" id="show-fps"> Show FPS Counter
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label>
-                            <input type="checkbox" id="particle-effects" checked> Particle Effects
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label>
-                            <input type="checkbox" id="screen-shake" checked> Screen Shake
-                        </label>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h4>📊 Statistics</h4>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-label">Total Games:</span>
-                            <span class="stat-value" id="total-games">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Best Score:</span>
-                            <span class="stat-value" id="best-score">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Total Coins:</span>
-                            <span class="stat-value" id="total-coins-earned">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Play Time:</span>
-                            <span class="stat-value" id="total-playtime">0m</span>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="settings-close" class="modal-close">×</button>
+        <div id="game-info" style="display:none;">
+            <div id="game-stats">
+                <span id="mode-display"></span>
+                <span id="level-display"></span>
             </div>
         </div>
-    </div>
-
-    <div id="game-info" style="display:none;">
-        <div id="game-stats">
-            <span id="mode-display"></span>
-            <span id="level-display"></span>
-        </div>
-    </div>
-    <canvas id="game-canvas" width="480" height="640" style="display:none;"></canvas>
-    <script src="game.js"></script>
-    <script>
-        // Back to Hub functionality
-        document.addEventListener('DOMContentLoaded', function () {
-            const backToHubBtn = document.getElementById('back-to-hub-btn');
-            if (backToHubBtn) {
-                backToHubBtn.addEventListener('click', function () {
-                    window.location.href = '/';
-                });
-            }
-
-            // Initialize user profile with login system
-            checkUserLogin();
-        });
-
-        // Check if user is logged in and update profile
-        function checkUserLogin() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-            const usernameDisplay = document.getElementById('username-display');
-            const userAvatar = document.getElementById('user-avatar');
-            const logoutBtn = document.getElementById('logout-btn');
-            const saveStatus = document.getElementById('save-status');
-
-            if (currentUser) {
-                usernameDisplay.textContent = currentUser.username;
-                userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
-                logoutBtn.style.display = 'block';
-                saveStatus.textContent = 'User Account';
-
-                // Update logout button text to English
-                logoutBtn.innerHTML = '<span>🚪</span> Logout';
-
-                // Load user-specific game data
-                loadUserGameData(currentUser.username);
-
-                // Add logout functionality
-                logoutBtn.onclick = function () {
-                    if (confirm('Are you sure you want to logout?')) {
-                        // Save current progress before logout
-                        saveUserGameData();
-
-                        // Clear current user
-                        localStorage.removeItem('currentUser');
-
-                        // Redirect to hub
+        <canvas id="game-canvas" width="480" height="640" style="display:none;"></canvas>
+        <script src="game.js"></script>
+        <script>
+            // Back to Hub functionality
+            document.addEventListener('DOMContentLoaded', function () {
+                const backToHubBtn = document.getElementById('back-to-hub-btn');
+                if (backToHubBtn) {
+                    backToHubBtn.addEventListener('click', function () {
                         window.location.href = '/';
+                    });
+                }
+
+                // Initialize user profile with login system
+                checkUserLogin();
+            });
+
+            // Check if user is logged in and update profile
+            function checkUserLogin() {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                const usernameDisplay = document.getElementById('username-display');
+                const userAvatar = document.getElementById('user-avatar');
+                const logoutBtn = document.getElementById('logout-btn');
+                const saveStatus = document.getElementById('save-status');
+
+                if (currentUser) {
+                    usernameDisplay.textContent = currentUser.username;
+                    userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+                    logoutBtn.style.display = 'block';
+                    saveStatus.textContent = 'User Account';
+
+                    // Update logout button text to English
+                    logoutBtn.innerHTML = '<span>🚪</span> Logout';
+
+                    // Load user-specific game data
+                    loadUserGameData(currentUser.username);
+
+                    // Add logout functionality
+                    logoutBtn.onclick = function () {
+                        if (confirm('Are you sure you want to logout?')) {
+                            // Save current progress before logout
+                            saveUserGameData();
+
+                            // Clear current user
+                            localStorage.removeItem('currentUser');
+
+                            // Redirect to hub
+                            window.location.href = '/';
+                        }
+                    };
+                } else {
+                    usernameDisplay.textContent = 'Guest Player';
+                    userAvatar.textContent = 'G';
+                    logoutBtn.style.display = 'none';
+                    saveStatus.textContent = 'Local Save';
+                }
+            }
+
+            // Wednesday Boost functions (fallback if not loaded from main page)
+            if (!window.isWednesday) {
+                window.isWednesday = function () {
+                    return new Date().getDay() === 3; // 0=Sunday, 3=Wednesday
+                };
+                window.getWednesdayBoostMultiplier = function () {
+                    return window.isWednesday() ? 2 : 1;
+                };
+                window.applyWednesdayBoost = function (amount) {
+                    return Math.floor(amount * window.getWednesdayBoostMultiplier());
+                };
+            }
+
+            // Load user-specific game data
+            function loadUserGameData(username) {
+                const userGameData = JSON.parse(localStorage.getItem(`subwayGame_${username}`) || 'null');
+                if (userGameData && window.gameState) {
+                    // Restore high scores
+                    if (userGameData.highScores) {
+                        window.gameState.highScores = userGameData.highScores;
                     }
-                };
-            } else {
-                usernameDisplay.textContent = 'Guest Player';
-                userAvatar.textContent = 'G';
-                logoutBtn.style.display = 'none';
-                saveStatus.textContent = 'Local Save';
-            }
-        }
 
-        // Wednesday Boost functions (fallback if not loaded from main page)
-        if (!window.isWednesday) {
-            window.isWednesday = function () {
-                return new Date().getDay() === 3; // 0=Sunday, 3=Wednesday
-            };
-            window.getWednesdayBoostMultiplier = function () {
-                return window.isWednesday() ? 2 : 1;
-            };
-            window.applyWednesdayBoost = function (amount) {
-                return Math.floor(amount * window.getWednesdayBoostMultiplier());
-            };
-        }
+                    // Restore unlocked themes
+                    if (userGameData.unlockedThemes) {
+                        window.gameState.unlockedThemes = userGameData.unlockedThemes;
+                    }
 
-        // Load user-specific game data
-        function loadUserGameData(username) {
-            const userGameData = JSON.parse(localStorage.getItem(`subwayGame_${username}`) || 'null');
-            if (userGameData && window.gameState) {
-                // Restore high scores
-                if (userGameData.highScores) {
-                    window.gameState.highScores = userGameData.highScores;
+                    // Restore achievements
+                    if (userGameData.achievements) {
+                        window.gameState.achievements = userGameData.achievements;
+                    }
+
+                    // Restore stats
+                    if (userGameData.totalGamesPlayed) {
+                        window.gameState.totalGamesPlayed = userGameData.totalGamesPlayed;
+                    }
+
+                    console.log('User game data loaded for:', username);
                 }
-
-                // Restore unlocked themes
-                if (userGameData.unlockedThemes) {
-                    window.gameState.unlockedThemes = userGameData.unlockedThemes;
-                }
-
-                // Restore achievements
-                if (userGameData.achievements) {
-                    window.gameState.achievements = userGameData.achievements;
-                }
-
-                // Restore stats
-                if (userGameData.totalGamesPlayed) {
-                    window.gameState.totalGamesPlayed = userGameData.totalGamesPlayed;
-                }
-
-                console.log('User game data loaded for:', username);
             }
-        }
 
-        // Save user-specific game data
-        function saveUserGameData() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-            if (currentUser && window.gameState) {
-                const gameData = {
-                    highScores: window.gameState.highScores || {},
-                    unlockedThemes: window.gameState.unlockedThemes || ['default'],
-                    achievements: window.gameState.achievements || {},
-                    totalGamesPlayed: window.gameState.totalGamesPlayed || 0,
-                    lastSaved: new Date().toISOString()
-                };
-
-                localStorage.setItem(`subwayGame_${currentUser.username}`, JSON.stringify(gameData));
-                console.log('User game data saved for:', currentUser.username);
-            }
-        }
-
-        // Auto-save every minute during gameplay
-        setInterval(() => {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-            if (currentUser) {
-                saveUserGameData();
-            }
-        }, 60000);
-
-        // Save when page is about to unload
-        window.addEventListener('beforeunload', saveUserGameData);
-
-        // Fix: Ensure game screen opens and panels close properly
-        // This script should be placed at the end of the file before </body>
-
-        // Helper to close theme/shop/update panels
-        function closePanels() {
-            document.getElementById('theme-panel').style.display = 'none';
-            document.getElementById('shop-panel').style.display = 'none';
-            document.getElementById('update-log').style.display = 'none';
-        }
-
-        // Add event listeners for close buttons
-        window.addEventListener('DOMContentLoaded', function () {
-            // Close theme panel
-            const themePanel = document.getElementById('theme-panel');
-            if (themePanel) {
-                themePanel.querySelectorAll('.close-btn').forEach(btn => {
-                    btn.onclick = function () {
-                        themePanel.style.display = 'none';
+            // Save user-specific game data
+            function saveUserGameData() {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                if (currentUser && window.gameState) {
+                    const gameData = {
+                        highScores: window.gameState.highScores || {},
+                        unlockedThemes: window.gameState.unlockedThemes || ['default'],
+                        achievements: window.gameState.achievements || {},
+                        totalGamesPlayed: window.gameState.totalGamesPlayed || 0,
+                        lastSaved: new Date().toISOString()
                     };
-                });
-            }
-            // Close shop panel
-            const shopPanel = document.getElementById('shop-panel');
-            if (shopPanel) {
-                shopPanel.querySelectorAll('.close-btn').forEach(btn => {
-                    btn.onclick = function () {
-                        shopPanel.style.display = 'none';
-                    };
-                });
-            }
-            // Close update log panel
-            const updatePanel = document.getElementById('update-log');
-            if (updatePanel) {
-                updatePanel.querySelectorAll('.close-btn').forEach(btn => {
-                    btn.onclick = function () {
-                        updatePanel.style.display = 'none';
-                    };
-                });
-            }
-        });
 
-        // Ensure startGame always closes panels and shows game
-        function startGameMode(mode) {
-            console.log(`🎮 Starting game mode: ${mode}`);
-            closePanels();
-
-            // Check if game.js startGame function is available
-            if (typeof window.startGame === 'function') {
-                window.startGame(mode);
-            } else {
-                console.error('❌ startGame function not found in game.js');
-                alert('Game engine not loaded. Please refresh the page.');
+                    localStorage.setItem(`subwayGame_${currentUser.username}`, JSON.stringify(gameData));
+                    console.log('User game data saved for:', currentUser.username);
+                }
             }
-        }
 
-        // Make sure all buttons use the correct function
-        document.addEventListener('DOMContentLoaded', function () {
-            // Update all game mode buttons to use startGameMode
-            const buttons = document.querySelectorAll('.mode-btn[onclick*="startGame"]');
-            buttons.forEach(btn => {
-                const onclick = btn.getAttribute('onclick');
-                if (onclick) {
-                    const newOnclick = onclick.replace('startGame(', 'startGameMode(');
-                    btn.setAttribute('onclick', newOnclick);
-                    console.log(`🔧 Fixed button: ${onclick} → ${newOnclick}`);
+            // Auto-save every minute during gameplay
+            setInterval(() => {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                if (currentUser) {
+                    saveUserGameData();
+                }
+            }, 60000);
+
+            // Save when page is about to unload
+            window.addEventListener('beforeunload', saveUserGameData);
+
+            // Fix: Ensure game screen opens and panels close properly
+            // This script should be placed at the end of the file before </body>
+
+            // Helper to close theme/shop/update panels
+            function closePanels() {
+                document.getElementById('theme-panel').style.display = 'none';
+                document.getElementById('shop-panel').style.display = 'none';
+                document.getElementById('update-log').style.display = 'none';
+            }
+
+            // Add event listeners for close buttons
+            window.addEventListener('DOMContentLoaded', function () {
+                // Close theme panel
+                const themePanel = document.getElementById('theme-panel');
+                if (themePanel) {
+                    themePanel.querySelectorAll('.close-btn').forEach(btn => {
+                        btn.onclick = function () {
+                            themePanel.style.display = 'none';
+                        };
+                    });
+                }
+                // Close shop panel
+                const shopPanel = document.getElementById('shop-panel');
+                if (shopPanel) {
+                    shopPanel.querySelectorAll('.close-btn').forEach(btn => {
+                        btn.onclick = function () {
+                            shopPanel.style.display = 'none';
+                        };
+                    });
+                }
+                // Close update log panel
+                const updatePanel = document.getElementById('update-log');
+                if (updatePanel) {
+                    updatePanel.querySelectorAll('.close-btn').forEach(btn => {
+                        btn.onclick = function () {
+                            updatePanel.style.display = 'none';
+                        };
+                    });
                 }
             });
-        });
-    </script>
+
+            // Ensure startGame always closes panels and shows game
+            function startGameMode(mode) {
+                console.log(`🎮 Starting game mode: ${mode}`);
+                closePanels();
+
+                // Check if game.js startGame function is available
+                if (typeof window.startGame === 'function') {
+                    window.startGame(mode);
+                } else {
+                    console.error('❌ startGame function not found in game.js');
+                    alert('Game engine not loaded. Please refresh the page.');
+                }
+            }
+
+            // Make sure all buttons use the correct function
+            document.addEventListener('DOMContentLoaded', function () {
+                // Update all game mode buttons to use startGameMode
+                const buttons = document.querySelectorAll('.mode-btn[onclick*="startGame"]');
+                buttons.forEach(btn => {
+                    const onclick = btn.getAttribute('onclick');
+                    if (onclick) {
+                        const newOnclick = onclick.replace('startGame(', 'startGameMode(');
+                        btn.setAttribute('onclick', newOnclick);
+                        console.log(`🔧 Fixed button: ${onclick} → ${newOnclick}`);
+                    }
+                });
+            });
+        </script>
 </body>
 
 </html>

@@ -3,33 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Fortnite 3D - Game Hub</title>
+    <title>Fortnite 3D - Demo</title>
     <style>
         body {
-            background: linear-gradient(135deg, #232d3f 0%, #4e6fae 100%);
+            margin: 0;
+            overflow: hidden;
+            background: #232d3f;
+        }
+
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             color: #fff;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            text-align: center;
-        }
-
-        .coming-soon {
-            margin-top: 100px;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #ffea00;
-            text-shadow: 0 0 10px #232d3f;
-        }
-
-        .desc {
-            margin-top: 30px;
-            font-size: 1.2rem;
-            color: #fff;
-        }
-
-        .back-btn {
-            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.5);
             padding: 12px 32px;
-            font-size: 1.1rem;
+            border-radius: 12px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            z-index: 10;
+        }
+
+        #back {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 24px;
+            font-size: 1rem;
             border-radius: 8px;
             background: #232d3f;
             color: #fff;
@@ -38,19 +38,124 @@
             box-shadow: 0 2px 8px #0005;
         }
 
-        .back-btn:hover {
+        #back:hover {
             background: #4e6fae;
         }
     </style>
 </head>
 
 <body>
-    <div class="coming-soon">Fortnite 3D - Coming Soon!</div>
-    <div class="desc">
-        A full 3D battle royale experience is in development.<br>
-        Build, shoot, and survive for Victory Royale!
+    <div id="info">
+        <b>Fortnite 3D Demo</b><br>
+        WASD = bewegen, Muis = rondkijken, Linkermuisknop = schieten<br>
+        <span style="font-size:0.9em;">(Basis 3D battle royale demo met Three.js)</span>
     </div>
-    <button class="back-btn" onclick="window.location.href='/'">Back to Game Hub</button>
+    <button id="back" onclick="window.location.href='/'">Back to Game Hub</button>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/controls/PointerLockControls.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x232d3f);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
+
+        // Simple ground
+        const groundGeo = new THREE.PlaneGeometry(200, 200);
+        const groundMat = new THREE.MeshPhongMaterial({
+            color: 0x3a5fae
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = 0;
+        scene.add(ground);
+
+        // Player (cube)
+        const playerGeo = new THREE.BoxGeometry(2, 4, 2);
+        const playerMat = new THREE.MeshPhongMaterial({
+            color: 0x00ffea
+        });
+        const player = new THREE.Mesh(playerGeo, playerMat);
+        player.position.set(0, 2, 0);
+        scene.add(player);
+
+        // Camera controls
+        const controls = new THREE.PointerLockControls(camera, document.body);
+        camera.position.set(0, 3, 10);
+        controls.getObject().position.set(0, 3, 10);
+        scene.add(controls.getObject());
+
+        document.body.addEventListener('click', () => {
+            controls.lock();
+        });
+
+        // Movement
+        const keys = {};
+        document.addEventListener('keydown', e => keys[e.code] = true);
+        document.addEventListener('keyup', e => keys[e.code] = false);
+
+        // Shooting
+        let bullets = [];
+        function shoot() {
+            const bulletGeo = new THREE.SphereGeometry(0.3, 8, 8);
+            const bulletMat = new THREE.MeshBasicMaterial({
+                color: 0xffff00
+            });
+            const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            bullet.position.copy(controls.getObject().position);
+            bullet.userData = {
+                dir: dir.clone()
+            };
+            scene.add(bullet);
+            bullets.push(bullet);
+        }
+        document.addEventListener('mousedown', e => {
+            if (e.button === 0 && controls.isLocked) shoot();
+        });
+
+        // Animate
+        function animate() {
+            requestAnimationFrame(animate);
+            // Movement
+            if (controls.isLocked) {
+                let speed = 0.2;
+                let obj = controls.getObject();
+                if (keys['KeyW']) obj.translateZ(-speed);
+                if (keys['KeyS']) obj.translateZ(speed);
+                if (keys['KeyA']) obj.translateX(-speed);
+                if (keys['KeyD']) obj.translateX(speed);
+            }
+            // Bullets
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let b = bullets[i];
+                b.position.add(b.userData.dir.clone().multiplyScalar(0.7));
+                if (b.position.length() > 200) {
+                    scene.remove(b);
+                    bullets.splice(i, 1);
+                }
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 </body>
 
 </html>
