@@ -224,6 +224,30 @@
             font-size: 1em;
             opacity: 0.8;
         }
+
+        /* Navigation styles */
+        .nav-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff0080, #ff8c00);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 0, 128, 0.5);
+            background: linear-gradient(45deg, #ff8c00, #ff0040);
+        }
     </style>
 </head>
 
@@ -295,6 +319,9 @@
                 Use WASD or Arrow Keys to move, SPACE to shoot! Kill enemies to earn credits for upgrades!
             </div>
         </div>
+
+        <!-- Fortnite 3D Button -->
+        <a href="/fortnite-3d.html" class="nav-btn">🎮 Fortnite 3D</a>
 
         <a href="/" class="back-btn">← Back to Game Hub</a>
     </div>

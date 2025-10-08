@@ -336,11 +336,52 @@
                 align-items: center;
             }
         }
+
+        /* Navigation styles */
+        .nav {
+            width: 100%;
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.6);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
     </style>
 </head>
 
 <body>
     <div class="floating-shapes" id="floating-shapes"></div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/" class="nav-btn">🏠 Home</a>
+        <a href="/achievements.html" class="nav-btn">🏆 Achievements</a>
+        <a href="/leaderboard.html" class="nav-btn">📊 Leaderboard</a>
+        <a href="/fortnite-3d.html" class="nav-btn">🎮 Fortnite 3D</a>
+    </div>
 
     <div class="game-container">
         <div class="game-title">🧩 Puzzle Quest</div>

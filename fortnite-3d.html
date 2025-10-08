@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Fortnite 3D - Demo</title>
+    <title>Fortnite 3D - Simple Battle Royale</title>
     <style>
         body {
             margin: 0;
@@ -46,9 +46,9 @@
 
 <body>
     <div id="info">
-        <b>Fortnite 3D Demo</b><br>
-        WASD = bewegen, Muis = rondkijken, Linkermuisknop = schieten<br>
-        <span style="font-size:0.9em;">(Basis 3D battle royale demo met Three.js)</span>
+        <b>Fortnite 3D - Simple Battle Royale</b><br>
+        WASD = bewegen, Muis = rondkijken, Linkermuisknop = schieten, Spatie = springen<br>
+        <span style="font-size:0.9em;">Elimineer alle bots om te winnen!</span>
     </div>
     <button id="back" onclick="window.location.href='/'">Back to Game Hub</button>
     <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
@@ -63,13 +63,12 @@
         document.body.appendChild(renderer.domElement);
 
         // Lighting
-        const ambient = new THREE.AmbientLight(0xffffff, 0.7);
-        scene.add(ambient);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
         dirLight.position.set(10, 20, 10);
         scene.add(dirLight);
 
-        // Simple ground
+        // Ground
         const groundGeo = new THREE.PlaneGeometry(200, 200);
         const groundMat = new THREE.MeshPhongMaterial({
             color: 0x3a5fae
@@ -79,7 +78,18 @@
         ground.position.y = 0;
         scene.add(ground);
 
-        // Player (cube)
+        // Obstacles/buildings
+        for (let i = 0; i < 15; i++) {
+            const boxGeo = new THREE.BoxGeometry(4, Math.random() * 8 + 2, 4);
+            const boxMat = new THREE.MeshPhongMaterial({
+                color: 0x8e44ad
+            });
+            const box = new THREE.Mesh(boxGeo, boxMat);
+            box.position.set(Math.random() * 180 - 90, box.geometry.parameters.height / 2, Math.random() * 180 - 90);
+            scene.add(box);
+        }
+
+        // Player
         const playerGeo = new THREE.BoxGeometry(2, 4, 2);
         const playerMat = new THREE.MeshPhongMaterial({
             color: 0x00ffea
@@ -93,18 +103,36 @@
         camera.position.set(0, 3, 10);
         controls.getObject().position.set(0, 3, 10);
         scene.add(controls.getObject());
-
         document.body.addEventListener('click', () => {
             controls.lock();
         });
 
         // Movement
         const keys = {};
+        let velocityY = 0,
+            onGround = true;
         document.addEventListener('keydown', e => keys[e.code] = true);
         document.addEventListener('keyup', e => keys[e.code] = false);
 
+        // Bots
+        let bots = [];
+        for (let i = 0; i < 5; i++) {
+            const botGeo = new THREE.BoxGeometry(2, 4, 2);
+            const botMat = new THREE.MeshPhongMaterial({
+                color: 0xff4444
+            });
+            const bot = new THREE.Mesh(botGeo, botMat);
+            bot.position.set(Math.random() * 180 - 90, 2, Math.random() * 180 - 90);
+            bot.userData = {
+                alive: true
+            };
+            scene.add(bot);
+            bots.push(bot);
+        }
+
         // Shooting
         let bullets = [];
+
         function shoot() {
             const bulletGeo = new THREE.SphereGeometry(0.3, 8, 8);
             const bulletMat = new THREE.MeshBasicMaterial({
@@ -115,7 +143,8 @@
             camera.getWorldDirection(dir);
             bullet.position.copy(controls.getObject().position);
             bullet.userData = {
-                dir: dir.clone()
+                dir: dir.clone(),
+                player: true
             };
             scene.add(bullet);
             bullets.push(bullet);
@@ -124,7 +153,27 @@
             if (e.button === 0 && controls.isLocked) shoot();
         });
 
+        // Bot shooting
+        function botShoot(bot) {
+            const bulletGeo = new THREE.SphereGeometry(0.3, 8, 8);
+            const bulletMat = new THREE.MeshBasicMaterial({
+                color: 0xff4444
+            });
+            const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+            const dir = new THREE.Vector3();
+            dir.subVectors(controls.getObject().position, bot.position).normalize();
+            bullet.position.copy(bot.position);
+            bullet.userData = {
+                dir: dir.clone(),
+                player: false
+            };
+            scene.add(bullet);
+            bullets.push(bullet);
+        }
+
         // Animate
+        let lastBotShot = Date.now();
+
         function animate() {
             requestAnimationFrame(animate);
             // Movement
@@ -135,21 +184,64 @@
                 if (keys['KeyS']) obj.translateZ(speed);
                 if (keys['KeyA']) obj.translateX(-speed);
                 if (keys['KeyD']) obj.translateX(speed);
+                // Jump
+                if (keys['Space'] && onGround) {
+                    velocityY = 0.35;
+                    onGround = false;
+                }
+                obj.position.y += velocityY;
+                velocityY -= 0.02;
+                if (obj.position.y <= 3) {
+                    obj.position.y = 3;
+                    velocityY = 0;
+                    onGround = true;
+                }
             }
+            // Bots AI
+            bots.forEach(bot => {
+                if (!bot.userData.alive) return;
+                let dir = new THREE.Vector3();
+                dir.subVectors(controls.getObject().position, bot.position).normalize();
+                bot.position.add(dir.multiplyScalar(0.05));
+                // Bot shooting
+                if (Date.now() - lastBotShot > 1200) {
+                    botShoot(bot);
+                    lastBotShot = Date.now();
+                }
+            });
             // Bullets
             for (let i = bullets.length - 1; i >= 0; i--) {
                 let b = bullets[i];
                 b.position.add(b.userData.dir.clone().multiplyScalar(0.7));
+                // Hit bots
+                if (b.userData.player) {
+                    bots.forEach(bot => {
+                        if (bot.userData.alive && b.position.distanceTo(bot.position) < 2) {
+                            bot.userData.alive = false;
+                            scene.remove(bot);
+                            scene.remove(b);
+                            bullets.splice(i, 1);
+                        }
+                    });
+                }
+                // Hit player
+                if (!b.userData.player && b.position.distanceTo(controls.getObject().position) < 2) {
+                    document.getElementById('info').innerHTML = '<b>Game Over!</b><br>Je bent uitgeschakeld door een bot.<br><button onclick="window.location.reload()">Opnieuw spelen</button>';
+                    controls.unlock();
+                }
                 if (b.position.length() > 200) {
                     scene.remove(b);
                     bullets.splice(i, 1);
                 }
             }
+            // Win
+            if (bots.every(bot => !bot.userData.alive)) {
+                document.getElementById('info').innerHTML = '<b>Victory Royale!</b><br>Je hebt alle bots uitgeschakeld!<br><button onclick="window.location.reload()">Opnieuw spelen</button>';
+                controls.unlock();
+            }
             renderer.render(scene, camera);
         }
         animate();
-
-        // Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
