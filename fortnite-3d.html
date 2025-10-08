@@ -52,6 +52,18 @@
         .back-btn:hover {
             background: #4e6fae;
         }
+
+        #startBtn {
+            margin-top: 18px;
+            padding: 16px 48px;
+            font-size: 1.3em;
+            border-radius: 12px;
+            background: #00eaff;
+            color: #222c3c;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 12px #0005;
+        }
     </style>
 </head>
 
@@ -59,7 +71,8 @@
     <div id="instructions">
         <strong>Fortnite 3D - Simple Battle Royale</strong><br>
         WASD = move, Mouse = look, Left Mouse = shoot, Space = jump<br>
-        Eliminate all bots to win!
+        Eliminate all bots to win!<br><br>
+        <button id="startBtn">Start Game</button>
     </div>
     <button class="back-btn" onclick="window.location.href='/'">Back to Game Hub</button>
     <canvas id="gameCanvas" width="960" height="600"></canvas>
@@ -80,13 +93,17 @@
 
         const controls = new THREE.PointerLockControls(camera, canvas);
 
+        const startBtn = document.getElementById('startBtn');
+        startBtn.addEventListener('click', () => {
+            document.getElementById('instructions').style.display = 'none';
+            controls.lock();
+        });
         controls.addEventListener('lock', () => {
             document.getElementById('instructions').style.display = 'none';
         });
         controls.addEventListener('unlock', () => {
-            document.getElementById('instructions').style.display = '';
+            /* instructies blijven weg */
         });
-
         document.body.addEventListener('click', () => {
             document.getElementById('instructions').style.display = 'none';
             controls.lock();
