@@ -3,254 +3,266 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Fortnite 3D - Simple Battle Royale</title>
+    <title>Fortnite 3D - Game Hub</title>
     <style>
         body {
             margin: 0;
+            background: #222c3c;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
             overflow: hidden;
-            background: #232d3f;
         }
 
-        #info {
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background: #222c3c;
+            border-radius: 20px;
+            box-shadow: 0 0 40px #00eaff;
+        }
+
+        #instructions {
             position: absolute;
-            top: 20px;
+            top: 30px;
             left: 50%;
             transform: translateX(-50%);
-            color: #fff;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 12px 32px;
-            border-radius: 12px;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            background: rgba(20, 30, 40, 0.9);
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.2em;
             z-index: 10;
+            box-shadow: 0 2px 16px #0008;
         }
 
-        #back {
+        .back-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 24px;
-            font-size: 1rem;
+            top: 30px;
+            right: 40px;
+            padding: 12px 32px;
+            font-size: 1.1rem;
             border-radius: 8px;
             background: #232d3f;
             color: #fff;
             border: none;
             cursor: pointer;
             box-shadow: 0 2px 8px #0005;
+            z-index: 10;
         }
 
-        #back:hover {
+        .back-btn:hover {
             background: #4e6fae;
-        }
-
-        #debug {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            color: #fff;
-            background: #000a;
-            padding: 8px 16px;
-            border-radius: 8px;
-            z-index: 100;
-            font-size: 0.95em;
-            display: none
         }
     </style>
 </head>
 
 <body>
-    <div id="info">
-        <b>Fortnite 3D - Simple Battle Royale</b><br>
-        WASD = bewegen, Muis = rondkijken, Linkermuisknop = schieten, Spatie = springen<br>
-        <span style="font-size:0.9em;">Elimineer alle bots om te winnen!</span>
+    <div id="instructions">
+        <strong>Fortnite 3D - Simple Battle Royale</strong><br>
+        WASD = move, Mouse = look, Left Mouse = shoot, Space = jump<br>
+        Eliminate all bots to win!
     </div>
-    <button id="back" onclick="window.location.href='/'">Back to Game Hub</button>
-    <div id="debug"
-        style="position:fixed;bottom:10px;left:10px;color:#fff;background:#000a;padding:8px 16px;border-radius:8px;z-index:100;font-size:0.95em;display:none">
-    </div>
+    <button class="back-btn" onclick="window.location.href='/'">Back to Game Hub</button>
+    <canvas id="gameCanvas" width="960" height="600"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
     <script>
-        function showDebug(msg) {
-            var d = document.getElementById('debug');
-            d.innerText = msg;
-            d.style.display = 'block';
-        }
-        function scriptLoaded(name) {
-            showDebug('Script geladen: ' + name);
-            setTimeout(() => { document.getElementById('debug').style.display = 'none'; }, 1200);
-        }
-        function scriptError(name) {
-            showDebug('Fout: Kan script niet laden: ' + name);
-        }
-        function loadScript(src, name, cb) {
-            var s = document.createElement('script');
-            s.src = src;
-            s.onload = () => { scriptLoaded(name); cb(); };
-            s.onerror = () => { scriptError(name); };
-            document.head.appendChild(s);
-        }
-        loadScript('https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js', 'Three.js', function () {
-            loadScript('https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/controls/PointerLockControls.js', 'PointerLockControls', function () {
-                try {
-                    // Scene setup
-                    const scene = new THREE.Scene();
-                    scene.background = new THREE.Color(0x232d3f);
-                    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                    const renderer = new THREE.WebGLRenderer();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    document.body.appendChild(renderer.domElement);
-                    if (!renderer.capabilities.isWebGL2 && !renderer.capabilities.isWebGL) {
-                        showDebug('WebGL wordt niet ondersteund in deze browser. Probeer Chrome of Edge.');
-                        return;
-                    }
-                    // Lighting
-                    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-                    const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
-                    dirLight.position.set(10, 20, 10);
-                    scene.add(dirLight);
-                    // Ground
-                    const groundGeo = new THREE.PlaneGeometry(200, 200);
-                    const groundMat = new THREE.MeshPhongMaterial({ color: 0x3a5fae });
-                    const ground = new THREE.Mesh(groundGeo, groundMat);
-                    ground.rotation.x = -Math.PI / 2;
-                    ground.position.y = 0;
-                    scene.add(ground);
-                    // Obstacles/buildings
-                    for (let i = 0; i < 15; i++) {
-                        const boxGeo = new THREE.BoxGeometry(4, Math.random() * 8 + 2, 4);
-                        const boxMat = new THREE.MeshPhongMaterial({ color: 0x8e44ad });
-                        const box = new THREE.Mesh(boxGeo, boxMat);
-                        box.position.set(Math.random() * 180 - 90, box.geometry.parameters.height / 2, Math.random() * 180 - 90);
-                        scene.add(box);
-                    }
-                    // Player
-                    const playerGeo = new THREE.BoxGeometry(2, 4, 2);
-                    const playerMat = new THREE.MeshPhongMaterial({ color: 0x00ffea });
-                    const player = new THREE.Mesh(playerGeo, playerMat);
-                    player.position.set(0, 2, 0);
-                    scene.add(player);
-                    // Camera controls
-                    const controls = new THREE.PointerLockControls(camera, document.body);
-                    camera.position.set(0, 3, 10);
-                    controls.getObject().position.set(0, 3, 10);
-                    scene.add(controls.getObject());
-                    document.body.addEventListener('click', () => { controls.lock(); });
-                    controls.addEventListener('lock', () => { showDebug(''); });
-                    controls.addEventListener('unlock', () => { showDebug('Klik op het scherm om te spelen!'); });
-                    showDebug('Klik op het scherm om te spelen!');
-                    // Movement
-                    const keys = {};
-                    let velocityY = 0, onGround = true;
-                    document.addEventListener('keydown', e => keys[e.code] = true);
-                    document.addEventListener('keyup', e => keys[e.code] = false);
-                    // Bots
-                    let bots = [];
-                    for (let i = 0; i < 5; i++) {
-                        const botGeo = new THREE.BoxGeometry(2, 4, 2);
-                        const botMat = new THREE.MeshPhongMaterial({ color: 0xff4444 });
-                        const bot = new THREE.Mesh(botGeo, botMat);
-                        bot.position.set(Math.random() * 180 - 90, 2, Math.random() * 180 - 90);
-                        bot.userData = { alive: true };
-                        scene.add(bot);
-                        bots.push(bot);
-                    }
-                    // Shooting
-                    let bullets = [];
-                    function shoot() {
-                        const bulletGeo = new THREE.SphereGeometry(0.3, 8, 8);
-                        const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-                        const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-                        const dir = new THREE.Vector3();
-                        camera.getWorldDirection(dir);
-                        bullet.position.copy(controls.getObject().position);
-                        bullet.userData = { dir: dir.clone(), player: true };
-                        scene.add(bullet);
-                        bullets.push(bullet);
-                    }
-                    document.addEventListener('mousedown', e => { if (e.button === 0 && controls.isLocked) shoot(); });
-                    // Bot shooting
-                    function botShoot(bot) {
-                        const bulletGeo = new THREE.SphereGeometry(0.3, 8, 8);
-                        const bulletMat = new THREE.MeshBasicMaterial({ color: 0xff4444 });
-                        const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-                        const dir = new THREE.Vector3();
-                        dir.subVectors(controls.getObject().position, bot.position).normalize();
-                        bullet.position.copy(bot.position);
-                        bullet.userData = { dir: dir.clone(), player: false };
-                        scene.add(bullet);
-                        bullets.push(bullet);
-                    }
-                    // Animate
-                    let lastBotShot = Date.now();
-                    function animate() {
-                        requestAnimationFrame(animate);
-                        // Movement
-                        if (controls.isLocked) {
-                            let speed = 0.2;
-                            let obj = controls.getObject();
-                            if (keys['KeyW']) obj.translateZ(-speed);
-                            if (keys['KeyS']) obj.translateZ(speed);
-                            if (keys['KeyA']) obj.translateX(-speed);
-                            if (keys['KeyD']) obj.translateX(speed);
-                            // Jump
-                            if (keys['Space'] && onGround) { velocityY = 0.35; onGround = false; }
-                            obj.position.y += velocityY;
-                            velocityY -= 0.02;
-                            if (obj.position.y <= 3) { obj.position.y = 3; velocityY = 0; onGround = true; }
-                        }
-                        // Bots AI
-                        bots.forEach(bot => {
-                            if (!bot.userData.alive) return;
-                            let dir = new THREE.Vector3();
-                            dir.subVectors(controls.getObject().position, bot.position).normalize();
-                            bot.position.add(dir.multiplyScalar(0.05));
-                            // Bot shooting
-                            if (Date.now() - lastBotShot > 1200) { botShoot(bot); lastBotShot = Date.now(); }
-                        });
-                        // Bullets
-                        for (let i = bullets.length - 1; i >= 0; i--) {
-                            let b = bullets[i];
-                            b.position.add(b.userData.dir.clone().multiplyScalar(0.7));
-                            // Hit bots
-                            if (b.userData.player) {
-                                bots.forEach(bot => {
-                                    if (bot.userData.alive && b.position.distanceTo(bot.position) < 2) {
-                                        bot.userData.alive = false;
-                                        scene.remove(bot);
-                                        scene.remove(b);
-                                        bullets.splice(i, 1);
-                                    }
-                                });
-                            }
-                            // Hit player
-                            if (!b.userData.player && b.position.distanceTo(controls.getObject().position) < 2) {
-                                document.getElementById('info').innerHTML = '<b>Game Over!</b><br>Je bent uitgeschakeld door een bot.<br><button onclick="window.location.reload()">Opnieuw spelen</button>';
-                                controls.unlock();
-                            }
-                            if (b.position.length() > 200) {
-                                scene.remove(b);
-                                bullets.splice(i, 1);
-                            }
-                        }
-                        // Win
-                        if (bots.every(bot => !bot.userData.alive)) {
-                            document.getElementById('info').innerHTML = '<b>Victory Royale!</b><br>Je hebt alle bots uitgeschakeld!<br><button onclick="window.location.reload()">Opnieuw spelen</button>';
-                            controls.unlock();
-                        }
-                        renderer.render(scene, camera);
-                    }
-                    animate();
-                    window.addEventListener('resize', () => {
-                        camera.aspect = window.innerWidth / window.innerHeight;
-                        camera.updateProjectionMatrix();
-                        renderer.setSize(window.innerWidth, window.innerHeight);
-                    });
-                } catch (e) {
-                    showDebug('Fout: ' + e.message);
-                }
-                window.onerror = function (msg, url, line, col, error) {
-                    showDebug('JS Error: ' + msg + ' (' + line + ':' + col + ')');
-                };
-            });
+        // Basic Three.js setup
+        const canvas = document.getElementById('gameCanvas');
+        const renderer = new THREE.WebGLRenderer({ canvas });
+        renderer.setSize(canvas.width, canvas.height);
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x222c3c);
+
+        // Camera & controls
+        const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+        camera.position.set(0, 2, 10);
+
+        const controls = new THREE.PointerLockControls(camera, canvas);
+
+        document.body.addEventListener('click', () => {
+            controls.lock();
         });
+
+        // Floor
+        const floorGeometry = new THREE.PlaneGeometry(40, 40);
+        const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x3a4a6d });
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
+
+        // Player
+        const player = {
+            mesh: new THREE.Mesh(
+                new THREE.CapsuleGeometry(0.5, 1.2, 4, 8),
+                new THREE.MeshStandardMaterial({ color: 0x00eaff })
+            ),
+            velocity: new THREE.Vector3(),
+            canJump: true,
+            health: 100
+        };
+        player.mesh.position.set(0, 1, 0);
+        scene.add(player.mesh);
+
+        // Bots
+        const bots = [];
+        for (let i = 0; i < 5; i++) {
+            const bot = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 2, 1),
+                new THREE.MeshStandardMaterial({ color: 0xff4e4e })
+            );
+            bot.position.set(
+                Math.random() * 30 - 15,
+                1,
+                Math.random() * 30 - 15
+            );
+            bot.health = 50;
+            scene.add(bot);
+            bots.push(bot);
+        }
+
+        // Obstacles
+        for (let i = 0; i < 10; i++) {
+            const wall = new THREE.Mesh(
+                new THREE.BoxGeometry(2, Math.random() * 4 + 2, 0.5),
+                new THREE.MeshStandardMaterial({ color: 0x6e7b8b })
+            );
+            wall.position.set(
+                Math.random() * 36 - 18,
+                wall.geometry.parameters.height / 2,
+                Math.random() * 36 - 18
+            );
+            scene.add(wall);
+        }
+
+        // Bullets
+        const bullets = [];
+        function shootBullet() {
+            const bullet = new THREE.Mesh(
+                new THREE.SphereGeometry(0.15, 8, 8),
+                new THREE.MeshStandardMaterial({ color: 0xffff00 })
+            );
+            bullet.position.copy(camera.position);
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            bullet.userData = { velocity: dir.multiplyScalar(0.7), life: 0 };
+            scene.add(bullet);
+            bullets.push(bullet);
+        }
+
+        // Controls
+        const keys = {};
+        document.addEventListener('keydown', e => { keys[e.code] = true; });
+        document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+        // Mouse click to shoot
+        document.addEventListener('mousedown', e => {
+            if (controls.isLocked && e.button === 0) shootBullet();
+        });
+
+        // Game loop
+        let lastTime = performance.now();
+        function animate() {
+            requestAnimationFrame(animate);
+            const now = performance.now();
+            const dt = Math.min((now - lastTime) / 1000, 0.05);
+            lastTime = now;
+
+            // Player movement
+            if (controls.isLocked) {
+                let move = new THREE.Vector3();
+                if (keys['KeyW']) move.z -= 1;
+                if (keys['KeyS']) move.z += 1;
+                if (keys['KeyA']) move.x -= 1;
+                if (keys['KeyD']) move.x += 1;
+                move.normalize();
+
+                // Move in camera direction
+                const direction = new THREE.Vector3();
+                camera.getWorldDirection(direction);
+                direction.y = 0;
+                direction.normalize();
+
+                const right = new THREE.Vector3().crossVectors(direction, new THREE.Vector3(0, 1, 0));
+                const moveVector = new THREE.Vector3();
+                moveVector.addScaledVector(direction, move.z);
+                moveVector.addScaledVector(right, move.x);
+
+                player.mesh.position.addScaledVector(moveVector, 8 * dt);
+
+                // Gravity
+                if (player.mesh.position.y > 1) {
+                    player.velocity.y -= 20 * dt;
+                    player.mesh.position.y += player.velocity.y * dt;
+                    if (player.mesh.position.y <= 1) {
+                        player.mesh.position.y = 1;
+                        player.velocity.y = 0;
+                        player.canJump = true;
+                    }
+                }
+
+                // Jump
+                if (keys['Space'] && player.canJump) {
+                    player.velocity.y = 8;
+                    player.canJump = false;
+                }
+
+                // Sync camera to player
+                camera.position.copy(player.mesh.position).add(new THREE.Vector3(0, 0.5, 0));
+            }
+
+            // Bullets update
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const b = bullets[i];
+                b.position.add(b.userData.velocity);
+                b.userData.life += dt;
+                if (b.userData.life > 2) {
+                    scene.remove(b);
+                    bullets.splice(i, 1);
+                    continue;
+                }
+                // Collision with bots
+                for (let j = bots.length - 1; j >= 0; j--) {
+                    const bot = bots[j];
+                    if (b.position.distanceTo(bot.position) < 1) {
+                        bot.health -= 25;
+                        scene.remove(b);
+                        bullets.splice(i, 1);
+                        if (bot.health <= 0) {
+                            scene.remove(bot);
+                            bots.splice(j, 1);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Bots AI
+            bots.forEach(bot => {
+                // Move towards player
+                const dir = new THREE.Vector3().subVectors(player.mesh.position, bot.position);
+                dir.y = 0;
+                if (dir.length() > 2) {
+                    dir.normalize();
+                    bot.position.addScaledVector(dir, 2 * dt);
+                }
+            });
+
+            // Win/Lose condition
+            if (bots.length === 0) {
+                document.getElementById('instructions').innerHTML = "<strong>Victory Royale!</strong><br>You eliminated all bots!";
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
     </script>
 </body>
 
