@@ -80,6 +80,13 @@
 
         const controls = new THREE.PointerLockControls(camera, canvas);
 
+        controls.addEventListener('lock', () => {
+            document.getElementById('instructions').style.display = 'none';
+        });
+        controls.addEventListener('unlock', () => {
+            document.getElementById('instructions').style.display = '';
+        });
+
         document.body.addEventListener('click', () => {
             controls.lock();
         });
