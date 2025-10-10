@@ -3,55 +3,67 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Fortnite 3D - Game Hub</title>
+    <title>Fortnite 3D - Alles in 3D</title>
     <style>
         body {
             margin: 0;
-            background: #222c3c;
+            background: #232d3f;
             color: #fff;
             font-family: 'Segoe UI', Arial, sans-serif;
             overflow: hidden;
         }
 
-        #gameCanvas {
+        #lobby3d,
+        #game3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             display: none;
-            margin: 0 auto;
-            background: #222c3c;
-            border-radius: 20px;
-            box-shadow: 0 0 40px #00eaff;
         }
 
-        #instructions {
-            display: none;
+        #lobbyUI {
             position: absolute;
-            top: 30px;
+            top: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(20, 30, 40, 0.9);
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 1.2em;
             z-index: 10;
-            box-shadow: 0 2px 16px #0008;
+            background: rgba(20, 30, 40, 0.85);
+            padding: 32px 48px;
+            border-radius: 18px;
+            box-shadow: 0 2px 24px #00eaff88;
+            text-align: center;
         }
 
-        .back-btn {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            padding: 12px 32px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            background: #232d3f;
-            color: #fff;
+        #lobbyUI h1 {
+            color: #00eaff;
+            font-size: 2.2em;
+            margin-bottom: 18px;
+        }
+
+        #lobbyUI button {
+            margin: 18px 12px 0 12px;
+            padding: 16px 44px;
+            font-size: 1.2em;
+            border-radius: 12px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 2px 8px #0005;
-            z-index: 10;
+            background: #00eaff;
+            color: #232d3f;
+            box-shadow: 0 2px 12px #0005;
         }
 
-        .back-btn:hover {
+        #lobbyUI button:hover {
             background: #4e6fae;
+            color: #fff;
+        }
+
+        #skinName {
+            margin-top: 12px;
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: bold;
         }
 
         #healthbar {
@@ -88,251 +100,112 @@
             font-weight: bold;
             font-size: 1.1em;
         }
-
-        #lobby {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(120deg, #232d3f 60%, #00eaff 100%);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #lobby h1 {
-            color: #00eaff;
-            font-size: 2.5em;
-            margin-bottom: 24px;
-        }
-
-        #lobby button {
-            padding: 18px 44px;
-            font-size: 1.2em;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 12px #0005;
-        }
-
-        #lobby .shop-btn {
-            background: #4e6fae;
-            color: #fff;
-        }
-
-        #lobby .locker-btn {
-            background: #00eaff;
-            color: #222c3c;
-        }
-
-        #lobby .battlepass-btn {
-            background: #ff4e4e;
-            color: #fff;
-        }
-
-        #lobby .vbucks-btn {
-            background: #ffd700;
-            color: #222c3c;
-        }
-
-        #lobby #playBtn {
-            padding: 20px 60px;
-            font-size: 1.5em;
-            border-radius: 16px;
-            background: #00eaff;
-            color: #222c3c;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 16px #0005;
-        }
-
-        #lobbyContent {
-            margin-top: 32px;
-            color: #fff;
-            font-size: 1.2em;
-        }
-
-        .lobby-tab {
-            padding: 14px 38px;
-            font-size: 1.1em;
-            border-radius: 10px;
-            background: #232d3f;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 8px #0005;
-            margin: 0 8px;
-            transition: background 0.2s;
-        }
-
-        .lobby-tab:hover {
-            background: #00eaff;
-            color: #232d3f;
-        }
     </style>
 </head>
 
 <body>
-    <div id="lobby"
-        style="position:absolute;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(120deg,#232d3f 60%,#00eaff 100%);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-        <div
-            style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;background:url('https://cdn.wallpapersafari.com/41/36/1QwQwA.jpg') center/cover no-repeat;opacity:0.25;">
-        </div>
-        <div
-            style="position:absolute;top:32px;left:0;width:100vw;display:flex;justify-content:center;gap:48px;z-index:2;">
-            <button onclick="showLocker()" class="lobby-tab">Locker</button>
-            <button onclick="showShop()" class="lobby-tab">Shop</button>
-            <button onclick="showBattlePass()" class="lobby-tab">Battle Pass</button>
-            <button onclick="showVBucks()" class="lobby-tab">B-Bucks</button>
-        </div>
-        <div
-            style="position:absolute;top:32px;right:32px;z-index:2;color:#fff;font-size:1.1em;background:rgba(0,0,0,0.3);padding:8px 24px;border-radius:8px;box-shadow:0 2px 8px #0005;">
-            Updates: Nieuwe skins & events!</div>
-        <div style="position:absolute;left:32px;bottom:32px;z-index:2;">
-            <button id="playBtn"
-                style="padding:20px 60px;font-size:1.5em;border-radius:16px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 16px #0005;">Play</button>
-        </div>
-        <div
-            style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;">
-            <img id="skinPreview" src="https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png"
-                style="width:180px;height:180px;border-radius:24px;box-shadow:0 4px 32px #00eaff;" alt="Skin Preview">
-            <div id="skinName"
-                style="margin-top:18px;color:#fff;font-size:1.3em;font-weight:bold;text-shadow:0 2px 8px #0008;">
-                Meowscles</div>
-        </div>
-        <div id="lobbyContent" style="margin-top:32px;color:#fff;font-size:1.2em;z-index:2;"></div>
+    <div id="lobby3d"></div>
+    <div id="game3d"></div>
+    <div id="lobbyUI">
+        <h1>Fortnite 3D Lobby</h1>
+        <div id="skinPreview3d" style="width:180px;height:180px;margin:0 auto;"></div>
+        <div id="skinName">Meowscles</div>
+        <button onclick="startGame3d()">Play</button>
     </div>
-    <div id="instructions">
-        <strong>Fortnite 3D - Simple Battle Royale</strong><br>
-        WASD = move, Mouse = look, Left Mouse = shoot, Space = jump<br>
-        Eliminate all bots to win!<br><br>
-        <button id="startBtn"
-            style="margin-top:18px;padding:16px 48px;font-size:1.3em;border-radius:12px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">Start
-            Game</button>
-        <div id="startHelp" style="margin-top:10px;font-size:1em;color:#ff4e4e;display:none;">Klik op het canvas als het
-            niet werkt!</div>
-    </div>
-    <button class="back-btn" onclick="window.location.href='/'">Back to Game Hub</button>
-    <canvas id="gameCanvas" width="960" height="600"></canvas>
-    <div id="healthbar"
-        style="position:absolute;top:16px;left:16px;width:220px;height:32px;background:#222c3c;border-radius:8px;box-shadow:0 2px 8px #0005;z-index:20;display:none">
-        <div id="healthfill" style="height:100%;background:#00eaff;border-radius:8px;width:100%;transition:width 0.2s;">
-        </div>
-        <span id="healthtext"
-            style="position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;text-align:center;line-height:32px;color:#fff;font-weight:bold;font-size:1.1em;">100
-            HP</span>
+    <div id="healthbar">
+        <div id="healthfill"></div>
+        <span id="healthtext">100 HP</span>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
     <script>
-        // --- LOBBY LOGIC ---
-        function showLobby() {
-            document.getElementById('lobby').style.display = '';
-            document.getElementById('instructions').style.display = 'none';
-            document.getElementById('healthbar').style.display = 'none';
-            document.getElementById('gameCanvas').style.display = 'none';
-        }
-        function showGame() {
-            document.getElementById('lobby').style.display = 'none';
-            document.getElementById('instructions').style.display = '';
-            document.getElementById('gameCanvas').style.display = '';
-            document.getElementById('healthbar').style.display = 'none';
-        }
-        document.getElementById('playBtn').onclick = showGame;
-        showLobby();
-
-        // Skins data
+        // --- 3D LOBBY ---
+        const lobbyDiv = document.getElementById('lobby3d');
+        lobbyDiv.style.display = '';
+        document.getElementById('lobbyUI').style.display = '';
+        // Skins
         const skins = [
-            { name: 'Meowscles', img: 'https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png' },
-            { name: 'Peely', img: 'https://fortnite-api.com/images/cosmetics/br/character_banana/icon.png' },
-            { name: 'Jonesy', img: 'https://fortnite-api.com/images/cosmetics/br/character_jonesy/icon.png' },
-            { name: 'Raven', img: 'https://fortnite-api.com/images/cosmetics/br/character_raven/icon.png' },
-            { name: 'Fishstick', img: 'https://fortnite-api.com/images/cosmetics/br/character_fishstick/icon.png' }
+            { name: 'Meowscles', color: 0x00eaff },
+            { name: 'Peely', color: 0xffe600 },
+            { name: 'Raven', color: 0x4e6fae },
+            { name: 'Fishstick', color: 0xffa500 }
         ];
-        let selectedSkin = skins[Math.floor(Math.random() * skins.length)];
-        function updateSkinPreview() {
-            document.getElementById('skinPreview').src = selectedSkin.img;
+        let selectedSkin = skins[0];
+        // Three.js lobby renderer
+        const lobbyRenderer = new THREE.WebGLRenderer({ antialias: true });
+        lobbyRenderer.setSize(180, 180);
+        lobbyDiv.appendChild(lobbyRenderer.domElement);
+        const lobbyScene = new THREE.Scene();
+        lobbyScene.background = new THREE.Color(0x232d3f);
+        const lobbyCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+        lobbyCamera.position.set(0, 1.2, 3);
+        const lobbyControls = new THREE.OrbitControls(lobbyCamera, lobbyRenderer.domElement);
+        lobbyControls.enablePan = false;
+        lobbyControls.enableZoom = false;
+        // Skin preview mesh
+        let skinMesh = null;
+        function updateSkinPreview3d() {
+            if (skinMesh) lobbyScene.remove(skinMesh);
+            skinMesh = new THREE.Mesh(
+                new THREE.CapsuleGeometry(0.5, 1.2, 4, 8),
+                new THREE.MeshStandardMaterial({ color: selectedSkin.color })
+            );
+            skinMesh.position.y = 1;
+            lobbyScene.add(skinMesh);
             document.getElementById('skinName').innerText = selectedSkin.name;
         }
-        updateSkinPreview();
-        function showLocker() {
-            let html = '<b>Locker:</b> Kies je skin:<br><div style="display:flex;gap:18px;margin-top:18px;">';
-            skins.forEach(skin => {
-                html += `<img src="${skin.img}" alt="${skin.name}" title="${skin.name}" style="width:64px;height:64px;border-radius:12px;box-shadow:0 2px 8px #00eaff;cursor:pointer;outline:${skin.name === selectedSkin.name ? '3px solid #00eaff' : 'none'}" onclick="selectSkin('${skin.name}')">`;
-            });
-            html += '</div>';
-            document.getElementById('lobbyContent').innerHTML = html;
+        updateSkinPreview3d();
+        // Lighting
+        lobbyScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+        const lobbyDirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        lobbyDirLight.position.set(2, 4, 2);
+        lobbyScene.add(lobbyDirLight);
+        // Animate lobby
+        function animateLobby() {
+            requestAnimationFrame(animateLobby);
+            if (skinMesh) skinMesh.rotation.y += 0.01;
+            lobbyRenderer.render(lobbyScene, lobbyCamera);
         }
-        window.selectSkin = function (name) {
-            selectedSkin = skins.find(s => s.name === name);
-            updateSkinPreview();
-            showLocker();
-        }
-        function showShop() {
-            document.getElementById('lobbyContent').innerHTML = '<b>Shop:</b> <br>Skins: Meowscles, Peely, Raven<br>Emotes: Dab, Floss<br>Pickaxes: Default, Rainbow<br><span style="color:#ffd700">Koop met B-Bucks! (Demo)</span>';
-        }
-        let battlePassLevel = Math.floor(Math.random() * 100) + 1;
-        function showBattlePass() {
-            document.getElementById('lobbyContent').innerHTML = `<b>Battle Pass:</b> Level <span style="color:#00eaff;font-weight:bold;">${battlePassLevel}</span><br>Volgende beloning bij level ${battlePassLevel + 1}!`;
-        }
-        let vbucks = 1000 + Math.floor(Math.random() * 5000);
-        function showVBucks() {
-            document.getElementById('lobbyContent').innerHTML = `<b>B-Bucks:</b> Je hebt <span style="color:#ffd700;font-size:1.2em;font-weight:bold;">${vbucks}</span> B-Bucks!`;
-        }
-
-        // --- GAME LOGIC ---
-        document.getElementById('startBtn').onclick = function () {
-            document.getElementById('instructions').style.display = 'none';
-            document.getElementById('gameCanvas').focus();
+        animateLobby();
+        // --- 3D GAME ---
+        function startGame3d() {
+            document.getElementById('lobby3d').style.display = 'none';
+            document.getElementById('lobbyUI').style.display = 'none';
+            document.getElementById('game3d').style.display = '';
             document.getElementById('healthbar').style.display = '';
-            startGame();
-        };
-
-        function startGame() {
-            // Basic Three.js setup
-            const canvas = document.getElementById('gameCanvas');
-            const renderer = new THREE.WebGLRenderer({ canvas });
-            renderer.setSize(canvas.width, canvas.height);
-
+            // Game renderer
+            const gameDiv = document.getElementById('game3d');
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            gameDiv.appendChild(renderer.domElement);
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x222c3c);
-
             // Camera & controls
-            const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 2, 10);
-
-            const controls = new THREE.PointerLockControls(camera, canvas);
-
-            canvas.addEventListener('click', () => {
-                controls.lock();
-            });
-
+            const controls = new THREE.PointerLockControls(camera, renderer.domElement);
+            renderer.domElement.addEventListener('click', () => controls.lock());
             controls.addEventListener('lock', () => {
                 document.getElementById('healthbar').style.display = '';
             });
-
             // Floor
-            const floorGeometry = new THREE.PlaneGeometry(40, 40);
-            const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x3a4a6d });
-            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            const floor = new THREE.Mesh(
+                new THREE.PlaneGeometry(40, 40),
+                new THREE.MeshStandardMaterial({ color: 0x3a4a6d })
+            );
             floor.rotation.x = -Math.PI / 2;
             scene.add(floor);
-
             // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
             const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
             dirLight.position.set(10, 20, 10);
             scene.add(dirLight);
-
             // Player
             const player = {
                 mesh: new THREE.Mesh(
                     new THREE.CapsuleGeometry(0.5, 1.2, 4, 8),
-                    new THREE.MeshStandardMaterial({ color: 0x00eaff })
+                    new THREE.MeshStandardMaterial({ color: selectedSkin.color })
                 ),
                 velocity: new THREE.Vector3(),
                 canJump: true,
@@ -340,7 +213,6 @@
             };
             player.mesh.position.set(0, 1, 0);
             scene.add(player.mesh);
-
             // Bots
             const bots = [];
             for (let i = 0; i < 5; i++) {
@@ -357,7 +229,6 @@
                 scene.add(bot);
                 bots.push(bot);
             }
-
             // Obstacles
             for (let i = 0; i < 10; i++) {
                 const wall = new THREE.Mesh(
@@ -371,7 +242,6 @@
                 );
                 scene.add(wall);
             }
-
             // Bullets
             const bullets = [];
             function shootBullet() {
@@ -386,17 +256,14 @@
                 scene.add(bullet);
                 bullets.push(bullet);
             }
-
             // Controls
             const keys = {};
             document.addEventListener('keydown', e => { keys[e.code] = true; });
             document.addEventListener('keyup', e => { keys[e.code] = false; });
-
             // Mouse click to shoot
             document.addEventListener('mousedown', e => {
                 if (controls.isLocked && e.button === 0) shootBullet();
             });
-
             // Healthbar update
             function updateHealthBar() {
                 const hp = Math.max(0, Math.floor(player.health));
@@ -404,7 +271,6 @@
                 document.getElementById('healthtext').innerText = hp + ' HP';
             }
             updateHealthBar();
-
             // Bot schiet terug
             function botShoot(bot) {
                 const bullet = new THREE.Mesh(
@@ -417,7 +283,6 @@
                 scene.add(bullet);
                 bullets.push(bullet);
             }
-
             // Game loop
             let lastTime = performance.now();
             let lastBotShot = performance.now();
@@ -426,7 +291,6 @@
                 const now = performance.now();
                 const dt = Math.min((now - lastTime) / 1000, 0.05);
                 lastTime = now;
-
                 // Player movement
                 if (controls.isLocked) {
                     let move = new THREE.Vector3();
@@ -435,20 +299,16 @@
                     if (keys['KeyA']) move.x -= 1;
                     if (keys['KeyD']) move.x += 1;
                     move.normalize();
-
                     // Move in camera direction
                     const direction = new THREE.Vector3();
                     camera.getWorldDirection(direction);
                     direction.y = 0;
                     direction.normalize();
-
                     const right = new THREE.Vector3().crossVectors(direction, new THREE.Vector3(0, 1, 0));
                     const moveVector = new THREE.Vector3();
                     moveVector.addScaledVector(direction, move.z);
                     moveVector.addScaledVector(right, move.x);
-
                     player.mesh.position.addScaledVector(moveVector, 8 * dt);
-
                     // Gravity
                     if (player.mesh.position.y > 1) {
                         player.velocity.y -= 20 * dt;
@@ -459,17 +319,14 @@
                             player.canJump = true;
                         }
                     }
-
                     // Jump
                     if (keys['Space'] && player.canJump) {
                         player.velocity.y = 8;
                         player.canJump = false;
                     }
-
                     // Sync camera to player
                     camera.position.copy(player.mesh.position).add(new THREE.Vector3(0, 0.5, 0));
                 }
-
                 // Bots AI
                 bots.forEach(bot => {
                     // Move towards player
@@ -485,7 +342,6 @@
                         lastBotShot = performance.now();
                     }
                 });
-
                 // Bullets update
                 for (let i = bullets.length - 1; i >= 0; i--) {
                     const b = bullets[i];
@@ -517,27 +373,364 @@
                         scene.remove(b);
                         bullets.splice(i, 1);
                         if (player.health <= 0) {
-                            document.getElementById('instructions').innerHTML = '<strong>Game Over!</strong><br>Je bent uitgeschakeld.<br><button onclick="window.location.reload()" style="margin-top:18px;padding:16px 48px;font-size:1.3em;border-radius:12px;background:#ff4e4e;color:#fff;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">Opnieuw spelen</button>';
-                            document.getElementById('instructions').style.display = '';
-                            document.getElementById('healthbar').style.display = 'none';
-                            controls.unlock();
+                            alert('Game Over! Je bent uitgeschakeld.');
+                            window.location.reload();
                         }
                     }
                 }
-
                 // Win/Lose condition
                 if (bots.length === 0) {
-                    document.getElementById('instructions').innerHTML = "<strong>Victory Royale!</strong><br>You eliminated all bots!<br><button onclick=\"window.location.reload()\" style=\"margin-top:18px;padding:16px 48px;font-size:1.3em;border-radius:12px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;\">Play Again</button>";
-                    document.getElementById('instructions').style.display = '';
-                    document.getElementById('healthbar').style.display = 'none';
-                    controls.unlock();
+                    alert('Victory Royale! Je hebt alle bots uitgeschakeld!');
+                    window.location.reload();
                 }
-
                 renderer.render(scene, camera);
             }
             animate();
         }
     </script>
+</body>
+
+</html>
+<img id="skinPreview" src="https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png"
+    style="width:180px;height:180px;border-radius:24px;box-shadow:0 4px 32px #00eaff;" alt="Skin Preview">
+<div id="skinName" style="margin-top:18px;color:#fff;font-size:1.3em;font-weight:bold;text-shadow:0 2px 8px #0008;">
+    Meowscles</div>
+</div>
+<div id="lobbyContent" style="margin-top:32px;color:#fff;font-size:1.2em;z-index:2;"></div>
+</div>
+<div id="instructions">
+    <strong>Fortnite 3D - Simple Battle Royale</strong><br>
+    WASD = move, Mouse = look, Left Mouse = shoot, Space = jump<br>
+    Eliminate all bots to win!<br><br>
+    <button id="startBtn"
+        style="margin-top:18px;padding:16px 48px;font-size:1.3em;border-radius:12px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">Start
+        Game</button>
+    <div id="startHelp" style="margin-top:10px;font-size:1em;color:#ff4e4e;display:none;">Klik op het canvas als het
+        niet werkt!</div>
+</div>
+<button class="back-btn" onclick="window.location.href='/'">Back to Game Hub</button>
+<canvas id="gameCanvas" width="960" height="600"></canvas>
+<div id="healthbar"
+    style="position:absolute;top:16px;left:16px;width:220px;height:32px;background:#222c3c;border-radius:8px;box-shadow:0 2px 8px #0005;z-index:20;display:none">
+    <div id="healthfill" style="height:100%;background:#00eaff;border-radius:8px;width:100%;transition:width 0.2s;">
+    </div>
+    <span id="healthtext"
+        style="position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;text-align:center;line-height:32px;color:#fff;font-weight:bold;font-size:1.1em;">100
+        HP</span>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
+<script>
+    // --- LOBBY LOGIC ---
+    function showLobby() {
+        document.getElementById('lobby').style.display = '';
+        document.getElementById('instructions').style.display = 'none';
+        document.getElementById('healthbar').style.display = 'none';
+        document.getElementById('gameCanvas').style.display = 'none';
+    }
+    function showGame() {
+        document.getElementById('lobby').style.display = 'none';
+        document.getElementById('instructions').style.display = '';
+        document.getElementById('gameCanvas').style.display = '';
+        document.getElementById('healthbar').style.display = 'none';
+    }
+    document.getElementById('playBtn').onclick = showGame;
+    showLobby();
+
+    // Skins data
+    const skins = [
+        { name: 'Meowscles', img: 'https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png' },
+        { name: 'Peely', img: 'https://fortnite-api.com/images/cosmetics/br/character_banana/icon.png' },
+        { name: 'Jonesy', img: 'https://fortnite-api.com/images/cosmetics/br/character_jonesy/icon.png' },
+        { name: 'Raven', img: 'https://fortnite-api.com/images/cosmetics/br/character_raven/icon.png' },
+        { name: 'Fishstick', img: 'https://fortnite-api.com/images/cosmetics/br/character_fishstick/icon.png' }
+    ];
+    let selectedSkin = skins[Math.floor(Math.random() * skins.length)];
+    function updateSkinPreview() {
+        document.getElementById('skinPreview').src = selectedSkin.img;
+        document.getElementById('skinName').innerText = selectedSkin.name;
+    }
+    updateSkinPreview();
+    function showLocker() {
+        let html = '<b>Locker:</b> Kies je skin:<br><div style="display:flex;gap:18px;margin-top:18px;">';
+        skins.forEach(skin => {
+            html += `<img src="${skin.img}" alt="${skin.name}" title="${skin.name}" style="width:64px;height:64px;border-radius:12px;box-shadow:0 2px 8px #00eaff;cursor:pointer;outline:${skin.name === selectedSkin.name ? '3px solid #00eaff' : 'none'}" onclick="selectSkin('${skin.name}')">`;
+        });
+        html += '</div>';
+        document.getElementById('lobbyContent').innerHTML = html;
+    }
+    window.selectSkin = function (name) {
+        selectedSkin = skins.find(s => s.name === name);
+        updateSkinPreview();
+        showLocker();
+    }
+    function showShop() {
+        document.getElementById('lobbyContent').innerHTML = '<b>Shop:</b> <br>Skins: Meowscles, Peely, Raven<br>Emotes: Dab, Floss<br>Pickaxes: Default, Rainbow<br><span style="color:#ffd700">Koop met B-Bucks! (Demo)</span>';
+    }
+    let battlePassLevel = Math.floor(Math.random() * 100) + 1;
+    function showBattlePass() {
+        document.getElementById('lobbyContent').innerHTML = `<b>Battle Pass:</b> Level <span style="color:#00eaff;font-weight:bold;">${battlePassLevel}</span><br>Volgende beloning bij level ${battlePassLevel + 1}!`;
+    }
+    let vbucks = 1000 + Math.floor(Math.random() * 5000);
+    function showVBucks() {
+        document.getElementById('lobbyContent').innerHTML = `<b>B-Bucks:</b> Je hebt <span style="color:#ffd700;font-size:1.2em;font-weight:bold;">${vbucks}</span> B-Bucks!`;
+    }
+
+    // --- GAME LOGIC ---
+    document.getElementById('startBtn').onclick = function () {
+        document.getElementById('instructions').style.display = 'none';
+        document.getElementById('gameCanvas').focus();
+        document.getElementById('healthbar').style.display = '';
+        startGame();
+    };
+
+    function startGame() {
+        // Basic Three.js setup
+        const canvas = document.getElementById('gameCanvas');
+        const renderer = new THREE.WebGLRenderer({ canvas });
+        renderer.setSize(canvas.width, canvas.height);
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x222c3c);
+
+        // Camera & controls
+        const camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+        camera.position.set(0, 2, 10);
+
+        const controls = new THREE.PointerLockControls(camera, canvas);
+
+        canvas.addEventListener('click', () => {
+            controls.lock();
+        });
+
+        controls.addEventListener('lock', () => {
+            document.getElementById('healthbar').style.display = '';
+        });
+
+        // Floor
+        const floorGeometry = new THREE.PlaneGeometry(40, 40);
+        const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x3a4a6d });
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
+
+        // Player
+        const player = {
+            mesh: new THREE.Mesh(
+                new THREE.CapsuleGeometry(0.5, 1.2, 4, 8),
+                new THREE.MeshStandardMaterial({ color: 0x00eaff })
+            ),
+            velocity: new THREE.Vector3(),
+            canJump: true,
+            health: 100
+        };
+        player.mesh.position.set(0, 1, 0);
+        scene.add(player.mesh);
+
+        // Bots
+        const bots = [];
+        for (let i = 0; i < 5; i++) {
+            const bot = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 2, 1),
+                new THREE.MeshStandardMaterial({ color: 0xff4e4e })
+            );
+            bot.position.set(
+                Math.random() * 30 - 15,
+                1,
+                Math.random() * 30 - 15
+            );
+            bot.health = 50;
+            scene.add(bot);
+            bots.push(bot);
+        }
+
+        // Obstacles
+        for (let i = 0; i < 10; i++) {
+            const wall = new THREE.Mesh(
+                new THREE.BoxGeometry(2, Math.random() * 4 + 2, 0.5),
+                new THREE.MeshStandardMaterial({ color: 0x6e7b8b })
+            );
+            wall.position.set(
+                Math.random() * 36 - 18,
+                wall.geometry.parameters.height / 2,
+                Math.random() * 36 - 18
+            );
+            scene.add(wall);
+        }
+
+        // Bullets
+        const bullets = [];
+        function shootBullet() {
+            const bullet = new THREE.Mesh(
+                new THREE.SphereGeometry(0.15, 8, 8),
+                new THREE.MeshStandardMaterial({ color: 0xffff00 })
+            );
+            bullet.position.copy(camera.position);
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+            bullet.userData = { velocity: dir.multiplyScalar(0.7), life: 0 };
+            scene.add(bullet);
+            bullets.push(bullet);
+        }
+
+        // Controls
+        const keys = {};
+        document.addEventListener('keydown', e => { keys[e.code] = true; });
+        document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+        // Mouse click to shoot
+        document.addEventListener('mousedown', e => {
+            if (controls.isLocked && e.button === 0) shootBullet();
+        });
+
+        // Healthbar update
+        function updateHealthBar() {
+            const hp = Math.max(0, Math.floor(player.health));
+            document.getElementById('healthfill').style.width = hp + '%';
+            document.getElementById('healthtext').innerText = hp + ' HP';
+        }
+        updateHealthBar();
+
+        // Bot schiet terug
+        function botShoot(bot) {
+            const bullet = new THREE.Mesh(
+                new THREE.SphereGeometry(0.15, 8, 8),
+                new THREE.MeshStandardMaterial({ color: 0xff4e4e })
+            );
+            bullet.position.copy(bot.position);
+            const dir = new THREE.Vector3().subVectors(player.mesh.position, bot.position).normalize();
+            bullet.userData = { velocity: dir.multiplyScalar(0.5), life: 0, bot: true };
+            scene.add(bullet);
+            bullets.push(bullet);
+        }
+
+        // Game loop
+        let lastTime = performance.now();
+        let lastBotShot = performance.now();
+        function animate() {
+            requestAnimationFrame(animate);
+            const now = performance.now();
+            const dt = Math.min((now - lastTime) / 1000, 0.05);
+            lastTime = now;
+
+            // Player movement
+            if (controls.isLocked) {
+                let move = new THREE.Vector3();
+                if (keys['KeyW']) move.z -= 1;
+                if (keys['KeyS']) move.z += 1;
+                if (keys['KeyA']) move.x -= 1;
+                if (keys['KeyD']) move.x += 1;
+                move.normalize();
+
+                // Move in camera direction
+                const direction = new THREE.Vector3();
+                camera.getWorldDirection(direction);
+                direction.y = 0;
+                direction.normalize();
+
+                const right = new THREE.Vector3().crossVectors(direction, new THREE.Vector3(0, 1, 0));
+                const moveVector = new THREE.Vector3();
+                moveVector.addScaledVector(direction, move.z);
+                moveVector.addScaledVector(right, move.x);
+
+                player.mesh.position.addScaledVector(moveVector, 8 * dt);
+
+                // Gravity
+                if (player.mesh.position.y > 1) {
+                    player.velocity.y -= 20 * dt;
+                    player.mesh.position.y += player.velocity.y * dt;
+                    if (player.mesh.position.y <= 1) {
+                        player.mesh.position.y = 1;
+                        player.velocity.y = 0;
+                        player.canJump = true;
+                    }
+                }
+
+                // Jump
+                if (keys['Space'] && player.canJump) {
+                    player.velocity.y = 8;
+                    player.canJump = false;
+                }
+
+                // Sync camera to player
+                camera.position.copy(player.mesh.position).add(new THREE.Vector3(0, 0.5, 0));
+            }
+
+            // Bots AI
+            bots.forEach(bot => {
+                // Move towards player
+                const dir = new THREE.Vector3().subVectors(player.mesh.position, bot.position);
+                dir.y = 0;
+                if (dir.length() > 2) {
+                    dir.normalize();
+                    bot.position.addScaledVector(dir, 2 * dt);
+                }
+                // Bots schieten
+                if (performance.now() - lastBotShot > 1200) {
+                    botShoot(bot);
+                    lastBotShot = performance.now();
+                }
+            });
+
+            // Bullets update
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const b = bullets[i];
+                b.position.add(b.userData.velocity);
+                b.userData.life += dt;
+                if (b.userData.life > 2) {
+                    scene.remove(b);
+                    bullets.splice(i, 1);
+                    continue;
+                }
+                // Collision with bots
+                for (let j = bots.length - 1; j >= 0; j--) {
+                    const bot = bots[j];
+                    if (!b.userData.bot && b.position.distanceTo(bot.position) < 1) {
+                        bot.health -= 25;
+                        scene.remove(b);
+                        bullets.splice(i, 1);
+                        if (bot.health <= 0) {
+                            scene.remove(bot);
+                            bots.splice(j, 1);
+                        }
+                        break;
+                    }
+                }
+                // Collision with player
+                if (b.userData.bot && b.position.distanceTo(player.mesh.position) < 1) {
+                    player.health -= 20;
+                    updateHealthBar();
+                    scene.remove(b);
+                    bullets.splice(i, 1);
+                    if (player.health <= 0) {
+                        document.getElementById('instructions').innerHTML = '<strong>Game Over!</strong><br>Je bent uitgeschakeld.<br><button onclick="window.location.reload()" style="margin-top:18px;padding:16px 48px;font-size:1.3em;border-radius:12px;background:#ff4e4e;color:#fff;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">Opnieuw spelen</button>';
+                        document.getElementById('instructions').style.display = '';
+                        document.getElementById('healthbar').style.display = 'none';
+                        controls.unlock();
+                    }
+                }
+            }
+
+            // Win/Lose condition
+            if (bots.length === 0) {
+                document.getElementById('instructions').innerHTML = "<strong>Victory Royale!</strong><br>You eliminated all bots!<br><button onclick=\"window.location.reload()\" style=\"margin-top:18px;padding:16px 48px;font-size:1.3em;border-radius:12px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;\">Play Again</button>";
+                document.getElementById('instructions').style.display = '';
+                document.getElementById('healthbar').style.display = 'none';
+                controls.unlock();
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    }
+</script>
 </body>
 
 </html>
