@@ -119,7 +119,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: #232d3f;
+            background: linear-gradient(120deg, #232d3f 60%, #00eaff 100%);
             z-index: 100;
             display: flex;
             flex-direction: column;
@@ -178,27 +178,56 @@
             color: #fff;
             font-size: 1.2em;
         }
+
+        .lobby-tab {
+            padding: 14px 38px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            background: #232d3f;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #0005;
+            margin: 0 8px;
+            transition: background 0.2s;
+        }
+
+        .lobby-tab:hover {
+            background: #00eaff;
+            color: #232d3f;
+        }
     </style>
 </head>
 
 <body>
     <div id="lobby"
-        style="position:absolute;top:0;left:0;width:100vw;height:100vh;background:#232d3f;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-        <h1 style="color:#00eaff;font-size:2.5em;margin-bottom:24px;">Fortnite Lobby</h1>
-        <div style="display:flex;gap:32px;margin-bottom:32px;">
-            <button onclick="showShop()"
-                style="padding:18px 44px;font-size:1.2em;border-radius:12px;background:#4e6fae;color:#fff;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">Shop</button>
-            <button onclick="showLocker()"
-                style="padding:18px 44px;font-size:1.2em;border-radius:12px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">Locker</button>
-            <button onclick="showBattlePass()"
-                style="padding:18px 44px;font-size:1.2em;border-radius:12px;background:#ff4e4e;color:#fff;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">Battle
-                Pass</button>
-            <button onclick="showVBucks()"
-                style="padding:18px 44px;font-size:1.2em;border-radius:12px;background:#ffd700;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 12px #0005;">B-Bucks</button>
+        style="position:absolute;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(120deg,#232d3f 60%,#00eaff 100%);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div
+            style="position:absolute;top:0;left:0;width:100vw;height:100vh;pointer-events:none;background:url('https://cdn.wallpapersafari.com/41/36/1QwQwA.jpg') center/cover no-repeat;opacity:0.25;">
         </div>
-        <button id="playBtn"
-            style="padding:20px 60px;font-size:1.5em;border-radius:16px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 16px #0005;">Play</button>
-        <div id="lobbyContent" style="margin-top:32px;color:#fff;font-size:1.2em;"></div>
+        <div
+            style="position:absolute;top:32px;left:0;width:100vw;display:flex;justify-content:center;gap:48px;z-index:2;">
+            <button onclick="showLocker()" class="lobby-tab">Locker</button>
+            <button onclick="showShop()" class="lobby-tab">Shop</button>
+            <button onclick="showBattlePass()" class="lobby-tab">Battle Pass</button>
+            <button onclick="showVBucks()" class="lobby-tab">B-Bucks</button>
+        </div>
+        <div
+            style="position:absolute;top:32px;right:32px;z-index:2;color:#fff;font-size:1.1em;background:rgba(0,0,0,0.3);padding:8px 24px;border-radius:8px;box-shadow:0 2px 8px #0005;">
+            Updates: Nieuwe skins & events!</div>
+        <div style="position:absolute;left:32px;bottom:32px;z-index:2;">
+            <button id="playBtn"
+                style="padding:20px 60px;font-size:1.5em;border-radius:16px;background:#00eaff;color:#222c3c;border:none;cursor:pointer;box-shadow:0 2px 16px #0005;">Play</button>
+        </div>
+        <div
+            style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;">
+            <img id="skinPreview" src="https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png"
+                style="width:180px;height:180px;border-radius:24px;box-shadow:0 4px 32px #00eaff;" alt="Skin Preview">
+            <div id="skinName"
+                style="margin-top:18px;color:#fff;font-size:1.3em;font-weight:bold;text-shadow:0 2px 8px #0008;">
+                Meowscles</div>
+        </div>
+        <div id="lobbyContent" style="margin-top:32px;color:#fff;font-size:1.2em;z-index:2;"></div>
     </div>
     <div id="instructions">
         <strong>Fortnite 3D - Simple Battle Royale</strong><br>
@@ -520,6 +549,11 @@
             document.getElementById('lobby').style.display = 'none';
             document.getElementById('instructions').style.display = '';
             document.getElementById('gameCanvas').style.display = '';
+            document.getElementById('healthbar').style.display = '';
+            // Start direct het spel
+            if (typeof controls !== 'undefined' && controls.lock) {
+                controls.lock();
+            }
         };
         function showShop() {
             document.getElementById('lobbyContent').innerHTML = '<b>Shop:</b> Koop skins, emotes en meer! (Demo)';
