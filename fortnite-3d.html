@@ -14,7 +14,7 @@
         }
 
         #gameCanvas {
-            display: block;
+            display: none;
             margin: 0 auto;
             background: #222c3c;
             border-radius: 20px;
@@ -22,6 +22,7 @@
         }
 
         #instructions {
+            display: none;
             position: absolute;
             top: 30px;
             left: 50%;
@@ -51,31 +52,6 @@
 
         .back-btn:hover {
             background: #4e6fae;
-        }
-
-        #startBtn {
-            margin-top: 18px;
-            padding: 16px 48px;
-            font-size: 1.3em;
-            border-radius: 12px;
-            background: #00eaff;
-            color: #222c3c;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 12px #0005;
-        }
-
-        #debug {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            color: #fff;
-            background: #000a;
-            padding: 8px 16px;
-            border-radius: 8px;
-            z-index: 100;
-            font-size: 1em;
-            display: none;
         }
 
         #healthbar {
@@ -241,9 +217,6 @@
     </div>
     <button class="back-btn" onclick="window.location.href='/'">Back to Game Hub</button>
     <canvas id="gameCanvas" width="960" height="600"></canvas>
-    <div id="debug"
-        style="position:fixed;bottom:10px;left:10px;color:#fff;background:#000a;padding:8px 16px;border-radius:8px;z-index:100;font-size:1em;display:none">
-    </div>
     <div id="healthbar"
         style="position:absolute;top:16px;left:16px;width:220px;height:32px;background:#222c3c;border-radius:8px;box-shadow:0 2px 8px #0005;z-index:20;display:none">
         <div id="healthfill" style="height:100%;background:#00eaff;border-radius:8px;width:100%;transition:width 0.2s;">
@@ -255,22 +228,74 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/PointerLockControls.js"></script>
     <script>
-        function showDebug(msg) {
-            var d = document.getElementById('debug');
-            d.innerText = msg;
-            d.style.display = 'block';
+        // --- LOBBY LOGIC ---
+        function showLobby() {
+            document.getElementById('lobby').style.display = '';
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('healthbar').style.display = 'none';
+            document.getElementById('gameCanvas').style.display = 'none';
         }
-        window.onerror = function (msg, url, line, col, error) {
-            showDebug('JS Error: ' + msg + ' (' + line + ':' + col + ')');
+        function showGame() {
+            document.getElementById('lobby').style.display = 'none';
+            document.getElementById('instructions').style.display = '';
+            document.getElementById('gameCanvas').style.display = '';
+            document.getElementById('healthbar').style.display = 'none';
+        }
+        document.getElementById('playBtn').onclick = showGame;
+        showLobby();
+
+        // Skins data
+        const skins = [
+            { name: 'Meowscles', img: 'https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png' },
+            { name: 'Peely', img: 'https://fortnite-api.com/images/cosmetics/br/character_banana/icon.png' },
+            { name: 'Jonesy', img: 'https://fortnite-api.com/images/cosmetics/br/character_jonesy/icon.png' },
+            { name: 'Raven', img: 'https://fortnite-api.com/images/cosmetics/br/character_raven/icon.png' },
+            { name: 'Fishstick', img: 'https://fortnite-api.com/images/cosmetics/br/character_fishstick/icon.png' }
+        ];
+        let selectedSkin = skins[Math.floor(Math.random() * skins.length)];
+        function updateSkinPreview() {
+            document.getElementById('skinPreview').src = selectedSkin.img;
+            document.getElementById('skinName').innerText = selectedSkin.name;
+        }
+        updateSkinPreview();
+        function showLocker() {
+            let html = '<b>Locker:</b> Kies je skin:<br><div style="display:flex;gap:18px;margin-top:18px;">';
+            skins.forEach(skin => {
+                html += `<img src="${skin.img}" alt="${skin.name}" title="${skin.name}" style="width:64px;height:64px;border-radius:12px;box-shadow:0 2px 8px #00eaff;cursor:pointer;outline:${skin.name === selectedSkin.name ? '3px solid #00eaff' : 'none'}" onclick="selectSkin('${skin.name}')">`;
+            });
+            html += '</div>';
+            document.getElementById('lobbyContent').innerHTML = html;
+        }
+        window.selectSkin = function (name) {
+            selectedSkin = skins.find(s => s.name === name);
+            updateSkinPreview();
+            showLocker();
+        }
+        function showShop() {
+            document.getElementById('lobbyContent').innerHTML = '<b>Shop:</b> <br>Skins: Meowscles, Peely, Raven<br>Emotes: Dab, Floss<br>Pickaxes: Default, Rainbow<br><span style="color:#ffd700">Koop met B-Bucks! (Demo)</span>';
+        }
+        let battlePassLevel = Math.floor(Math.random() * 100) + 1;
+        function showBattlePass() {
+            document.getElementById('lobbyContent').innerHTML = `<b>Battle Pass:</b> Level <span style="color:#00eaff;font-weight:bold;">${battlePassLevel}</span><br>Volgende beloning bij level ${battlePassLevel + 1}!`;
+        }
+        let vbucks = 1000 + Math.floor(Math.random() * 5000);
+        function showVBucks() {
+            document.getElementById('lobbyContent').innerHTML = `<b>B-Bucks:</b> Je hebt <span style="color:#ffd700;font-size:1.2em;font-weight:bold;">${vbucks}</span> B-Bucks!`;
+        }
+
+        // --- GAME LOGIC ---
+        document.getElementById('startBtn').onclick = function () {
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('gameCanvas').focus();
+            document.getElementById('healthbar').style.display = '';
+            startGame();
         };
-        try {
+
+        function startGame() {
             // Basic Three.js setup
             const canvas = document.getElementById('gameCanvas');
             const renderer = new THREE.WebGLRenderer({ canvas });
             renderer.setSize(canvas.width, canvas.height);
-            if (!renderer.capabilities.isWebGL2 && !renderer.capabilities.isWebGL) {
-                showDebug('WebGL wordt niet ondersteund in deze browser. Probeer Chrome of Edge.');
-            }
 
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x222c3c);
@@ -281,34 +306,12 @@
 
             const controls = new THREE.PointerLockControls(camera, canvas);
 
-            const startBtn = document.getElementById('startBtn');
-            const startHelp = document.getElementById('startHelp');
-            startBtn.addEventListener('click', () => {
-                document.getElementById('instructions').style.display = 'none';
-                document.getElementById('gameCanvas').focus();
+            canvas.addEventListener('click', () => {
                 controls.lock();
-                setTimeout(() => {
-                    if (!controls.isLocked) {
-                        startHelp.style.display = '';
-                    }
-                }, 500);
             });
-            document.getElementById('gameCanvas').addEventListener('click', () => {
-                controls.lock();
-                startHelp.style.display = 'none';
-            });
+
             controls.addEventListener('lock', () => {
-                document.getElementById('instructions').style.display = 'none';
-                startHelp.style.display = 'none';
                 document.getElementById('healthbar').style.display = '';
-                updateHealthBar();
-            });
-            controls.addEventListener('unlock', () => {
-                /* instructies blijven weg */
-            });
-            document.body.addEventListener('click', () => {
-                document.getElementById('instructions').style.display = 'none';
-                controls.lock();
             });
 
             // Floor
@@ -394,18 +397,13 @@
                 if (controls.isLocked && e.button === 0) shootBullet();
             });
 
-            // Toon healthbar bij start
+            // Healthbar update
             function updateHealthBar() {
                 const hp = Math.max(0, Math.floor(player.health));
                 document.getElementById('healthfill').style.width = hp + '%';
                 document.getElementById('healthtext').innerText = hp + ' HP';
             }
-            controls.addEventListener('lock', () => {
-                document.getElementById('instructions').style.display = 'none';
-                startHelp.style.display = 'none';
-                document.getElementById('healthbar').style.display = '';
-                updateHealthBar();
-            });
+            updateHealthBar();
 
             // Bot schiet terug
             function botShoot(bot) {
@@ -422,6 +420,7 @@
 
             // Game loop
             let lastTime = performance.now();
+            let lastBotShot = performance.now();
             function animate() {
                 requestAnimationFrame(animate);
                 const now = performance.now();
@@ -472,7 +471,6 @@
                 }
 
                 // Bots AI
-                let lastBotShot = performance.now();
                 bots.forEach(bot => {
                     // Move towards player
                     const dir = new THREE.Vector3().subVectors(player.mesh.position, bot.position);
@@ -538,70 +536,7 @@
                 renderer.render(scene, camera);
             }
             animate();
-        } catch (e) {
-            showDebug('Fout: ' + e.message);
         }
-        document.getElementById('lobby').style.display = '';
-        document.getElementById('instructions').style.display = 'none';
-        document.getElementById('healthbar').style.display = 'none';
-        document.getElementById('gameCanvas').style.display = 'none';
-        document.getElementById('playBtn').onclick = function () {
-            document.getElementById('lobby').style.display = 'none';
-            document.getElementById('instructions').style.display = '';
-            document.getElementById('gameCanvas').style.display = '';
-            document.getElementById('healthbar').style.display = '';
-            if (window.controls && typeof controls.lock === 'function') {
-                controls.lock();
-            }
-        };
-        // Skins data
-        const skins = [
-            { name: 'Meowscles', img: 'https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png' },
-            { name: 'Peely', img: 'https://fortnite-api.com/images/cosmetics/br/character_banana/icon.png' },
-            { name: 'Jonesy', img: 'https://fortnite-api.com/images/cosmetics/br/character_jonesy/icon.png' },
-            { name: 'Raven', img: 'https://fortnite-api.com/images/cosmetics/br/character_raven/icon.png' },
-            { name: 'Fishstick', img: 'https://fortnite-api.com/images/cosmetics/br/character_fishstick/icon.png' }
-        ];
-        let selectedSkin = skins[Math.floor(Math.random() * skins.length)];
-        function updateSkinPreview() {
-            document.getElementById('skinPreview').src = selectedSkin.img;
-            document.getElementById('skinName').innerText = selectedSkin.name;
-            document.getElementById('skinPreview').style.animation = 'popSkin 0.5s';
-            setTimeout(() => { document.getElementById('skinPreview').style.animation = ''; }, 500);
-        }
-        updateSkinPreview();
-        // Locker: skin selectie
-        function showLocker() {
-            let html = '<b>Locker:</b> Kies je skin:<br><div style="display:flex;gap:18px;margin-top:18px;">';
-            skins.forEach(skin => {
-                html += `<img src="${skin.img}" alt="${skin.name}" title="${skin.name}" style="width:64px;height:64px;border-radius:12px;box-shadow:0 2px 8px #00eaff;cursor:pointer;outline:${skin.name === selectedSkin.name ? '3px solid #00eaff' : 'none'}" onclick="selectSkin('${skin.name}')">`;
-            });
-            html += '</div>';
-            document.getElementById('lobbyContent').innerHTML = html;
-        }
-        window.selectSkin = function (name) {
-            selectedSkin = skins.find(s => s.name === name);
-            updateSkinPreview();
-            showLocker();
-        }
-        // Shop: echte items
-        function showShop() {
-            document.getElementById('lobbyContent').innerHTML = '<b>Shop:</b> <br>Skins: Meowscles, Peely, Raven<br>Emotes: Dab, Floss<br>Pickaxes: Default, Rainbow<br><span style="color:#ffd700">Koop met B-Bucks! (Demo)</span>';
-        }
-        // Battle Pass: voortgang
-        let battlePassLevel = Math.floor(Math.random() * 100) + 1;
-        function showBattlePass() {
-            document.getElementById('lobbyContent').innerHTML = `<b>Battle Pass:</b> Level <span style="color:#00eaff;font-weight:bold;">${battlePassLevel}</span><br>Volgende beloning bij level ${battlePassLevel + 1}!`;
-        }
-        // B-Bucks teller
-        let vbucks = 1000 + Math.floor(Math.random() * 5000);
-        function showVBucks() {
-            document.getElementById('lobbyContent').innerHTML = `<b>B-Bucks:</b> Je hebt <span style="color:#ffd700;font-size:1.2em;font-weight:bold;">${vbucks}</span> B-Bucks!`;
-        }
-        // Animatie skin
-        const style = document.createElement('style');
-        style.innerHTML = `@keyframes popSkin {0%{transform:scale(1);}50%{transform:scale(1.15);}100%{transform:scale(1);}}`;
-        document.head.appendChild(style);
     </script>
 </body>
 
