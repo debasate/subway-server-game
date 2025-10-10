@@ -550,23 +550,58 @@
             document.getElementById('instructions').style.display = '';
             document.getElementById('gameCanvas').style.display = '';
             document.getElementById('healthbar').style.display = '';
-            // Start direct het spel
-            if (typeof controls !== 'undefined' && controls.lock) {
+            if (window.controls && typeof controls.lock === 'function') {
                 controls.lock();
             }
         };
-        function showShop() {
-            document.getElementById('lobbyContent').innerHTML = '<b>Shop:</b> Koop skins, emotes en meer! (Demo)';
+        // Skins data
+        const skins = [
+            { name: 'Meowscles', img: 'https://fortnite-api.com/images/cosmetics/br/character_cattus/icon.png' },
+            { name: 'Peely', img: 'https://fortnite-api.com/images/cosmetics/br/character_banana/icon.png' },
+            { name: 'Jonesy', img: 'https://fortnite-api.com/images/cosmetics/br/character_jonesy/icon.png' },
+            { name: 'Raven', img: 'https://fortnite-api.com/images/cosmetics/br/character_raven/icon.png' },
+            { name: 'Fishstick', img: 'https://fortnite-api.com/images/cosmetics/br/character_fishstick/icon.png' }
+        ];
+        let selectedSkin = skins[Math.floor(Math.random() * skins.length)];
+        function updateSkinPreview() {
+            document.getElementById('skinPreview').src = selectedSkin.img;
+            document.getElementById('skinName').innerText = selectedSkin.name;
+            document.getElementById('skinPreview').style.animation = 'popSkin 0.5s';
+            setTimeout(() => { document.getElementById('skinPreview').style.animation = ''; }, 500);
         }
+        updateSkinPreview();
+        // Locker: skin selectie
         function showLocker() {
-            document.getElementById('lobbyContent').innerHTML = '<b>Locker:</b> Bekijk en selecteer je skins! (Demo)';
+            let html = '<b>Locker:</b> Kies je skin:<br><div style="display:flex;gap:18px;margin-top:18px;">';
+            skins.forEach(skin => {
+                html += `<img src="${skin.img}" alt="${skin.name}" title="${skin.name}" style="width:64px;height:64px;border-radius:12px;box-shadow:0 2px 8px #00eaff;cursor:pointer;outline:${skin.name === selectedSkin.name ? '3px solid #00eaff' : 'none'}" onclick="selectSkin('${skin.name}')">`;
+            });
+            html += '</div>';
+            document.getElementById('lobbyContent').innerHTML = html;
         }
+        window.selectSkin = function (name) {
+            selectedSkin = skins.find(s => s.name === name);
+            updateSkinPreview();
+            showLocker();
+        }
+        // Shop: echte items
+        function showShop() {
+            document.getElementById('lobbyContent').innerHTML = '<b>Shop:</b> <br>Skins: Meowscles, Peely, Raven<br>Emotes: Dab, Floss<br>Pickaxes: Default, Rainbow<br><span style="color:#ffd700">Koop met B-Bucks! (Demo)</span>';
+        }
+        // Battle Pass: voortgang
+        let battlePassLevel = Math.floor(Math.random() * 100) + 1;
         function showBattlePass() {
-            document.getElementById('lobbyContent').innerHTML = '<b>Battle Pass:</b> Bekijk je voortgang en beloningen! (Demo)';
+            document.getElementById('lobbyContent').innerHTML = `<b>Battle Pass:</b> Level <span style="color:#00eaff;font-weight:bold;">${battlePassLevel}</span><br>Volgende beloning bij level ${battlePassLevel + 1}!`;
         }
+        // B-Bucks teller
+        let vbucks = 1000 + Math.floor(Math.random() * 5000);
         function showVBucks() {
-            document.getElementById('lobbyContent').innerHTML = '<b>B-Bucks:</b> Je hebt <span style="color:#ffd700">1000</span> B-Bucks! (Demo)';
+            document.getElementById('lobbyContent').innerHTML = `<b>B-Bucks:</b> Je hebt <span style="color:#ffd700;font-size:1.2em;font-weight:bold;">${vbucks}</span> B-Bucks!`;
         }
+        // Animatie skin
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes popSkin {0%{transform:scale(1);}50%{transform:scale(1.15);}100%{transform:scale(1);}}`;
+        document.head.appendChild(style);
     </script>
 </body>
 
